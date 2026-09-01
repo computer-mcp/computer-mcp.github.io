@@ -32,6 +32,13 @@ test("ships complete metadata and the GitHub Pages root contract", async ({ page
   await expect((await request.get("/og-image.png")).status()).toBe(200);
   await expect((await request.get("/favicon.svg")).status()).toBe(200);
   await expect((await request.get("/site.webmanifest")).status()).toBe(200);
+  const releaseResponse = await request.get("/release.json");
+  expect(releaseResponse.status()).toBe(200);
+  expect(await releaseResponse.json()).toMatchObject({
+    product: "Computer MCP",
+    version: "1.0.24",
+    release_tag: "v1.0.24",
+  });
   expect(existsSync("public/CNAME"), "A custom-domain CNAME must not be present.").toBe(false);
 });
 
