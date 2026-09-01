@@ -46,6 +46,29 @@ window.addEventListener("scroll", updateHeader, { passive: true });
 
 let toastTimer;
 
+const showCopyStatus = (message) => {
+  if (!(copyToast instanceof HTMLElement)) {
+    return;
+  }
+
+  copyToast.textContent = message;
+  copyToast.classList.add("visible");
+};
+
+const selectCommandText = (control) => {
+  const command = control.parentElement?.querySelector("code");
+  const selection = window.getSelection();
+  if (!(command instanceof HTMLElement) || !selection) {
+    return false;
+  }
+
+  const range = document.createRange();
+  range.selectNodeContents(command);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  return selection.toString() === command.textContent;
+};
+
 document.querySelectorAll("[data-copy]").forEach((control) => {
   if (!(control instanceof HTMLButtonElement)) {
     return;
@@ -63,19 +86,22 @@ document.querySelectorAll("[data-copy]").forEach((control) => {
     try {
       await navigator.clipboard.writeText(value);
       control.textContent = "Copied";
-      if (copyToast instanceof HTMLElement) {
-        copyToast.classList.add("visible");
-      }
+      showCopyStatus("Copied");
       window.clearTimeout(toastTimer);
       toastTimer = window.setTimeout(() => {
         control.textContent = defaultLabel;
         copyToast?.classList.remove("visible");
       }, 1600);
     } catch {
-      control.textContent = "Select text";
+      const selected = selectCommandText(control);
+      control.textContent = selected ? "Text selected" : "Copy unavailable";
+      showCopyStatus(
+        selected ? "Clipboard unavailable. Command selected." : "Clipboard unavailable.",
+      );
       window.clearTimeout(toastTimer);
       toastTimer = window.setTimeout(() => {
         control.textContent = defaultLabel;
+        copyToast?.classList.remove("visible");
       }, 1600);
     }
   });

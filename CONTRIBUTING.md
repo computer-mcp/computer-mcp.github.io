@@ -7,6 +7,7 @@ Before opening a pull request:
 
 ```sh
 npm ci
+npm run test:install
 npm run check
 ```
 

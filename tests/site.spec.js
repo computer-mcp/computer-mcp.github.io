@@ -61,8 +61,11 @@ test("has no automated accessibility violations", async ({ page }) => {
   expect(violations).toEqual([]);
 });
 
-test("supports keyboard navigation and command copy", async ({ page, browserName }) => {
+test("supports keyboard navigation and command copy", async ({ context, page, browserName }) => {
   test.skip(browserName !== "chromium", "Clipboard behavior is validated in Chromium.");
+  await context.grantPermissions(["clipboard-read", "clipboard-write"], {
+    origin: "http://127.0.0.1:4173",
+  });
   await page.goto("/");
 
   await page.keyboard.press("Tab");
@@ -73,6 +76,30 @@ test("supports keyboard navigation and command copy", async ({ page, browserName
   await copy.click();
   await expect(copy).toHaveText("Copied");
   await expect(page.getByRole("status")).toHaveText("Copied");
+});
+
+test("selects the command when clipboard access is unavailable", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async () => {
+          throw new DOMException("Clipboard access denied", "NotAllowedError");
+        },
+      },
+    });
+  });
+  await page.goto("/");
+
+  const copy = page.getByRole("button", { name: "Copy workspace.list" });
+  await copy.click();
+
+  await expect(copy).toHaveText("Text selected");
+  await expect(page.getByRole("status")).toHaveText("Clipboard unavailable. Command selected.");
+  await expect(copy).toBeFocused();
+  await expect
+    .poll(() => page.evaluate(() => window.getSelection()?.toString()))
+    .toBe("workspace.list");
 });
 
 test("mobile menu opens, closes with Escape, and does not overflow", async ({ page }, testInfo) => {
