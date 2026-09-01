@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+  <title id="title">Computer MCP</title>
+  <desc id="description">Controlled local execution for AI agents</desc>
+  <defs>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#171a17" stroke-opacity=".08"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#f2f0e9"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect x="72" y="70" width="56" height="56" fill="#171a17"/>
+  <rect x="82" y="80" width="36" height="36" fill="none" stroke="#f2f0e9" stroke-width="3"/>
+  <path d="M94 83v30M106 83v30" stroke="#f2f0e9" stroke-width="3"/>
+  <path d="M96 83h8v30h-8z" fill="#e65332"/>
+  <text x="148" y="108" fill="#171a17" font-family="Arial, sans-serif" font-size="28" font-weight="700">Computer MCP</text>
+  <text x="72" y="230" fill="#171a17" font-family="Arial, sans-serif" font-size="72" font-weight="700" letter-spacing="-3">Your agents can act locally.</text>
+  <text x="72" y="310" fill="#e65332" font-family="Georgia, serif" font-size="74" font-style="italic">You keep the boundary.</text>
+  <text x="76" y="377" fill="#454a43" font-family="Arial, sans-serif" font-size="27">Policy-controlled · workspace-scoped · locally executed</text>
+  <g transform="translate(72 448)">
+    <rect width="270" height="74" fill="#171a17"/>
+    <text x="24" y="31" fill="#b7ed52" font-family="monospace" font-size="16" font-weight="700">AI CLIENT</text>
+    <text x="24" y="55" fill="#f2f0e9" font-family="monospace" font-size="15">ChatGPT · Codex · MCP</text>
+    <path d="M290 37h70" stroke="#e65332" stroke-width="4"/>
+    <path d="m350 27 14 10-14 10" fill="none" stroke="#e65332" stroke-width="4"/>
+    <rect x="382" width="300" height="74" fill="#f9f8f3" stroke="#171a17" stroke-width="2"/>
+    <text x="406" y="31" fill="#676b64" font-family="monospace" font-size="16" font-weight="700">POLICY + APPROVAL</text>
+    <text x="406" y="55" fill="#171a17" font-family="monospace" font-size="15">registered scope only</text>
+    <path d="M702 37h70" stroke="#e65332" stroke-width="4"/>
+    <path d="m762 27 14 10-14 10" fill="none" stroke="#e65332" stroke-width="4"/>
+    <rect x="794" width="270" height="74" fill="#b7ed52" stroke="#171a17" stroke-width="2"/>
+    <text x="818" y="31" fill="#26704c" font-family="monospace" font-size="16" font-weight="700">LOCAL RESULT</text>
+    <text x="818" y="55" fill="#171a17" font-family="monospace" font-size="15">bounded + audited</text>
+  </g>
+  <rect x="0" y="602" width="1200" height="28" fill="#171a17"/>
+  <rect x="0" y="602" width="320" height="28" fill="#e65332"/>
+</svg>

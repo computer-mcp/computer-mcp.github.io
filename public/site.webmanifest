@@ -1,0 +1,17 @@
+{
+  "name": "Computer MCP",
+  "short_name": "Computer MCP",
+  "description": "A policy-controlled, workspace-scoped local execution gateway for AI agents.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f2f0e9",
+  "theme_color": "#f2f0e9",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

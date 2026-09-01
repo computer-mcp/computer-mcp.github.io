@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Computer MCP — Controlled local execution for AI agents</title>
+    <meta
+      name="description"
+      content="Connect ChatGPT, Codex, and other MCP clients to registered local workspaces and tools through explicit policy, approval, and audit boundaries."
+    />
+    <meta name="theme-color" content="#f2f0e9" />
+    <meta name="color-scheme" content="light" />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://computer-mcp.github.io/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Computer MCP" />
+    <meta property="og:title" content="Controlled local execution for AI agents" />
+    <meta
+      property="og:description"
+      content="A policy-controlled, workspace-scoped local execution gateway for ChatGPT, Codex, and other MCP clients."
+    />
+    <meta property="og:url" content="https://computer-mcp.github.io/" />
+    <meta property="og:image" content="https://computer-mcp.github.io/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Computer MCP policy path from agent to local tools" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Computer MCP" />
+    <meta
+      name="twitter:description"
+      content="Controlled, workspace-scoped local execution for AI agents."
+    />
+    <meta name="twitter:image" content="https://computer-mcp.github.io/og-image.png" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <header class="site-header" data-header>
+      <div class="nav-shell">
+        <a class="brand" href="#top" aria-label="Computer MCP home">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>Computer MCP</span>
+        </a>
+        <button
+          class="menu-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="primary-nav"
+          data-menu-toggle
+        >
+          <span class="sr-only">Toggle navigation</span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+        <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation" data-menu>
+          <a href="#workflow">How it works</a>
+          <a href="#capabilities">Capabilities</a>
+          <a href="#security">Security</a>
+          <a href="#codex-remote">Codex Remote</a>
+          <a class="nav-cta" href="#get-started">Get started</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <section id="top" class="hero section-shell">
+        <div class="hero-copy">
+          <p class="eyebrow">
+            <span class="pulse" aria-hidden="true"></span> Local execution, governed
+          </p>
+          <h1>Your agents can act locally.<br /><em>You keep the boundary.</em></h1>
+          <p class="hero-lede">
+            Computer MCP connects ChatGPT, Codex, and other MCP clients to registered workspaces,
+            CLIs, desktop applications, and development tools—without exposing an unrestricted
+            remote shell.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#get-started">
+              Get started
+              <span aria-hidden="true">↘</span>
+            </a>
+            <a class="button button-secondary" href="https://github.com/computer-mcp/computer-mcp">
+              View on GitHub
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+          <ul class="hero-notes" aria-label="Product facts">
+            <li>macOS 14+</li>
+            <li>Local-first</li>
+            <li>Source-visible</li>
+          </ul>
+        </div>
+
+        <div class="control-surface" role="img" aria-label="Example Computer MCP policy path">
+          <div class="surface-chrome">
+            <span>CONTROL PATH</span>
+            <span class="surface-state"><i aria-hidden="true"></i> VERIFIED</span>
+          </div>
+          <div class="request-card">
+            <div class="request-origin">
+              <span class="mono-label">CALLER</span>
+              <strong>ChatGPT</strong>
+              <small>secure-tunnel</small>
+            </div>
+            <span class="flow-arrow" aria-hidden="true">→</span>
+            <div class="request-target">
+              <span class="mono-label">CAPABILITY</span>
+              <strong>git.commit</strong>
+              <small>workspace · project-alpha</small>
+            </div>
+          </div>
+          <div class="policy-stack">
+            <div class="policy-row passed">
+              <span class="row-index">01</span>
+              <span>Caller and profile</span>
+              <strong>PASS</strong>
+            </div>
+            <div class="policy-row passed">
+              <span class="row-index">02</span>
+              <span>Registered workspace</span>
+              <strong>PASS</strong>
+            </div>
+            <div class="policy-row review">
+              <span class="row-index">03</span>
+              <span>Action consent</span>
+              <strong>REVIEW</strong>
+            </div>
+            <div class="policy-row queued">
+              <span class="row-index">04</span>
+              <span>Execute + audit</span>
+              <strong>QUEUED</strong>
+            </div>
+          </div>
+          <div class="surface-footer">
+            <span>request · 4c8e…91af</span>
+            <span>policy ≠ approval</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="proof-line" aria-label="Core guarantees">
+        <div class="section-shell proof-grid">
+          <p><span>01</span> Registered workspaces</p>
+          <p><span>02</span> Capability profiles</p>
+          <p><span>03</span> Explicit approvals</p>
+          <p><span>04</span> Correlated audit</p>
+        </div>
+      </section>
+
+      <section id="problem" class="section-shell section-block split-intro">
+        <div>
+          <p class="eyebrow">The access gap</p>
+          <h2>Reasoning is remote.<br />Your working context is local.</h2>
+        </div>
+        <div class="intro-copy">
+          <p>
+            AI clients can plan and reason, but useful work often depends on local repositories,
+            private files, installed tools, desktop applications, and authenticated developer
+            workflows.
+          </p>
+          <p>
+            A remote shell is too broad. One-off integrations do not scale. Computer MCP puts a
+            deterministic gateway between the client and the machine so every local action has a
+            known route and a bounded authority.
+          </p>
+        </div>
+      </section>
+
+      <section id="workflow" class="workflow-section section-block">
+        <div class="section-shell">
+          <div class="section-heading">
+            <p class="eyebrow">One request, seven checks</p>
+            <h2>From agent intent to a bounded local result.</h2>
+            <p>
+              The gateway routes tools; it does not silently invent authority, select a workspace,
+              or rewrite the requested operation.
+            </p>
+          </div>
+
+          <ol class="workflow-grid">
+            <li>
+              <span class="step-number">01</span>
+              <h3>AI client</h3>
+              <p>ChatGPT, Codex, or another MCP-compatible client requests an exact tool.</p>
+            </li>
+            <li>
+              <span class="step-number">02</span>
+              <h3>Authenticate</h3>
+              <p>The connection is bound to a known local, tunnel, or reviewed remote caller.</p>
+            </li>
+            <li>
+              <span class="step-number">03</span>
+              <h3>Apply profile</h3>
+              <p>A capability-scoped profile defines what this caller can discover and invoke.</p>
+            </li>
+            <li>
+              <span class="step-number">04</span>
+              <h3>Resolve scope</h3>
+              <p>The request targets a registered workspace, tool, CLI, app, or provider.</p>
+            </li>
+            <li>
+              <span class="step-number">05</span>
+              <h3>Approve risk</h3>
+              <p>Allowed higher-risk actions pause for explicit, durable consent.</p>
+            </li>
+            <li>
+              <span class="step-number">06</span>
+              <h3>Execute locally</h3>
+              <p>A typed adapter runs with bounded input, output, time, and lifecycle resources.</p>
+            </li>
+            <li>
+              <span class="step-number">07</span>
+              <h3>Return + audit</h3>
+              <p>The client receives a structured result linked to a redacted audit receipt.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section id="capabilities" class="section-shell section-block">
+        <div class="section-heading heading-row">
+          <div>
+            <p class="eyebrow">Capability planes</p>
+            <h2>A control plane, not a tool pile.</h2>
+          </div>
+          <p>
+            Bring deterministic local capabilities under one workspace, policy, approval, and audit
+            model.
+          </p>
+        </div>
+
+        <div class="capability-grid">
+          <article class="capability-card capability-wide">
+            <div class="card-index">A / SCOPE</div>
+            <h3>Workspace-scoped access</h3>
+            <p>
+              Register folders with stable identities. Every relevant call resolves inside an
+              allowed workspace; ambiguous multi-workspace requests must name their target.
+            </p>
+            <div class="scope-visual" aria-hidden="true">
+              <span>~/Projects</span>
+              <div>
+                <i></i>
+                <strong>vehicleOS</strong>
+                <small>registered · read/write</small>
+              </div>
+              <div class="muted">
+                <i></i>
+                <strong>Personal</strong>
+                <small>not granted</small>
+              </div>
+            </div>
+          </article>
+
+          <article class="capability-card">
+            <div class="card-index">B / EXTEND</div>
+            <h3>CLIs, MCPs, and Skills</h3>
+            <p>
+              Register exact local commands, compose reviewed downstream MCP tools, and expose
+              bounded Skill packages without flattening everything into shell text.
+            </p>
+            <ul class="tag-list" aria-label="Adapter types">
+              <li>CLI</li>
+              <li>MCP</li>
+              <li>SKILL</li>
+              <li>BUILTIN</li>
+            </ul>
+          </article>
+
+          <article class="capability-card dark-card">
+            <div class="card-index">C / GOVERN</div>
+            <h3>Policy and approvals</h3>
+            <p>
+              Policy decides whether a capability exists for the caller. Consent decides whether an
+              allowed higher-risk action can proceed now.
+            </p>
+            <div class="logic-line" role="img" aria-label="Policy and approval relationship">
+              <span>ALLOW</span>
+              <i aria-hidden="true">∧</i>
+              <span>APPROVE</span>
+              <i aria-hidden="true">→</i>
+              <strong>RUN</strong>
+            </div>
+          </article>
+
+          <article class="capability-card">
+            <div class="card-index">D / OBSERVE</div>
+            <h3>Correlated audit</h3>
+            <p>
+              Follow a request across caller, approval, operation ticket, adapter execution, and
+              result without retaining credentials or unrestricted payloads.
+            </p>
+            <div class="audit-lines" aria-hidden="true">
+              <span style="--line: 92%"></span>
+              <span style="--line: 68%"></span>
+              <span style="--line: 81%"></span>
+              <span style="--line: 44%"></span>
+            </div>
+          </article>
+
+          <article class="capability-card capability-wide codex-card">
+            <div>
+              <div class="card-index">E / ORCHESTRATE · EXPERIMENTAL</div>
+              <h3>Optional Codex execution</h3>
+              <p>
+                Run App Server, Exec, or MCP lifecycles with owned process groups, durable
+                approvals, official Goal passthrough, thread handoff diagnostics, acceptance
+                evidence, and exclusive worktree leases.
+              </p>
+            </div>
+            <div class="runtime-visual" aria-hidden="true">
+              <div><span>runtime</span><strong>OWNED</strong></div>
+              <div><span>thread</span><strong>LOADED</strong></div>
+              <div><span>acceptance</span><strong>3 / 4</strong></div>
+              <div><span>next</span><strong>TEST</strong></div>
+            </div>
+          </article>
+
+          <article class="capability-card">
+            <div class="card-index">F / OPERATE</div>
+            <h3>Desktop and system tools</h3>
+            <p>
+              Use typed local capabilities and bounded Computer Use. Accessibility and Screen
+              Recording preflight only the operations that actually need them.
+            </p>
+            <div class="permission-row">
+              <span>SCREEN</span>
+              <span>ACCESS</span>
+              <strong>ASK</strong>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="use-cases" class="use-case-section section-block">
+        <div class="section-shell">
+          <div class="section-heading heading-row">
+            <div>
+              <p class="eyebrow">Real workflows</p>
+              <h2>Local context. Deliberate action.</h2>
+            </div>
+            <p>Computer MCP is most useful when one task crosses several local trust boundaries.</p>
+          </div>
+
+          <div class="use-case-list">
+            <article>
+              <span class="use-index">01</span>
+              <div>
+                <h3>ChatGPT researches. Codex implements.</h3>
+                <p>
+                  ChatGPT gathers local project context, starts or steers Codex, and tracks
+                  acceptance evidence while each tool remains bound to the same registered
+                  workspace.
+                </p>
+              </div>
+              <span class="case-label">MULTI-AGENT</span>
+            </article>
+            <article>
+              <span class="use-index">02</span>
+              <div>
+                <h3>Governed development changes.</h3>
+                <p>
+                  An agent edits files, reviews the diff, requests approval, stages, commits with
+                  hooks, and proves a clean worktree—without implicit push.
+                </p>
+              </div>
+              <span class="case-label">GIT + CLI</span>
+            </article>
+            <article>
+              <span class="use-index">03</span>
+              <div>
+                <h3>Remote intent, local execution.</h3>
+                <p>
+                  A remote client reaches a loopback-owned gateway through a reviewed tunnel.
+                  Sensitive execution remains on the Mac; the caller receives only bounded results.
+                </p>
+              </div>
+              <span class="case-label">TUNNEL</span>
+            </article>
+            <article>
+              <span class="use-index">04</span>
+              <div>
+                <h3>Desktop workflows with explicit TCC.</h3>
+                <p>
+                  Observe or control a local application through typed Computer Use operations after
+                  the installed signed App has the exact macOS permission required.
+                </p>
+              </div>
+              <span class="case-label">COMPUTER USE</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="security" class="security-section section-block">
+        <div class="section-shell security-layout">
+          <div class="security-copy">
+            <p class="eyebrow light">Trust model</p>
+            <h2>Permission is a path,<br />not a switch.</h2>
+            <p>
+              Computer MCP separates what a caller may ever do from whether a risky allowed action
+              may happen now. Neither tunnels nor approvals bypass the gateway policy.
+            </p>
+            <a
+              class="text-link light-link"
+              href="https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Architecture/SecurityAndPrivacy.md"
+            >
+              Read the security architecture <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+
+          <div class="security-rules">
+            <article>
+              <span class="rule-mark" aria-hidden="true">LOCAL</span>
+              <div>
+                <h3>What stays local</h3>
+                <p>
+                  Credentials, CLI execution, desktop control, and Codex child processes remain on
+                  the registered Mac. Workspace data crosses an active transport only through the
+                  bounded result of an invoked tool.
+                </p>
+              </div>
+            </article>
+            <article>
+              <span class="rule-mark" aria-hidden="true">BOUND</span>
+              <div>
+                <h3>What is registered</h3>
+                <p>
+                  Workspaces, profiles, callers, capabilities, CLIs, downstream tools, and remote
+                  transports are explicit inputs—not ambient authority.
+                </p>
+              </div>
+            </article>
+            <article>
+              <span class="rule-mark" aria-hidden="true">ASK</span>
+              <div>
+                <h3>What needs approval</h3>
+                <p>
+                  Allowed mutations, destructive atomics, Codex requests, and other configured
+                  higher-risk actions create reviewable consent records.
+                </p>
+              </div>
+            </article>
+            <article>
+              <span class="rule-mark" aria-hidden="true">REFUSE</span>
+              <div>
+                <h3>What it refuses</h3>
+                <p>
+                  Unknown tools, workspace escapes, profile expansion, unowned process control, and
+                  silent multi-workspace selection fail closed. Logs and diagnostics redact
+                  credential-like data.
+                </p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="codex-remote" class="section-shell section-block remote-section">
+        <div class="remote-intro">
+          <p class="eyebrow">Complementary by design</p>
+          <h2>Computer MCP is not Codex Remote.</h2>
+          <p>
+            Use the official first-party experience for ordinary remote Codex control. Use Computer
+            MCP when the workflow needs a general MCP-accessible local execution plane across
+            clients, tools, applications, and custom policy.
+          </p>
+        </div>
+
+        <table class="comparison">
+          <caption class="sr-only">
+            When to use Codex Remote or Computer MCP
+          </caption>
+          <thead>
+            <tr class="comparison-head">
+              <th scope="col">Choose</th>
+              <th scope="col">When the job is</th>
+              <th scope="col">Primary value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="comparison-row">
+              <th scope="row">Codex Remote</th>
+              <td>First-party remote control of ordinary Codex work</td>
+              <td>Native Codex experience</td>
+            </tr>
+            <tr class="comparison-row active">
+              <th scope="row">Computer MCP</th>
+              <td>Cross-client local execution with custom tools and boundaries</td>
+              <td>General MCP control plane</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="architecture" class="architecture-section section-block">
+        <div class="section-shell">
+          <div class="section-heading heading-row">
+            <div>
+              <p class="eyebrow">Architecture</p>
+              <h2>One gateway. Explicit planes.</h2>
+            </div>
+            <a
+              class="text-link"
+              href="https://github.com/computer-mcp/computer-mcp/tree/master/Documentation/Architecture"
+            >
+              Explore architecture <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+
+          <div class="architecture-map" role="img" aria-label="Computer MCP architecture diagram">
+            <div class="architecture-clients architecture-group">
+              <span class="map-label">CLIENTS</span>
+              <div class="map-nodes">
+                <strong>ChatGPT</strong>
+                <strong>Codex</strong>
+                <strong>MCP client</strong>
+              </div>
+            </div>
+            <div class="architecture-channel" aria-hidden="true">
+              <span>stdio</span><i></i><span>secure tunnel</span><i></i><span>HTTP</span>
+            </div>
+            <div class="architecture-core architecture-group">
+              <span class="map-label">COMPUTER MCP.APP</span>
+              <div class="core-path">
+                <strong>AUTH</strong><i>→</i><strong>PROFILE</strong><i>→</i
+                ><strong>WORKSPACE</strong><i>→</i><strong>POLICY</strong><i>→</i
+                ><strong>APPROVAL</strong>
+              </div>
+            </div>
+            <div class="architecture-channel single" aria-hidden="true">
+              <i></i><span>bounded dispatch + audit</span><i></i>
+            </div>
+            <div class="architecture-adapters architecture-group">
+              <span class="map-label">LOCAL ADAPTERS</span>
+              <div class="map-nodes adapters">
+                <strong>Builtins</strong>
+                <strong>Skills</strong>
+                <strong>CLI</strong>
+                <strong>MCP</strong>
+                <strong>Computer Use</strong>
+                <strong>Git</strong>
+                <strong>Codex</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="get-started" class="get-started-section section-block">
+        <div class="section-shell get-started-grid">
+          <div>
+            <p class="eyebrow">Quick start</p>
+            <h2>Make the first bounded call.</h2>
+            <p class="get-started-lede">
+              Install the notarized macOS App, register a workspace, connect a local MCP client, and
+              begin with a read-only workspace discovery request.
+            </p>
+            <div class="requirements">
+              <span>macOS 14+</span>
+              <span>Signed Universal 2 App</span>
+              <span>No TOML required</span>
+            </div>
+          </div>
+
+          <div class="quickstart-panel">
+            <ol>
+              <li>
+                <span>1</span>
+                <p>
+                  Download the latest DMG, verify <code>SHA256SUMS</code>, and open the installed
+                  App from Finder.
+                </p>
+              </li>
+              <li>
+                <span>2</span>
+                <p>Register a folder, choose <strong>Local MCP</strong>, and start the Gateway.</p>
+              </li>
+              <li>
+                <span>3</span>
+                <p>Copy the displayed stdio command into your MCP client.</p>
+              </li>
+              <li>
+                <span>4</span>
+                <div>
+                  <p>Call the first read-only tool.</p>
+                  <pre><code>workspace.list</code><button type="button" data-copy="workspace.list">Copy</button></pre>
+                </div>
+              </li>
+            </ol>
+            <div class="quickstart-actions">
+              <a
+                class="button button-primary"
+                href="https://github.com/computer-mcp/computer-mcp/releases/latest"
+              >
+                Download latest release <span aria-hidden="true">↗</span>
+              </a>
+              <a
+                class="button button-secondary"
+                href="https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Reference/QuickStart.md"
+              >
+                Full quick start
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="status" class="section-shell section-block status-section">
+        <div class="section-heading heading-row">
+          <div>
+            <p class="eyebrow">Status and roadmap</p>
+            <h2>Stable core. Honest edges.</h2>
+          </div>
+          <p>
+            Capability labels describe product maturity, not permission. Every enabled path still
+            passes through the same policy and resource boundaries.
+          </p>
+        </div>
+
+        <div class="status-grid">
+          <article>
+            <span class="status-chip stable">STABLE</span>
+            <h3>Gateway foundation</h3>
+            <p>
+              Workspaces, profiles, local and tunnel connections, builtins, registered providers,
+              governed Git, Computer Use, operation tickets, and redacted audit.
+            </p>
+          </article>
+          <article>
+            <span class="status-chip experimental">EXPERIMENTAL</span>
+            <h3>Advanced Codex orchestration</h3>
+            <p>
+              App Server, Exec, and MCP lifecycles; Goal passthrough; acceptance runs; handoff
+              diagnosis; and managed child worktrees. Opt-in and disabled by default.
+            </p>
+          </article>
+          <article>
+            <span class="status-chip planned">PLANNED</span>
+            <h3>Broader reach</h3>
+            <p>
+              More first-class orchestration UI and platform support beyond macOS. No committed
+              release date.
+            </p>
+          </article>
+        </div>
+
+        <div class="limitations">
+          <h3>Know the boundary</h3>
+          <ul>
+            <li>The signed product currently requires macOS 14 or later.</li>
+            <li>Remote paths depend on user-owned OpenAI or Cloudflare services.</li>
+            <li>Computer MCP cannot terminate an external Codex client it does not own.</li>
+            <li>
+              It does not silently pick a workspace, implicitly push Git, or equate turn completion
+              with accepted Goal completion.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="closing-section">
+        <div class="section-shell closing-inner">
+          <p class="eyebrow">Give agents a route, not the whole machine.</p>
+          <h2>Local execution with an accountable boundary.</h2>
+          <div class="hero-actions">
+            <a class="button button-inverse" href="#get-started"
+              >Get started <span aria-hidden="true">↘</span></a
+            >
+            <a
+              class="button button-ghost"
+              href="https://github.com/computer-mcp/computer-mcp/tree/master/Documentation"
+            >
+              Read the docs <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="section-shell footer-grid">
+        <div>
+          <a class="brand footer-brand" href="#top" aria-label="Computer MCP home">
+            <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span>Computer MCP</span>
+          </a>
+          <p>A policy-controlled, workspace-scoped local execution gateway for AI agents.</p>
+        </div>
+        <div>
+          <h2>Product</h2>
+          <a href="#workflow">How it works</a>
+          <a href="#capabilities">Capabilities</a>
+          <a href="#security">Security model</a>
+          <a href="#status">Status</a>
+        </div>
+        <div>
+          <h2>Project</h2>
+          <a href="https://github.com/computer-mcp/computer-mcp">GitHub</a>
+          <a href="https://github.com/computer-mcp/computer-mcp/tree/master/Documentation"
+            >Documentation</a
+          >
+          <a href="https://github.com/computer-mcp/computer-mcp/releases">Releases</a>
+          <a href="https://github.com/computer-mcp/computer-mcp/blob/master/CONTRIBUTING.md"
+            >Contributing</a
+          >
+        </div>
+        <div>
+          <h2>Trust</h2>
+          <a href="https://github.com/computer-mcp/computer-mcp/security/policy">Security</a>
+          <a href="https://github.com/computer-mcp/computer-mcp/blob/master/PRIVACY.md">Privacy</a>
+          <a href="https://github.com/computer-mcp/computer-mcp/blob/master/LICENSE">License</a>
+        </div>
+      </div>
+      <div class="section-shell footer-base">
+        <span>© 2026 Xudong Xu</span>
+        <span>Built as a static GitHub Pages site. No custom domain.</span>
+      </div>
+    </footer>
+
+    <div class="copy-toast" role="status" aria-live="polite" data-copy-toast>Copied</div>
+  </body>
+</html>
