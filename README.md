@@ -32,8 +32,9 @@ npm test
 The production build is written to `dist/`. GitHub Pages deploys only that artifact from the
 protected `main` branch.
 
-`public/release.json` binds the deployed site artifact to the coordinated main repository release
-tag. Update that record only as part of the indivisible two-repository release batch.
+`public/release.json` binds the deployed site artifact to the coordinated main repository source
+commit and release tag. Update that record only as part of the indivisible two-repository release
+batch.
 
 ## Content boundaries
 
