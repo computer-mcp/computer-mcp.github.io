@@ -3,7 +3,7 @@
   "product": "Computer MCP",
   "version": "1.0.27",
   "main_repository": "https://github.com/computer-mcp/computer-mcp",
-  "source_commit": "e9f42000658cd1017b37ca599641ff5a1b8745d3",
+  "source_commit": "719c57cd0a934d805f22b17572a0f19e58726704",
   "release_tag": "v1.0.27",
   "release_url": "https://github.com/computer-mcp/computer-mcp/releases/tag/v1.0.27"
 }
