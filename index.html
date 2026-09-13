@@ -305,11 +305,11 @@
           <article class="capability-card capability-wide codex-card">
             <div>
               <div class="card-index">E / ORCHESTRATE · EXPERIMENTAL</div>
-              <h3>Optional Codex execution</h3>
+              <h3>Independent Codex plugin</h3>
               <p>
-                Run App Server, Exec, or MCP lifecycles with owned process groups, durable
-                approvals, official Goal passthrough, thread handoff diagnostics, acceptance
-                evidence, and exclusive worktree leases.
+                The Codex plugin supplies App Server, Exec, and MCP lifecycles through swift-codex.
+                Keep existing thread, Goal, approval, and handoff capabilities while the gateway
+                retains policy, workspace access, and audit authority.
               </p>
             </div>
             <div class="runtime-visual" aria-hidden="true">
@@ -324,14 +324,37 @@
             <div class="card-index">F / OPERATE</div>
             <h3>Desktop and system tools</h3>
             <p>
-              Use typed local capabilities and bounded Computer Use. Accessibility and Screen
-              Recording preflight only the operations that actually need them.
+              Connect the native Computer Use MCP plugin, with native Accessibility as a fallback.
+              Vendor caller authentication can block native CUA operations; a successful tools list
+              does not prove desktop control. Permission checks remain specific to each operation.
             </p>
             <div class="permission-row">
               <span>SCREEN</span>
               <span>ACCESS</span>
               <strong>ASK</strong>
             </div>
+          </article>
+
+          <article class="capability-card capability-wide">
+            <div class="card-index">G / COMPOSE</div>
+            <h3>MCP, CLI, and Skills in one plugin package</h3>
+            <p>
+              Search official repositories and manage installation, updates, rollback, and
+              activation in the App or management CLI. Native MCP servers can also be registered
+              directly. Choose all tools or an exact allowlist; CLI declarations produce
+              deterministic arguments. External vendor runtimes remain yours to install and manage.
+            </p>
+            <p>
+              Explore
+              <a href="https://github.com/computer-mcp/plugin-codex">Codex</a>,
+              <a href="https://github.com/computer-mcp/plugin-computer-use">Computer Use</a>, and
+              <a href="https://github.com/computer-mcp/plugin-swift-format">Swift Format</a>, or
+              read the
+              <a
+                href="https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Reference/PluginPackages.md"
+                >plugin package reference</a
+              >.
+            </p>
           </article>
         </div>
       </section>

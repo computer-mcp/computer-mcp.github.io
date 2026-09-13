@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "product": "Computer MCP",
-  "version": "1.0.27",
+  "version": "1.1.0",
   "main_repository": "https://github.com/computer-mcp/computer-mcp",
-  "source_commit": "f805e74470a7f8831146ebdd6cf332e68a2fd05f",
-  "release_tag": "v1.0.27",
-  "release_url": "https://github.com/computer-mcp/computer-mcp/releases/tag/v1.0.27"
+  "source_commit": "681f4a32b24ccb0bcb4207a15d2a4e831f553431",
+  "release_tag": "v1.1.0",
+  "release_url": "https://github.com/computer-mcp/computer-mcp/releases/tag/v1.1.0"
 }

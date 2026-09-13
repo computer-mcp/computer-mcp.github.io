@@ -11,6 +11,16 @@ test("presents the product contract and primary actions", async ({ page }) => {
   );
   await expect(page.getByText("A control plane, not a tool pile.")).toBeVisible();
   await expect(page.getByText("Computer MCP is not Codex Remote.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Independent Codex plugin" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "MCP, CLI, and Skills in one plugin package" }),
+  ).toBeVisible();
+  for (const name of ["codex", "computer-use", "swift-format"]) {
+    await expect(
+      page.locator(`a[href="https://github.com/computer-mcp/plugin-${name}"]`),
+    ).toBeVisible();
+  }
+  await expect(page.getByText(/Vendor caller authentication can block native CUA/)).toBeVisible();
   await expect(page.getByRole("link", { name: "Download latest release" })).toHaveAttribute(
     "href",
     "https://github.com/computer-mcp/computer-mcp/releases/latest",
@@ -36,9 +46,10 @@ test("ships complete metadata and the GitHub Pages root contract", async ({ page
   expect(releaseResponse.status()).toBe(200);
   expect(await releaseResponse.json()).toMatchObject({
     product: "Computer MCP",
-    version: "1.0.27",
-    source_commit: "f805e74470a7f8831146ebdd6cf332e68a2fd05f",
-    release_tag: "v1.0.27",
+    version: "1.1.0",
+    source_commit: "681f4a32b24ccb0bcb4207a15d2a4e831f553431",
+    release_tag: "v1.1.0",
+    release_url: "https://github.com/computer-mcp/computer-mcp/releases/tag/v1.1.0",
   });
   expect(existsSync("public/CNAME"), "A custom-domain CNAME must not be present.").toBe(false);
 });
