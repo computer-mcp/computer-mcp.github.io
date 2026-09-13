@@ -46,10 +46,10 @@ test("ships complete metadata and the GitHub Pages root contract", async ({ page
   expect(releaseResponse.status()).toBe(200);
   expect(await releaseResponse.json()).toMatchObject({
     product: "Computer MCP",
-    version: "1.1.0",
-    source_commit: "681f4a32b24ccb0bcb4207a15d2a4e831f553431",
-    release_tag: "v1.1.0",
-    release_url: "https://github.com/computer-mcp/computer-mcp/releases/tag/v1.1.0",
+    version: "1.1.2",
+    source_commit: "3ab986269b76272952ada38758df9a6b52b0d823",
+    release_tag: "v1.1.2",
+    release_url: "https://github.com/computer-mcp/computer-mcp/releases/tag/v1.1.2",
   });
   expect(existsSync("public/CNAME"), "A custom-domain CNAME must not be present.").toBe(false);
 });
