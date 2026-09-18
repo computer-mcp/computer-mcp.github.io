@@ -1,16 +1,16 @@
 {
   "name": "Computer MCP",
   "short_name": "Computer MCP",
-  "description": "A policy-controlled, workspace-scoped local execution gateway for AI agents.",
+  "description": "Connect ChatGPT to your Mac’s CLI tools, Codex, MCP servers and Skills.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f2f0e9",
-  "theme_color": "#f2f0e9",
+  "background_color": "#171819",
+  "theme_color": "#171819",
   "icons": [
     {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/brand/mark.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
       "purpose": "any"
     }
   ]

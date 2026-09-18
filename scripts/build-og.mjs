@@ -1,13 +1,10 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { copyFile } from "node:fs/promises";
 import sharp from "sharp";
 
-const root = new URL("../", import.meta.url).pathname;
-const source = join(root, "public", "og-image.svg");
-const destination = join(root, "public", "og-image.png");
-const svg = await readFile(source);
-
-await sharp(svg, { density: 144 })
-  .resize(1200, 630)
-  .png({ compressionLevel: 9 })
-  .toFile(destination);
+const source = new URL("../public/brand/social.png", import.meta.url);
+const destination = new URL("../public/og-image.png", import.meta.url);
+const { width, height } = await sharp(source.pathname).metadata();
+if (width !== 1729 || height !== 910) {
+  throw new Error("Social image dimensions must match the website's Open Graph metadata.");
+}
+await copyFile(source, destination);
