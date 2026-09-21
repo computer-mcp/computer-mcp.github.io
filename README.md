@@ -48,3 +48,18 @@ batch.
   consent decides whether an allowed higher-risk action may proceed now.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) before opening a change.
+
+## Brand and copy
+
+[DESIGN.md](DESIGN.md) is the approved website design baseline. It records the positioning, tokens,
+composition, shared assets, responsive behavior and rendered reference images. Read it before
+changing the visual identity.
+
+The homepage leads with “Let ChatGPT use your local tools” and gives CLI, Codex, MCP and Skills
+equal placement. Main-repository documentation owns capability and permission facts; website copy
+follows that contract.
+
+`npm run assets:build` checks the share-card dimensions and copies the source to
+`public/og-image.png`. Verify the approved source images from `public/brand/` with
+`shasum -a 256 -c SHA256SUMS`. Keep shared assets synchronized with the main repository's
+`Assets/Brand/` directory.

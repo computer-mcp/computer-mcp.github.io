@@ -4,33 +4,53 @@ import { existsSync } from "node:fs";
 
 test("presents the product contract and primary actions", async ({ page }) => {
   await page.goto("/");
-
   await expect(page).toHaveTitle(/Computer MCP/);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Your agents can act locally.",
-  );
-  await expect(page.getByText("A control plane, not a tool pile.")).toBeVisible();
-  await expect(page.getByText("Computer MCP is not Codex Remote.")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Independent Codex plugin" })).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "MCP, CLI, and Skills in one plugin package" }),
-  ).toBeVisible();
-  for (const name of ["codex", "computer-use", "swift-format"]) {
-    await expect(
-      page.locator(`a[href="https://github.com/computer-mcp/plugin-${name}"]`),
-    ).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("用上你的本机工具");
+  await expect(page.getByRole("tab")).toHaveCount(4);
+  for (const [id, name] of [
+    ["cli", "swift-format"],
+    ["codex", "codex"],
+  ]) {
+    await page.locator(`#tab-${id}`).click();
+    await expect(page.locator(`#panel-${id}`)).toBeVisible();
+    await expect(page.locator(`#panel-${id} a`)).toHaveAttribute(
+      "href",
+      `https://github.com/computer-mcp/plugin-${name}`,
+    );
   }
-  await expect(page.getByText(/Vendor caller authentication can block native CUA/)).toBeVisible();
-  await expect(page.getByRole("link", { name: "Download latest release" })).toHaveAttribute(
+  await page.getByRole("button", { name: "Switch to English" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("use your local tools");
+  await expect(page.getByRole("link", { name: "Download for Mac" })).toHaveAttribute(
     "href",
     "https://github.com/computer-mcp/computer-mcp/releases/latest",
   );
 });
 
+test("switches capabilities with keyboard access and preserves the selected panel across languages", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const cli = page.locator("#tab-cli");
+  await cli.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.locator("#tab-codex")).toBeFocused();
+  await expect(page.locator("#panel-codex")).toBeVisible();
+  await expect(page.locator("#panel-cli")).toBeHidden();
+  await page.keyboard.press("End");
+  await expect(page.locator("#tab-skills")).toBeFocused();
+  await expect(page.locator("#panel-skills")).toBeVisible();
+  await page.getByRole("button", { name: "Switch to English" }).click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await expect(page.locator("#panel-skills")).toContainText("reusable instructions");
+  await page.getByRole("button", { name: "切换为中文" }).click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
+  await expect(page.locator("#panel-skills")).toContainText("可复用的说明");
+});
+
 test("ships complete metadata and the GitHub Pages root contract", async ({ page, request }) => {
   await page.goto("/");
 
-  await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /policy/i);
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /CLI/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
     "https://computer-mcp.github.io/",
@@ -40,18 +60,64 @@ test("ships complete metadata and the GitHub Pages root contract", async ({ page
     "https://computer-mcp.github.io/og-image.png",
   );
   await expect((await request.get("/og-image.png")).status()).toBe(200);
-  await expect((await request.get("/favicon.svg")).status()).toBe(200);
+  await expect((await request.get("/brand/mark.png")).status()).toBe(200);
   await expect((await request.get("/site.webmanifest")).status()).toBe(200);
   const releaseResponse = await request.get("/release.json");
   expect(releaseResponse.status()).toBe(200);
   expect(await releaseResponse.json()).toMatchObject({
     product: "Computer MCP",
-    version: "1.1.4",
-    source_commit: "e8946e5ee6a555a340a7d2f6b1db32ff4fca5f9a",
-    release_tag: "v1.1.4",
-    release_url: "https://github.com/computer-mcp/computer-mcp/releases/tag/v1.1.4",
+    version: "1.2.1",
+    source_commit: "d1f0e642aa822b6f43d8b417b4c20473a64bf0a2",
+    release_tag: "v1.2.1",
+    release_url: "https://github.com/computer-mcp/computer-mcp/releases/tag/v1.2.1",
   });
   expect(existsSync("public/CNAME"), "A custom-domain CNAME must not be present.").toBe(false);
+});
+
+test("separates host permissions from native Codex authority", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Switch to English" }).click();
+  const security = page.locator("#security");
+  await expect(
+    security.getByRole("heading", { name: "Three host permission modes" }),
+  ).toBeVisible();
+  await expect(security).toContainText("independent of profile names or connection channels");
+  await expect(security).toContainText(
+    "Local full access alone does not grant tools or enable Full Shell",
+  );
+  await expect(security).toContainText("The owner approves in the App or management CLI");
+  await expect(security).toContainText("A model-supplied confirm field is not approval");
+  const codex = page.locator(".codex-contract");
+  await expect(codex).toContainText("App Server and Exec lifecycles through swift-codex");
+  await expect(codex).toContainText(
+    "Codex owns its configuration, provider, MCP, Skills, hooks and authentication",
+  );
+  await expect(codex).toContainText(
+    "Omitted execution settings inherit Codex configuration, including native Full Access",
+  );
+  await expect(codex).toContainText(
+    "Native approvals retain their decisions and scopes and cannot approve host tickets",
+  );
+});
+
+test("states execution, integration and cancellation boundaries", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Switch to English" }).click();
+  await page.getByText("What are the execution boundaries?", { exact: true }).click();
+  const limits = page.locator(".limitations");
+  await expect(limits).toContainText("A working directory or worktree is not an OS sandbox");
+  await expect(limits).toContainText(
+    "Full Shell and native Codex Full Access carry the executing user's permissions",
+  );
+  await expect(limits).toContainText(
+    "A cancellation request is not proof of completion or cleanup",
+  );
+  await expect(limits).toContainText("Unknown write results are not automatically replayed");
+  await page.getByText("Can it operate desktop apps?", { exact: true }).click();
+  await expect(page.getByText(/Availability depends on the operation/)).toBeVisible();
+  await expect(
+    page.locator('a[href="https://github.com/computer-mcp/plugin-computer-use"]'),
+  ).toBeVisible();
 });
 
 test("keeps every local navigation target resolvable", async ({ page }) => {
@@ -86,11 +152,11 @@ test("supports keyboard navigation and command copy", async ({ context, page, br
     origin: "http://127.0.0.1:4173",
   });
   await page.goto("/");
-
   await page.keyboard.press("Tab");
-  await expect(page.getByRole("link", { name: "Skip to main content" })).toBeFocused();
+  await expect(page.getByRole("link", { name: "跳转到正文" })).toBeFocused();
+  await page.getByRole("button", { name: "Switch to English" }).click();
 
-  const copy = page.getByRole("button", { name: "Copy workspace.list" });
+  const copy = page.getByRole("button", { name: /workspace.list/ });
   await copy.scrollIntoViewIfNeeded();
   await copy.click();
   await expect(copy).toHaveText("Copied");
@@ -110,11 +176,11 @@ test("selects the command when clipboard access is unavailable", async ({ page }
   });
   await page.goto("/");
 
-  const copy = page.getByRole("button", { name: "Copy workspace.list" });
+  const copy = page.getByRole("button", { name: /workspace.list/ });
   await copy.click();
 
-  await expect(copy).toHaveText("Text selected");
-  await expect(page.getByRole("status")).toHaveText("Clipboard unavailable. Command selected.");
+  await expect(copy).toHaveText("已选中文本");
+  await expect(page.getByRole("status")).toHaveText("剪贴板不可用，已选中命令。");
   await expect(copy).toBeFocused();
   await expect
     .poll(() => page.evaluate(() => window.getSelection()?.toString()))
@@ -128,7 +194,7 @@ test("mobile menu opens, closes with Escape, and does not overflow", async ({ pa
   );
   await page.goto("/");
 
-  const menuButton = page.getByRole("button", { name: "Toggle navigation" });
+  const menuButton = page.getByRole("button", { name: "菜单" });
   await expect(menuButton).toHaveAttribute("aria-expanded", "false");
   await menuButton.click();
   await expect(menuButton).toHaveAttribute("aria-expanded", "true");
