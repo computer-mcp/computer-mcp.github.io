@@ -32,9 +32,18 @@ npm test
 The production build is written to `dist/`. GitHub Pages deploys only that artifact from the
 protected `main` branch.
 
-`public/release.json` binds the deployed site artifact to the coordinated main repository source
-commit and release tag. Update that record only as part of the indivisible two-repository release
-batch.
+`public/release.json` binds the deployed site to the product's delivered commit and release tag. The
+private website package version describes this build project, not the product version. After the
+main repository publishes an accepted release, run `npm run release:update -- vX.Y.Z` to import its
+`release.json` asset. The importer verifies the official repository, public stable release, tag
+commit and GitHub asset digest; it refuses version regressions and changed identities for an
+existing version. It never derives a release from an installed App or local source checkout. Commit
+the generated record with the website delivery.
+
+`npm run release:check` checks the local record without changing it.
+`npm run release:verify-public -- vX.Y.Z` also compares it with the official public asset.
+Historical releases without a delivery-record asset retain their existing record until the next
+product delivery. Tests read the record rather than maintain another product-version constant.
 
 ## Content boundaries
 
