@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { validateRecord } from "../scripts/release.mjs";
 
 test("presents the product contract and primary actions", async ({ page }) => {
   await page.goto("/");
@@ -64,13 +65,8 @@ test("ships complete metadata and the GitHub Pages root contract", async ({ page
   await expect((await request.get("/site.webmanifest")).status()).toBe(200);
   const releaseResponse = await request.get("/release.json");
   expect(releaseResponse.status()).toBe(200);
-  expect(await releaseResponse.json()).toMatchObject({
-    product: "Computer MCP",
-    version: "1.2.1",
-    source_commit: "d1f0e642aa822b6f43d8b417b4c20473a64bf0a2",
-    release_tag: "v1.2.1",
-    release_url: "https://github.com/computer-mcp/computer-mcp/releases/tag/v1.2.1",
-  });
+  const release = validateRecord(await releaseResponse.json());
+  expect(release).toEqual(JSON.parse(readFileSync("public/release.json")));
   expect(existsSync("public/CNAME"), "A custom-domain CNAME must not be present.").toBe(false);
 });
 
