@@ -239,7 +239,7 @@ def project_manifest(data, repository, tag):
         values = manifest.get(kind, [])
         require(isinstance(values, list) and len(values) <= 1024, "Invalid contributions")
         require(all(isinstance(v, dict) and "id" in v for v in values), "Missing contribution ID")
-        contributions[kind] = sorted(matching(v["id"], IDENTIFIER) for v in values)
+        contributions[kind] = [matching(v["id"], IDENTIFIER) for v in values]
         ids.extend(contributions[kind])
     require(1 <= len(ids) <= 1024, "Invalid contribution count")
     unique(ids)

@@ -377,6 +377,11 @@ documentation = "https://python.org/"
         with self.assertRaises(catalog.CatalogError):
             catalog.project_manifest(data.replace(b'"2.0.0"', b'"1.0.0"'), REPOSITORY, "v1.0.0")
 
+    def test_contribution_order_matches_the_exact_tag_declaration(self):
+        data = Source().data + b'''\n[[mcp]]\nid = "another"\ntransport = "stdio"\nexecutable = {path = "bin/another"}\n'''
+        result = catalog.project_manifest(data, REPOSITORY, "v1.0.0")
+        self.assertEqual(result["contributions"]["mcp"], ["server", "another"])
+
     def test_archive_never_extracts_and_rejects_traversal_or_manifest_link(self):
         data = Source().data
         self.assertEqual(catalog.archive_manifest(io.BytesIO(package(data)), "example.zip"), data)
