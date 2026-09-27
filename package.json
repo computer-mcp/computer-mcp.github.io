@@ -12,12 +12,16 @@
     "format:check": "prettier --check .",
     "check:html": "html-validate index.html",
     "check:links": "linkinator dist --recurse --skip '^https://computer-mcp.github.io'",
-    "test": "node --test scripts/release.test.mjs && playwright test",
+    "test": "npm run catalog:test && node --test scripts/release.test.mjs && playwright test",
+    "catalog:test": "python3 -m unittest discover -s scripts -p 'test_plugin_catalog.py'",
+    "catalog:check": "python3 scripts/plugin_catalog.py check",
+    "catalog:check-policy": "python3 scripts/plugin_catalog.py check-policy",
+    "catalog:update": "python3 scripts/plugin_catalog.py update",
     "release:check": "node scripts/release.mjs check",
     "release:update": "node scripts/release.mjs update",
     "release:verify-public": "node scripts/release.mjs verify-public",
     "test:install": "playwright install chromium",
-    "check": "npm run release:check && npm run format:check && npm run check:html && npm run build && npm run check:links && npm run test"
+    "check": "npm run release:check && npm run catalog:check-policy && npm run format:check && npm run check:html && npm run build && npm run check:links && npm run test"
   },
   "engines": {
     "node": ">=22"
