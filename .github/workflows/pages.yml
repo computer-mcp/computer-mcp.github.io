@@ -5,11 +5,11 @@ on:
     branches:
       - main
   workflow_dispatch:
+  schedule:
+    - cron: "37 * * * *"
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
@@ -17,12 +17,22 @@ concurrency:
 
 jobs:
   build:
+    if: github.repository_id == '1353589608' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
+    permissions:
+      contents: write
+      pages: read
 
     steps:
       - name: Check out repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+
+      - name: Record current source
+        id: source
+        run: printf 'commit=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Set up Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
@@ -30,20 +40,34 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Set up catalog publisher Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.11"
+
+      - name: Verify catalog seed
+        env:
+          CATALOG_SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
+        run:
+          python3 scripts/plugin_catalog_publication.py --check-seed --expected-head
+          "$CATALOG_SOURCE_COMMIT"
+
+      - name: Reconcile all official plugin releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: npm run catalog:update -- --require-existing
+
       - name: Configure Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Set up catalog publisher Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
-        with:
-          python-version: "3.11"
-
       - name: Verify website
         run: |
+          npm run release:check
           npm run catalog:check-policy
+          npm run catalog:check
           npm run format:check
           npm run check:html
           npm run build
@@ -55,12 +79,20 @@ jobs:
       - name: Run accessibility and smoke tests
         run: npm test
 
+      - name: Persist verified catalog generation
+        env:
+          CATALOG_SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
+        run: python3 scripts/plugin_catalog_publication.py --expected-head "$CATALOG_SOURCE_COMMIT"
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
           path: dist
 
   deploy:
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

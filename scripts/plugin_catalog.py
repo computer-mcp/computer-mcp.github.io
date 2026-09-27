@@ -418,6 +418,26 @@ def validate_policy_snapshot(policy, snapshot):
     require(observed == withdrawals, "Catalog withdrawals differ from policy")
 
 
+def immutable_release(record):
+    return {k: v for k, v in record.items() if k not in ("prerelease", "withdrawn", "withdrawal_reason")}
+
+
+def validate_successor(previous, current):
+    validate_snapshot(previous)
+    validate_snapshot(current)
+    if current == previous:
+        return
+    require(current["generation"] == previous["generation"] + 1
+            and current["revision"] != previous["revision"]
+            and current["generated_at"] >= previous["generated_at"], "Catalog generation does not advance")
+    records = {release_key(r): r for r in current["releases"]}
+    for old in previous["releases"]:
+        new = records.get(release_key(old))
+        require(new is not None and immutable_release(new) == immutable_release(old),
+                "Published release identity changed or disappeared")
+        require(not old["withdrawn"] or new["withdrawn"], "A withdrawal cannot be silently undone")
+
+
 class SafeRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, request, fp, code, message, headers, new_url):
         https_url(new_url)
@@ -611,8 +631,7 @@ def reconcile(github, policy, previous=None, now=None):
             current[key] = copy.deepcopy(old)
         else:
             # Channel promotion and explicit withdrawal do not rewrite package identity.
-            immutable = lambda r: {k: v for k, v in r.items() if k not in ("prerelease", "withdrawn", "withdrawal_reason")}
-            require(immutable(current[key]) == immutable(old), "Published release identity changed")
+            require(immutable_release(current[key]) == immutable_release(old), "Published release identity changed")
         require(not old["withdrawn"] or key in withdrawals, "A withdrawal cannot be silently undone")
     for key, reason in withdrawals.items():
         require(key in current, "Withdrawal has no verified release record")
@@ -629,6 +648,8 @@ def reconcile(github, policy, previous=None, now=None):
         require(result["generated_at"] >= previous["generated_at"], "Publisher clock moved backwards")
     validate_snapshot(result)
     validate_policy_snapshot(policy, result)
+    if previous:
+        validate_successor(previous, result)
     return result
 
 
@@ -650,8 +671,9 @@ def writer_lock(destination, timeout=30):
             fcntl.flock(lock, fcntl.LOCK_UN)
 
 
-def publish(github, policy, destination, now=None):
+def publish(github, policy, destination, now=None, *, require_existing=False):
     with writer_lock(destination):
+        require(not require_existing or destination.is_file(), "Committed catalog seed is required")
         previous_bytes = read_json_bytes(destination) if destination.exists() else None
         previous = decode_json(previous_bytes) if previous_bytes is not None else None
         result = reconcile(github, policy, previous, now)
@@ -686,6 +708,7 @@ def main():
     parser.add_argument("--policy", type=Path, default=ROOT / "scripts/plugin-catalog-policy.json")
     parser.add_argument("--output", type=Path, default=ROOT / "public/plugins/index.json")
     parser.add_argument("--use-gh-auth", action="store_true", help="Use existing gh authentication in memory")
+    parser.add_argument("--require-existing", action="store_true", help="Refuse to initialize a missing catalog")
     args = parser.parse_args()
     try:
         policy = validate_policy(decode_json(read_json_bytes(args.policy)))
@@ -703,7 +726,7 @@ def main():
                                        capture_output=True, text=True, timeout=15, check=False)
             require(completed.returncode == 0 and completed.stdout.strip(), "Existing gh authentication unavailable")
             token = completed.stdout.strip()
-        snapshot, changed = publish(GitHub(token), policy, args.output)
+        snapshot, changed = publish(GitHub(token), policy, args.output, require_existing=args.require_existing)
         print(f"Catalog {'updated' if changed else 'unchanged'}: generation {snapshot['generation']}, "
               f"{len(snapshot['releases'])} releases, revision {snapshot['revision']}")
     except (CatalogError, OSError, ValueError, subprocess.SubprocessError) as error:

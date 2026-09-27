@@ -6,8 +6,10 @@ selection. It grants no execution permission and is not an artifact signature. T
 must still revalidate the selected GitHub Release, repository identity and asset membership, then
 verify the downloaded bytes and package using its existing installation rules.
 
-The generator, policy and offline tests are available in this repository. A verified public
-snapshot, automatic reconciliation/notification and host consumption are not yet delivered.
+The generator, policy, serialized publication workflow and offline tests are available in this
+repository. Public catalog delivery requires a complete verified initial snapshot committed to
+`main`. Until that prerequisite is satisfied, publication fails before upload and retains the
+deployed site. Plugin notification delivery and the live endpoint require separate acceptance.
 
 The host's
 [plugin package reference](https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Reference/PluginPackages.md)
@@ -33,7 +35,8 @@ rate limits. An inaccessible release or exhausted request budget fails the entir
 `--output <path>` and `--policy <path>` support isolated candidates. `check` performs no network
 requests. The generated file has deterministic UTF-8 JSON bytes, two-space indentation, sorted
 object keys and a trailing newline. It is excluded from Prettier because the publisher owns this
-serialization.
+serialization. `--require-existing` refuses to initialize a missing catalog before making source
+requests; automation always uses this option.
 
 ## Schema 1
 
@@ -118,11 +121,36 @@ events are idempotent; a complete reconciliation discovers releases even when th
 missed. A detected external edit aborts publication. File and directory synchronization make the
 replacement durable; failures before replacement leave the previous bytes intact.
 
-Pages deploys the complete site artifact using its serialized deployment workflow. Publisher policy
-checks and tests run in website CI and Pages validation. Updating a generated file locally does not
-deploy it. A failed generation must fail the publication job before upload, preserving the last
-deployed artifact. Publication automation must run from trusted central code; notification payloads
-may identify a repository or release but cannot supply catalog metadata or override the allowlist.
+The committed canonical `public/plugins/index.json` on `main` is the durable generation authority.
+Initialize it by generating and reviewing a complete verified snapshot, then committing it with the
+publisher policy. Automation never uses a missing file as permission to reset generation, and never
+restores authority from a CDN response, an Actions cache or an expiring artifact.
+
+The official repository's `pages.yml` workflow reconciles hourly at minute 37, on `main` pushes and
+through `workflow_dispatch`. One `pages` concurrency group covers generation through deployment;
+active runs are not cancelled. Each run checks out current `main` after entering the group and
+verifies its seed before requesting release metadata. It always scans every admitted repository, so
+missed notifications and replaced pending runs are repaired by the next successful reconciliation.
+
+After generation, the workflow validates and tests the complete site. The publication helper checks
+the catalog successor, exact built index bytes and unchanged source, then commits only the new index
+as a child of the checked-out commit. It uses a normal fast-forward push, never a force push. A
+concurrent source update rejects publication; the next run starts from current `main`. Identical
+catalog content creates no commit. Unrelated local or staged changes are rejected and preserved.
+
+Only then does Pages upload and deploy the complete artifact. Generation, validation or commit
+failure prevents upload and preserves the deployed artifact. If deployment fails after the verified
+index commit, the next run uses that committed generation and can deploy it without incrementing
+generation. A local generated file alone does not deploy anything. Publisher tests also run in
+read-only website CI, without contacting release sources.
+
+The central build job uses its short-lived GitHub job token with `contents: write` to persist the
+index; the deployment job has Pages and identity-token permissions. Plugin notification senders
+should invoke `pages.yml` on `main` using `workflow_dispatch`, with Actions write access scoped to
+this receiving repository. They do not need website Contents write access. Notification payloads
+provide no metadata or policy overrides. Existing GitHub authentication is an operator input; this
+repository does not create credentials. If notifications are unavailable, scheduled and manual
+reconciliation still use the same complete verification path.
 
 The index is bounded to 4 MiB and 1,024 releases. A manifest is at most 1 MiB; each archive is at
 most 512 MiB, with at most 20,000 entries and the host package format's expansion/path bounds. A
@@ -133,5 +161,6 @@ are generation failure bounds, not permission to truncate the catalog or omit ol
 
 Tests cover provenance rejection, immutable identities, explicit withdrawal, failed writes,
 concurrent publishers, duplicate events, invalid/oversized/truncated input, bounded retries,
-manifest/archive agreement, safe manifest reads and credential-free redirects. Network discovery in
-the host remains a separate consumer; installation must retain its exact GitHub revalidation.
+manifest/archive agreement, safe manifest reads, credential-free redirects, committed generation
+continuity, concurrent source pushes and deployment retry. Network discovery in the host remains a
+separate consumer; installation must retain its exact GitHub revalidation.

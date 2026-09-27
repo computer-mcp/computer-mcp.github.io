@@ -31,7 +31,7 @@ npm test
 ```
 
 The production build is written to `dist/`. GitHub Pages deploys only that artifact from the
-protected `main` branch.
+official repository's `main` branch after validation and catalog reconciliation.
 
 `public/release.json` binds the deployed site to the product's delivered commit and release tag. The
 private website package version describes this build project, not the product version. After the
@@ -52,7 +52,10 @@ existing GitHub CLI authentication, or provide `GH_TOKEN`/`GITHUB_TOKEN` in the 
 The publisher also works without authentication within GitHub's public API limits. It downloads and
 verifies release archives without running package code. `npm run catalog:check-policy` and
 `npm run catalog:test` run offline; `npm run catalog:check` validates a generated snapshot. No
-plugin catalog snapshot is currently shipped by this website. See
+plugin catalog snapshot is currently shipped by this website. Automatic publication requires an
+initial complete verified snapshot committed to `main`; until then, Pages publication fails before
+upload and preserves the deployed site. Subsequent runs reconcile hourly, on source pushes and on
+manual workflow dispatch, persist changed generations and deploy one complete artifact. See
 [the plugin catalog contract](docs/plugin-catalog.md) for provenance, withdrawals, resource bounds,
 atomic updates and installation trust.
 
