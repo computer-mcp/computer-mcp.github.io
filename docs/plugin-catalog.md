@@ -38,11 +38,11 @@ object keys and a trailing newline. It is excluded from Prettier because the pub
 serialization. `--require-existing` refuses to initialize a missing catalog before making source
 requests; automation always uses this option.
 
-## Schema 1
+## Schema 2
 
 | Field            | Meaning                                                                                  |
 | ---------------- | ---------------------------------------------------------------------------------------- |
-| `schema_version` | Integer `1`; other schemas require explicit client support.                              |
+| `schema_version` | Integer `2`; schema 1 remains readable with inherited macOS archive targets.             |
 | `publisher`      | Official organization login and numeric identity.                                        |
 | `generation`     | Positive integer incremented only when catalog content changes.                          |
 | `revision`       | SHA-256 of the canonical object containing `schema_version`, `publisher` and `releases`. |
@@ -56,17 +56,33 @@ Each release record contains:
 - Manifest `plugin_id`, `name`, semantic `version`, nullable `summary` and `contributions` with
   `mcp`, `cli` and `skills` identifier arrays.
 - `compatibility` with `platforms`, `architectures`, nullable `minimum_host` and nullable
-  `maximum_host`. Schema 1 represents the host's existing macOS package format, so `platforms` is
-  `['macos']`. This value is not inferred from package contents. Architectures come from the
-  released manifest; an empty array imposes no architecture restriction. The minimum is inclusive
-  and the maximum exclusive, following the host's semantic version precedence.
+  `maximum_host`. Platforms are the manifest's explicit unique subset of `macos` and `windows`,
+  defaulting to `['macos']` for legacy declarations. Architectures are a unique subset of `arm64`
+  and `x86_64`; an empty array permits both. The minimum is inclusive and the maximum exclusive,
+  following the host's semantic version precedence. Metadata support does not imply a shipped
+  Windows App, gateway or provider.
 - `dependencies`, containing manifest dependency IDs, command names, application locators, human
   setup instructions and nullable documentation URLs. These are prerequisites the user supplies, not
   instructions to install software automatically.
 - Boolean `prerelease`, UTC `published_at`, boolean `withdrawn` and nullable `withdrawal_reason`. A
   withdrawn version stays visible as a historical identity and cannot be selected for installation.
 - `assets`, sorted by numeric asset ID. Each archive carries `id`, `name`, `size` in bytes, `sha256`
-  and its exact official browser download `url`.
+  and its exact official browser download `url`, plus `compatibility` containing `platforms` and
+  `architectures`. Each archive target must be a subset of the release-wide target.
+
+Per-archive targets come from `[[compatibility.artifacts]]` in the exact tagged manifest. Each entry
+supplies `name`, `platforms` and `architectures`; names match published archive assets exactly and
+are unique ignoring case. A declared list must account for every published archive, and every
+declared archive must exist. Windows declarations require this list. Without one, archives inherit
+the legacy release target. Neither filenames nor native binary inspection can substitute for the
+declaration. Installation independently re-fetches the tag and proves the selected target before
+accepting the exact package bytes.
+
+Schema 1 contains no asset target field and requires macOS release targets. The publisher accepts
+such a seed, materializes each archive's already implied target, then advances generation to
+schema 2. This preserves the release's immutable identity and withdrawal state; narrowing or
+expanding an existing target is rejected. Schema downgrades are rejected. A client supporting only
+schema 1 must retain its last known-good snapshot when presented with schema 2.
 
 IDs are positive integers at most 9,007,199,254,740,991. Plugin IDs cannot move between numeric
 repository identities. A repository cannot advertise duplicate versions or tags, and archive IDs are

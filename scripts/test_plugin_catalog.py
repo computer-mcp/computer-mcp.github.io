@@ -27,9 +27,9 @@ NOW = "2026-09-28T01:00:00Z"
 def package(data, extra=None):
     file = io.BytesIO()
     with zipfile.ZipFile(file, "w") as archive:
-        archive.writestr(catalog.MANIFEST, data)
+        archive.writestr(zipfile.ZipInfo(catalog.MANIFEST, (2026, 1, 1, 0, 0, 0)), data)
         if extra:
-            archive.writestr(*extra)
+            archive.writestr(zipfile.ZipInfo(extra[0], (2026, 1, 1, 0, 0, 0)), extra[1])
     return file.getvalue()
 
 
@@ -94,6 +94,31 @@ class Source:
         yield io.BytesIO(self.bytes)
 
 
+def platform_source():
+    source = Source()
+    source.data += b"""
+[compatibility]
+platforms = ['windows', 'macos']
+[[compatibility.artifacts]]
+name = 'example-macos.zip'
+platforms = ['macos']
+architectures = ['arm64']
+[[compatibility.artifacts]]
+name = 'example-windows.zip'
+platforms = ['windows']
+architectures = ['x86_64']
+"""
+    source.reset_bytes()
+    source.assets = []
+    for identifier, name in ((30, "example-macos.zip"), (31, "example-windows.zip")):
+        asset = copy.deepcopy(source.asset)
+        asset.update(id=identifier, name=name,
+                     url=f"https://api.github.com/repos/{REPOSITORY}/releases/assets/{identifier}",
+                     browser_download_url=f"https://github.com/{REPOSITORY}/releases/download/v1.0.0/{name}")
+        source.assets.append(asset)
+    return source
+
+
 def concurrent_publish(destination, ready, release, results):
     source = Source()
     original = source.json
@@ -119,6 +144,67 @@ class PublisherTests(unittest.TestCase):
 
     def snapshot(self, previous=None):
         return catalog.reconcile(self.source, self.source.policy, previous, NOW)
+
+    def test_native_targets_are_projected_from_tag_declarations(self):
+        source = platform_source()
+        snapshot = catalog.reconcile(source, source.policy, now=NOW)
+        self.assertEqual(snapshot["schema_version"], 2)
+        record = snapshot["releases"][0]
+        self.assertEqual(record["compatibility"]["platforms"], ["macos", "windows"])
+        self.assertEqual([a["compatibility"] for a in record["assets"]], [
+            {"platforms": ["macos"], "architectures": ["arm64"]},
+            {"platforms": ["windows"], "architectures": ["x86_64"]}])
+        self.assertEqual(record["manifest_sha256"], hashlib.sha256(source.data).hexdigest())
+        self.assertEqual(catalog.reconcile(source, source.policy, snapshot, NOW), snapshot)
+        for fault in ("omitted", "renamed", "extra"):
+            with self.subTest(fault=fault):
+                changed = platform_source()
+                if fault == "omitted":
+                    changed.assets.pop()
+                elif fault == "renamed":
+                    changed.assets[0]["name"] = "other.zip"
+                    changed.assets[0]["browser_download_url"] = changed.assets[0]["browser_download_url"].replace("example-macos.zip", "other.zip")
+                else:
+                    changed.assets.append(changed.asset)
+                with self.assertRaises(catalog.CatalogError):
+                    catalog.reconcile(changed, changed.policy, now=NOW)
+
+    def test_invalid_manifest_targets_and_widened_asset_targets_fail(self):
+        original = platform_source()
+        for old, new in ((b"'windows', 'macos'", b"'linux', 'macos'"),
+                         (b"'windows', 'macos'", b"'macos'"),
+                         (b"'example-windows.zip'", b"'EXAMPLE-MACOS.zip'"),
+                         (b"'example-windows.zip'", b"'../windows.zip'")):
+            with self.subTest(new=new):
+                with self.assertRaises(catalog.CatalogError):
+                    catalog.project_manifest(original.data.replace(old, new), REPOSITORY, "v1.0.0")
+        snapshot = catalog.reconcile(original, original.policy, now=NOW)
+        widened = copy.deepcopy(snapshot)
+        widened["releases"][0]["assets"][0]["compatibility"]["platforms"] = ["linux"]
+        with self.assertRaises(catalog.CatalogError):
+            catalog.validate_snapshot(widened)
+
+    def test_schema_one_upgrade_preserves_immutable_release_identity(self):
+        current = self.snapshot()
+        old = copy.deepcopy(current)
+        old["schema_version"] = 1
+        for asset in old["releases"][0]["assets"]:
+            asset.pop("compatibility")
+        old["revision"] = hashlib.sha256(catalog.canonical({k: old[k] for k in ("schema_version", "publisher", "releases")})).hexdigest()
+        catalog.validate_snapshot(old)
+        successor = self.snapshot(old)
+        self.assertEqual(successor["schema_version"], 2)
+        self.assertEqual(successor["generation"], old["generation"] + 1)
+        self.assertEqual(catalog.immutable_release(old["releases"][0]), catalog.immutable_release(successor["releases"][0]))
+        catalog.validate_successor(old, successor)
+        changed = copy.deepcopy(successor)
+        changed["releases"][0]["assets"][0]["compatibility"]["architectures"] = ["arm64"]
+        changed["revision"] = hashlib.sha256(catalog.canonical({k: changed[k] for k in ("schema_version", "publisher", "releases")})).hexdigest()
+        with self.assertRaises(catalog.CatalogError):
+            catalog.validate_successor(old, changed)
+        old["generation"] = successor["generation"] + 1
+        with self.assertRaises(catalog.CatalogError):
+            catalog.validate_successor(successor, old)
 
     def test_verified_snapshot_and_duplicate_event_are_identical(self):
         first = self.snapshot()
@@ -350,7 +436,7 @@ class BoundaryTests(unittest.TestCase):
     def test_catalog_revision_unknown_schema_and_boolean_identity(self):
         source = Source()
         original = catalog.reconcile(source, source.policy, now=NOW)
-        for key, value in (("schema_version", 2), ("schema_version", True), ("generation", True),
+        for key, value in (("schema_version", 3), ("schema_version", True), ("generation", True),
                            ("revision", "f" * 64), ("generated_at", "2026-02-30T01:00:00Z")):
             with self.subTest(key=key), self.assertRaises(catalog.CatalogError):
                 catalog.validate_snapshot({**original, key: value})

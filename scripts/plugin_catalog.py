@@ -176,14 +176,26 @@ def release_key(record):
     return record["repository_id"], record["release_id"]
 
 
+def validate_target(value):
+    object_keys(value, ("platforms", "architectures"))
+    require(isinstance(value["platforms"], list) and bool(value["platforms"])
+            and all(p in ("macos", "windows") for p in value["platforms"]), "Invalid platforms")
+    require(isinstance(value["architectures"], list)
+            and all(a in ("arm64", "x86_64") for a in value["architectures"]), "Invalid architectures")
+    unique(value["platforms"])
+    unique(value["architectures"])
+    return {"platforms": sorted(value["platforms"]), "architectures": sorted(value["architectures"])}
+
+
+def target_subset(value, parent):
+    return (set(value["platforms"]) <= set(parent["platforms"])
+            and set(value["architectures"] or ("arm64", "x86_64"))
+            <= set(parent["architectures"] or ("arm64", "x86_64")))
+
+
 def validate_compatibility(value):
     object_keys(value, ("platforms", "architectures", "minimum_host", "maximum_host"))
-    # Schema 1 describes the existing macOS package format; TOML has no platform field.
-    require(value["platforms"] == ["macos"], "Unsupported catalog platform")
-    architectures = value["architectures"]
-    require(isinstance(architectures, list) and all(a in ("arm64", "x86_64") for a in architectures),
-            "Invalid architectures")
-    unique(architectures)
+    validate_target({k: value[k] for k in ("platforms", "architectures")})
     for key in ("minimum_host", "maximum_host"):
         if value[key] is not None:
             version(value[key])
@@ -244,11 +256,27 @@ def project_manifest(data, repository, tag):
     require(1 <= len(ids) <= 1024, "Invalid contribution count")
     unique(ids)
     source = manifest.get("compatibility", {})
-    object_keys(source, (), ("minimum_host", "maximum_host", "architectures"))
-    compatibility = {"platforms": ["macos"], "minimum_host": source.get("minimum_host"),
+    object_keys(source, (), ("minimum_host", "maximum_host", "platforms", "architectures", "artifacts"))
+    compatibility = {"platforms": source.get("platforms", ["macos"]), "minimum_host": source.get("minimum_host"),
                      "maximum_host": source.get("maximum_host"), "architectures": source.get("architectures", [])}
     validate_compatibility(compatibility)
     compatibility["architectures"].sort()
+    compatibility["platforms"].sort()
+    source_artifacts = source.get("artifacts", [])
+    require(isinstance(source_artifacts, list) and len(source_artifacts) <= 100, "Invalid artifact declarations")
+    artifact_targets = {}
+    for artifact in source_artifacts:
+        object_keys(artifact, ("name", "platforms", "architectures"))
+        name = text(artifact["name"], 255)
+        require(is_archive(name) and not any(c in name for c in ("/", "\\", ":"))
+                and not any(ord(c) < 32 or ord(c) == 127 for c in name), "Invalid artifact name")
+        target = validate_target({k: artifact[k] for k in ("platforms", "architectures")})
+        require(target_subset(target, compatibility), "Artifact target exceeds package compatibility")
+        require(name not in artifact_targets, "Duplicate artifact name")
+        artifact_targets[name] = target
+    unique([name.lower() for name in artifact_targets])
+    require(compatibility["platforms"] == ["macos"] or artifact_targets,
+            "Windows packages require explicit artifact declarations")
     dependencies = []
     source_dependencies = manifest.get("dependencies", [])
     require(isinstance(source_dependencies, list), "Invalid dependencies")
@@ -260,7 +288,7 @@ def project_manifest(data, repository, tag):
     validate_dependencies(dependencies)
     return {"plugin_id": manifest["id"], "name": manifest["name"], "version": manifest["version"],
             "summary": summary, "contributions": contributions, "compatibility": compatibility,
-            "dependencies": sorted(dependencies, key=lambda d: d["id"])}
+            "dependencies": sorted(dependencies, key=lambda d: d["id"]), "artifact_targets": artifact_targets}
 
 
 def safe_archive_path(value):
@@ -340,7 +368,7 @@ def asset_record(asset, repository, tag):
 
 def validate_snapshot(snapshot):
     object_keys(snapshot, ("schema_version", "publisher", "generation", "revision", "generated_at", "releases"))
-    require(type(snapshot["schema_version"]) is int and snapshot["schema_version"] == 1, "Unsupported catalog schema")
+    require(type(snapshot["schema_version"]) is int and snapshot["schema_version"] in (1, 2), "Unsupported catalog schema")
     require(snapshot["publisher"] == PUBLISHER, "Unexpected catalog publisher")
     identity(snapshot["generation"])
     matching(snapshot["revision"], DIGEST)
@@ -373,6 +401,8 @@ def validate_snapshot(snapshot):
         require(1 <= len(contribution_ids) <= 1024, "Invalid contribution count")
         unique(contribution_ids)
         validate_compatibility(record["compatibility"])
+        require(snapshot["schema_version"] != 1 or record["compatibility"]["platforms"] == ["macos"],
+                "Schema1 supports only macOS packages")
         validate_dependencies(record["dependencies"])
         require(type(record["prerelease"]) is bool and type(record["withdrawn"]) is bool, "Invalid release state")
         timestamp(record["published_at"])
@@ -383,7 +413,11 @@ def validate_snapshot(snapshot):
         assets = record["assets"]
         require(isinstance(assets, list) and 1 <= len(assets) <= 100, "Missing or excessive archives")
         for asset in assets:
-            object_keys(asset, ("id", "name", "size", "sha256", "url"))
+            keys = ("id", "name", "size", "sha256", "url")
+            object_keys(asset, keys + (("compatibility",) if snapshot["schema_version"] == 2 else ()))
+            if snapshot["schema_version"] == 2:
+                target = validate_target(asset["compatibility"])
+                require(target_subset(target, record["compatibility"]), "Asset target exceeds package compatibility")
             # Validate the same asset identity shape used at the GitHub boundary.
             asset_record({"id": asset["id"], "name": asset["name"], "size": asset["size"],
                           "digest": "sha256:" + text(asset["sha256"], 64), "state": "uploaded",
@@ -418,8 +452,17 @@ def validate_policy_snapshot(policy, snapshot):
     require(observed == withdrawals, "Catalog withdrawals differ from policy")
 
 
+def with_asset_targets(record):
+    result = copy.deepcopy(record)
+    inherited = {k: record["compatibility"][k] for k in ("platforms", "architectures")}
+    for asset in result["assets"]:
+        asset.setdefault("compatibility", copy.deepcopy(inherited))
+    return result
+
+
 def immutable_release(record):
-    return {k: v for k, v in record.items() if k not in ("prerelease", "withdrawn", "withdrawal_reason")}
+    return {k: v for k, v in with_asset_targets(record).items()
+            if k not in ("prerelease", "withdrawn", "withdrawal_reason")}
 
 
 def validate_successor(previous, current):
@@ -427,6 +470,7 @@ def validate_successor(previous, current):
     validate_snapshot(current)
     if current == previous:
         return
+    require(current["schema_version"] >= previous["schema_version"], "Catalog schema moved backwards")
     require(current["generation"] == previous["generation"] + 1
             and current["revision"] != previous["revision"]
             and current["generated_at"] >= previous["generated_at"], "Catalog generation does not advance")
@@ -571,6 +615,7 @@ def fetch_release(github, repo, release):
     require(hashlib.new("sha1" if len(blob_sha) == 40 else "sha256", blob).hexdigest() == blob_sha,
             "Manifest Git blob differs")
     projection = project_manifest(data, repository, tag)
+    targets = projection.pop("artifact_targets")
     asset_path = prefix + f"/releases/{release['id']}/assets"
 
     def archives():
@@ -581,6 +626,8 @@ def fetch_release(github, repo, release):
         return sorted(values, key=lambda a: a["id"])
 
     assets = archives()
+    require(not targets or set(targets) == {asset["name"] for asset in assets},
+            "Published archives differ from the manifest's artifact declarations")
     for asset in assets:
         with github.archive(repository, asset) as file:
             require(archive_manifest(file, asset["name"]) == data, "Archive and tagged manifests differ")
@@ -588,6 +635,9 @@ def fetch_release(github, repo, release):
             and archives() == assets
             and github.fetch(commit_path, 128, "application/vnd.github.sha").decode().strip() == commit,
             "Release changed while verifying")
+    inherited = {k: projection["compatibility"][k] for k in ("platforms", "architectures")}
+    for asset in assets:
+        asset["compatibility"] = targets.get(asset["name"], copy.deepcopy(inherited))
     return {"repository_id": repo["id"], "repository": repository, "release_id": release["id"],
             "tag": tag, "commit": commit, "manifest_blob_sha": blob_sha,
             "manifest_sha256": hashlib.sha256(data).hexdigest(), **projection,
@@ -637,8 +687,9 @@ def reconcile(github, policy, previous=None, now=None):
         require(key in current, "Withdrawal has no verified release record")
         current[key]["withdrawn"] = True
         current[key]["withdrawal_reason"] = reason
-    content = {"schema_version": 1, "publisher": PUBLISHER,
-               "releases": sorted(current.values(), key=lambda r: (r["repository_id"], r["release_id"]))}
+    content = {"schema_version": 2, "publisher": PUBLISHER,
+               "releases": sorted((with_asset_targets(r) for r in current.values()),
+                                  key=lambda r: (r["repository_id"], r["release_id"]))}
     revision = hashlib.sha256(canonical(content)).hexdigest()
     if previous and previous["revision"] == revision:
         return previous
