@@ -75,6 +75,8 @@ def notify(token, *, opener=None, clock=time.monotonic, sleep=time.sleep):
                 if error.code not in (429, 500, 502, 503, 504) and not rate_limited:
                     raise NotificationError(f"Catalog notification rejected (HTTP {error.code})") from None
                 retry_after = error.headers.get("Retry-After")
+                if retry_after is None and (error.code == 429 or rate_limited):
+                    raise NotificationError("Catalog notification is rate limited; wait for the server cooldown before retrying") from None
                 if retry_after is not None:
                     if not retry_after.isascii() or not retry_after.isdigit() or len(retry_after) > 2:
                         raise NotificationError("Catalog notification cannot honor the server retry delay") from None

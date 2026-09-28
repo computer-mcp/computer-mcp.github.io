@@ -115,6 +115,17 @@ class NotificationTests(unittest.TestCase):
             self.assertEqual(opener.open.call_count, 1)
             sleep.assert_not_called()
 
+    def test_rate_limit_without_explicit_delay_never_retries_early(self):
+        for status in (403, 429):
+            with self.subTest(status=status):
+                opener, sleep = Mock(), Mock()
+                opener.open.side_effect = [failure(status, {"X-RateLimit-Remaining": "0",
+                                                            "X-RateLimit-Reset": "9999999999"}), Response()]
+                with self.assertRaises(notification.NotificationError):
+                    notification.notify(TOKEN, opener=opener, sleep=sleep)
+                self.assertEqual(opener.open.call_count, 1)
+                sleep.assert_not_called()
+
     def test_authentication_and_configuration_failures_are_not_retried(self):
         for status in (400, 401, 403, 404, 422):
             opener, sleep = Mock(), Mock()

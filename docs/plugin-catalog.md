@@ -182,7 +182,9 @@ that run and the public index for generation, verification and Pages deployment 
 
 HTTP redirects are refused and response bodies are bounded to 16 KiB. Requests have a 20-second
 socket timeout, at most three attempts and a 90-second retry budget; caller jobs impose a
-three-minute limit. Transient failures honor supported server retry delays up to 30 seconds.
+three-minute limit. Transient failures honor supported server retry delays up to 30 seconds. Rate
+limits without a supported explicit retry delay fail instead of retrying before reset or the
+server's cooldown; retry the workflow later according to GitHub's rate-limit response.
 Authentication/configuration failures are not retried. Errors never print credentials or remote
 response bodies. A lost response may cause a duplicate request, which complete idempotent
 reconciliation handles. A failed notification does not change the already published release; retry
