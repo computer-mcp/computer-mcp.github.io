@@ -152,6 +152,44 @@ provide no metadata or policy overrides. Existing GitHub authentication is an op
 repository does not create credentials. If notifications are unavailable, scheduled and manual
 reconciliation still use the same complete verification path.
 
+## Plugin release notifications
+
+`.github/actions/notify-catalog` is the central composite action for notification senders. Pin it to
+a reviewed full commit in each plugin's workflow. It requires Python 3 on the runner, reads the
+provided `token` input through the environment, and sends only `{"ref":"main"}` to the fixed
+official `pages.yml` workflow. It cannot supply releases, replace policy or select another ref. It
+neither checks out nor executes the plugin package.
+
+Use an existing reviewed GitHub App installation token or other fine-grained authority with Actions
+write access restricted to `computer-mcp/computer-mcp.github.io`. Plugin repositories do not need
+Contents write access to the website. For event/manual notification, supply the token as
+`CATALOG_DISPATCH_TOKEN`; an existing release job can pass its temporary token directly to the
+action. Missing or rejected authority fails notification visibly. No action creates, renews or
+persists a credential, and a plugin's own `GITHUB_TOKEN` does not provide cross-repository access.
+
+Plugin workflows subscribe to published and edited releases, support manual retry, and expose a
+reusable workflow for the final publication job. A release created with a repository job token does
+not trigger ordinary release-event workflows: that publishing job must explicitly call notification
+after making the accepted release public. Candidate creation and draft upload do not publish a
+release and must not claim notification completion. GitHub documents these
+[event chaining rules](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow).
+
+The action uses the
+[workflow dispatch API](https://docs.github.com/en/rest/actions/workflows#create-a-workflow-dispatch-event),
+version `2026-03-10`. It validates the accepted run's numeric identity and exact official API/web
+URLs, and returns `run-url`. This receipt proves only that GitHub accepted a central run; inspect
+that run and the public index for generation, verification and Pages deployment success.
+
+HTTP redirects are refused and response bodies are bounded to 16 KiB. Requests have a 20-second
+socket timeout, at most three attempts and a 90-second retry budget; caller jobs impose a
+three-minute limit. Transient failures honor supported server retry delays up to 30 seconds.
+Authentication/configuration failures are not retried. Errors never print credentials or remote
+response bodies. A lost response may cause a duplicate request, which complete idempotent
+reconciliation handles. A failed notification does not change the already published release; retry
+the notification and let scheduled reconciliation recover missed events.
+
+## Resource bounds and verification
+
 The index is bounded to 4 MiB and 1,024 releases. A manifest is at most 1 MiB; each archive is at
 most 512 MiB, with at most 20,000 entries and the host package format's expansion/path bounds. A
 publisher run has a 10-minute deadline, at most 1,024 API requests and at most 1 GiB of archive

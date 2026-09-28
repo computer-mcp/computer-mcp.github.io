@@ -1,0 +1,20 @@
+name: Notify official plugin catalog
+description: Request a complete central catalog reconciliation and return its accepted run.
+inputs:
+  token:
+    description: Existing token with Actions write on computer-mcp/computer-mcp.github.io only.
+    required: true
+outputs:
+  run-url:
+    description: Accepted central workflow run; acceptance is not deployment success.
+    value: ${{ steps.notify.outputs.run-url }}
+runs:
+  using: composite
+  steps:
+    - name: Request central reconciliation
+      id: notify
+      shell: bash
+      env:
+        CATALOG_DISPATCH_TOKEN: ${{ inputs.token }}
+        CATALOG_ACTION_PATH: ${{ github.action_path }}
+      run: python3 "$CATALOG_ACTION_PATH/notify.py"
