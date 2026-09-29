@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "publisher": {
+    "login": "computer-mcp",
+    "id": 315005910
+  },
+  "repositories": [
+    { "id": 1368122608, "name": "computer-mcp/plugin-codex" },
+    { "id": 1368122624, "name": "computer-mcp/plugin-computer-use" },
+    { "id": 1368122634, "name": "computer-mcp/plugin-swift-format" },
+    { "id": 1384745559, "name": "computer-mcp/plugin-cursor" },
+    { "id": 1384746086, "name": "computer-mcp/plugin-claude" }
+  ],
+  "withdrawals": []
+}

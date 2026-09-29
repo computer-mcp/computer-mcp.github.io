@@ -11,7 +11,7 @@ not use a custom domain.
 
 ## Local development
 
-Use Node.js 22 or newer:
+Use Node.js 22 or newer and Python 3.11 or newer:
 
 ```sh
 npm ci
@@ -21,6 +21,7 @@ npm run dev
 Run every repository gate:
 
 ```sh
+npm run catalog:check-policy
 npm run format:check
 npm run check:html
 npm run build
@@ -30,7 +31,7 @@ npm test
 ```
 
 The production build is written to `dist/`. GitHub Pages deploys only that artifact from the
-protected `main` branch.
+official repository's `main` branch after validation and catalog reconciliation.
 
 `public/release.json` binds the deployed site to the product's delivered commit and release tag. The
 private website package version describes this build project, not the product version. After the
@@ -44,6 +45,20 @@ the generated record with the website delivery.
 `npm run release:verify-public -- vX.Y.Z` also compares it with the official public asset.
 Historical releases without a delivery-record asset retain their existing record until the next
 product delivery. Tests read the record rather than maintain another product-version constant.
+
+The plugin catalog publisher generates a separate versioned snapshot of verified current official
+plugin releases: the latest stable and any newer prerelease for each repository. Host and plugin
+releases are paired; discovery does not offer historical compatibility fallback. Run
+`npm run catalog:update -- --use-gh-auth` to produce `public/plugins/index.json` using existing
+GitHub CLI authentication, or provide `GH_TOKEN`/`GITHUB_TOKEN` in the process environment. The
+publisher also works without authentication within GitHub's public API limits. It downloads and
+verifies release archives without running package code. `npm run catalog:check-policy` and
+`npm run catalog:test` run offline; `npm run catalog:check` validates a generated snapshot.
+Automatic publication requires a complete verified snapshot committed to `main`; a missing seed
+fails Pages publication before upload and preserves the deployed site. Runs reconcile hourly, on
+source pushes and on manual workflow dispatch, persist changed generations and deploy one complete
+artifact. See [the plugin catalog contract](docs/plugin-catalog.md) for provenance, withdrawals,
+resource bounds, atomic updates and installation trust.
 
 ## Content boundaries
 
