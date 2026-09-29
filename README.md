@@ -46,18 +46,19 @@ the generated record with the website delivery.
 Historical releases without a delivery-record asset retain their existing record until the next
 product delivery. Tests read the record rather than maintain another product-version constant.
 
-The plugin catalog publisher generates a separate versioned snapshot of verified official plugin
-releases. Run `npm run catalog:update -- --use-gh-auth` to produce `public/plugins/index.json` using
-existing GitHub CLI authentication, or provide `GH_TOKEN`/`GITHUB_TOKEN` in the process environment.
-The publisher also works without authentication within GitHub's public API limits. It downloads and
+The plugin catalog publisher generates a separate versioned snapshot of verified current official
+plugin releases: the latest stable and any newer prerelease for each repository. Host and plugin
+releases are paired; discovery does not offer historical compatibility fallback. Run
+`npm run catalog:update -- --use-gh-auth` to produce `public/plugins/index.json` using existing
+GitHub CLI authentication, or provide `GH_TOKEN`/`GITHUB_TOKEN` in the process environment. The
+publisher also works without authentication within GitHub's public API limits. It downloads and
 verifies release archives without running package code. `npm run catalog:check-policy` and
-`npm run catalog:test` run offline; `npm run catalog:check` validates a generated snapshot. No
-plugin catalog snapshot is currently shipped by this website. Automatic publication requires an
-initial complete verified snapshot committed to `main`; until then, Pages publication fails before
-upload and preserves the deployed site. Subsequent runs reconcile hourly, on source pushes and on
-manual workflow dispatch, persist changed generations and deploy one complete artifact. See
-[the plugin catalog contract](docs/plugin-catalog.md) for provenance, withdrawals, resource bounds,
-atomic updates and installation trust.
+`npm run catalog:test` run offline; `npm run catalog:check` validates a generated snapshot.
+Automatic publication requires a complete verified snapshot committed to `main`; a missing seed
+fails Pages publication before upload and preserves the deployed site. Runs reconcile hourly, on
+source pushes and on manual workflow dispatch, persist changed generations and deploy one complete
+artifact. See [the plugin catalog contract](docs/plugin-catalog.md) for provenance, withdrawals,
+resource bounds, atomic updates and installation trust.
 
 ## Content boundaries
 

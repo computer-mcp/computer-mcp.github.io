@@ -309,8 +309,51 @@ class PublisherTests(unittest.TestCase):
 
         result = catalog.reconcile(Combined(), old.policy, previous, NOW)
         self.assertEqual(result["generation"], 2)
-        self.assertEqual([r["release_id"] for r in result["releases"]], [20, 21])
-        self.assertEqual(result["releases"][0], previous["releases"][0])
+        self.assertEqual([r["release_id"] for r in result["releases"]], [21])
+        catalog.validate_successor(previous, result)
+        # An obsolete package is outside discovery scope even if its archived manifest is broken.
+        old.bytes = package(b"invalid historical manifest")
+        self.assertEqual(catalog.reconcile(Combined(), old.policy, previous, NOW), result)
+        # A broken current package cannot cause fallback to the old release.
+        new.bytes = package(b"invalid current manifest")
+        with self.assertRaises(catalog.CatalogError):
+            catalog.reconcile(Combined(), old.policy, previous, NOW)
+
+    def test_current_channels_use_semantic_precedence_not_listing_order(self):
+        def record(identifier, value, prerelease=False):
+            return {"repository_id": 10, "release_id": identifier,
+                    "version": value, "prerelease": prerelease}
+        records = [record(1, "1.9.0"), record(2, "1.10.0"),
+                   record(3, "1.10.0-beta.1", True), record(4, "2.0.0-beta.2", True)]
+        for values in (records, list(reversed(records))):
+            self.assertEqual({r["release_id"] for r in catalog.current_releases(values)}, {2, 4})
+        self.assertEqual(catalog.current_releases(records[:3]), [records[1]])
+        with self.assertRaises(catalog.CatalogError):
+            catalog.current_releases([record(1, "1.0.0+a"), record(2, "1.0.0+b")])
+
+    def test_current_release_successor_preserves_owner_channel_and_precedence(self):
+        old = self.snapshot()["releases"][0]
+        current = copy.deepcopy(old)
+        current.update(release_id=21, version="2.0.0")
+        self.assertTrue(catalog.supersedes(current, old))
+        for field, value in (("version", "1.0.0"), ("version", "0.9.0"),
+                             ("prerelease", True), ("plugin_id", "other"),
+                             ("repository_id", 999), ("repository", "computer-mcp/plugin-other")):
+            with self.subTest(field=field, value=value):
+                changed = {**current, field: value}
+                self.assertFalse(catalog.supersedes(changed, old))
+        self.assertTrue(catalog.supersedes(current, {**old, "prerelease": True}))
+
+    def test_superseded_records_are_not_valid_snapshots(self):
+        snapshot = self.snapshot()
+        old = copy.deepcopy(snapshot["releases"][0])
+        old.update(release_id=19, version="0.9.0", tag="v0.9.0")
+        old["assets"][0].update(id=29, url=f"https://github.com/{REPOSITORY}/releases/download/v0.9.0/example.zip")
+        snapshot["releases"].insert(0, old)
+        snapshot["revision"] = hashlib.sha256(catalog.canonical({k: snapshot[k]
+            for k in ("schema_version", "publisher", "releases")})).hexdigest()
+        with self.assertRaisesRegex(catalog.CatalogError, "superseded"):
+            catalog.validate_snapshot(snapshot)
 
     def test_offline_snapshot_check_enforces_current_publisher_policy(self):
         snapshot = self.snapshot()

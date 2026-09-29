@@ -1,10 +1,13 @@
 # Official plugin catalog
 
 The publisher generates `public/plugins/index.json`, which belongs at `/plugins/index.json` in a
-complete Pages artifact. This JSON describes published plugin releases for discovery and version
-selection. It grants no execution permission and is not an artifact signature. The host installer
-must still revalidate the selected GitHub Release, repository identity and asset membership, then
-verify the downloaded bytes and package using its existing installation rules.
+complete Pages artifact. This JSON describes current published plugin releases for discovery and
+selection. Each repository contributes its highest stable semantic version and, when newer, its
+highest prerelease. API order and publication time do not choose the version. The catalog is a
+current release set for paired host/plugin delivery, with no historical compatibility fallback. It
+grants no execution permission and is not an artifact signature. The host installer must still
+revalidate the selected GitHub Release, repository identity and asset membership, then verify the
+downloaded bytes and package using its existing installation rules.
 
 The generator, policy, serialized publication workflow and offline tests are available in this
 repository. Public catalog delivery requires a complete verified initial snapshot committed to
@@ -47,7 +50,7 @@ requests; automation always uses this option.
 | `generation`     | Positive integer incremented only when catalog content changes.                          |
 | `revision`       | SHA-256 of the canonical object containing `schema_version`, `publisher` and `releases`. |
 | `generated_at`   | UTC time of the content generation, in `YYYY-MM-DDTHH:MM:SSZ` format.                    |
-| `releases`       | Complete records sorted by numeric repository ID and release ID.                         |
+| `releases`       | Current release records sorted by numeric repository ID and release ID.                  |
 
 Each release record contains:
 
@@ -65,7 +68,8 @@ Each release record contains:
   setup instructions and nullable documentation URLs. These are prerequisites the user supplies, not
   instructions to install software automatically.
 - Boolean `prerelease`, UTC `published_at`, boolean `withdrawn` and nullable `withdrawal_reason`. A
-  withdrawn version stays visible as a historical identity and cannot be selected for installation.
+  withdrawn current version stays unavailable until a newer release supersedes it. An older version
+  is never selected in its place.
 - `assets`, sorted by numeric asset ID. Each archive carries `id`, `name`, `size` in bytes, `sha256`
   and its exact official browser download `url`, plus `compatibility` containing `platforms` and
   `architectures`. Each archive target must be a subset of the release-wide target.
@@ -98,19 +102,26 @@ Clients therefore measure cache freshness from a successful fetch or conditional
 `scripts/plugin-catalog-policy.json` admits official repositories by both name and numeric ID.
 Adding a repository requires a reviewed publisher policy change and no host release. The generator
 checks that each source is a public, active, non-fork repository of the configured organization. It
-enumerates published releases, resolves each exact tag to a commit and reads the root
-`computer-mcp-plugin.toml` at that commit. It checks the Git blob identity, tag/version agreement,
-manifest projection, release-owned assets, uploaded state, size and SHA-256.
+enumerates published release identities, selects the current versions by semantic precedence,
+resolves each selected exact tag to a commit and reads the root `computer-mcp-plugin.toml` at that
+commit. It checks the Git blob identity, tag/version agreement, manifest projection, release-owned
+assets, uploaded state, size and SHA-256.
 
 Every advertised archive is downloaded within bounded budgets. The generator reads the root manifest
 directly from ZIP or tar, compares its bytes with the tagged manifest, and never extracts or
 executes package code. It checks release, tag and asset identities again after downloading.
-Non-archive receipt files are not advertised as installable archives. A published release with no
-complete verified archive fails generation; a draft is not advertised.
+Non-archive receipt files are not advertised as installable archives. A selected release with no
+complete verified archive fails generation; a draft is not advertised. Historical archives are
+outside discovery scope and are not fetched. A broken current archive fails the whole generation and
+preserves the previous snapshot, rather than selecting an older release. Equal-precedence versions
+with different release identities are ambiguous and fail selection.
 
 Existing package identities are immutable. Changing their tag commit, declaration, asset ID, name,
 digest or size fails generation. Promoting a prerelease to the stable channel preserves the same
-package identity. Missing releases, missing assets and network failures do not imply withdrawal.
+package identity. A current record can leave the snapshot only when a strictly newer version of the
+same plugin and numeric repository supersedes it. Stable releases require stable successors;
+prereleases can be superseded by either channel. This also applies when a client skips generations.
+Missing releases, missing assets and network failures do not imply withdrawal or permit rollback.
 
 To withdraw a version, add a record to the policy's `withdrawals` array:
 
@@ -122,11 +133,14 @@ To withdraw a version, add a record to the policy's `withdrawals` array:
 }
 ```
 
-The record must identify a previously verified or currently verifiable release. The publisher
-retains its verified metadata and marks it withdrawn, including when the upstream release has
-disappeared. A deleted repository can be removed from the repository allowlist only when all its
-previously advertised releases have explicit withdrawals. Removing a withdrawal does not silently
-restore a version; deliver a new release instead.
+For a current version, the record must identify a previously verified or currently verifiable
+release. The publisher retains its verified metadata and marks it withdrawn, including when the
+upstream release has disappeared. A newer release supersedes that unavailable current version.
+Policy withdrawal identities can remain as durable safety records after supersession, but they do
+not add historical versions to discovery. An unknown release identity is rejected. A deleted
+repository can be removed from the allowlist only with explicit withdrawals of its remaining current
+releases. Removing a withdrawal does not silently restore a version; deliver a new release instead.
+Published GitHub release files and tags remain immutable.
 
 ## Publication and failure behavior
 

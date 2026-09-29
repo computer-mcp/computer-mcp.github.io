@@ -1,0 +1,337 @@
+{
+  "generated_at": "2026-09-29T07:36:43Z",
+  "generation": 1,
+  "publisher": {
+    "id": 315005910,
+    "login": "computer-mcp"
+  },
+  "releases": [
+    {
+      "assets": [
+        {
+          "compatibility": {
+            "architectures": [
+              "arm64"
+            ],
+            "platforms": [
+              "macos"
+            ]
+          },
+          "id": 581929511,
+          "name": "codex-plugin.zip",
+          "sha256": "a35b41d960159fdf154c0cef2394737cc4cdbbfe087def92dbc4c6a20af0fcc8",
+          "size": 13402792,
+          "url": "https://github.com/computer-mcp/plugin-codex/releases/download/v0.2.1/codex-plugin.zip"
+        }
+      ],
+      "commit": "0c8be9e8ac61edeb2292da0935ab519f49765d60",
+      "compatibility": {
+        "architectures": [
+          "arm64"
+        ],
+        "maximum_host": null,
+        "minimum_host": null,
+        "platforms": [
+          "macos"
+        ]
+      },
+      "contributions": {
+        "cli": [],
+        "mcp": [
+          "app-server"
+        ],
+        "skills": []
+      },
+      "dependencies": [],
+      "manifest_blob_sha": "81060065b37a9b2cc41dff5597e087063f21f60f",
+      "manifest_sha256": "4a21cc7e0476552c57da9feb1478d0743c8317aa84ecc40f0ec1d8a348007829",
+      "name": "Codex",
+      "plugin_id": "codex",
+      "prerelease": false,
+      "published_at": "2026-09-22T17:53:08Z",
+      "release_id": 393988620,
+      "repository": "computer-mcp/plugin-codex",
+      "repository_id": 1368122608,
+      "summary": "Codex execution and protocol inspection through standard MCP.",
+      "tag": "v0.2.1",
+      "version": "0.2.1",
+      "withdrawal_reason": null,
+      "withdrawn": false
+    },
+    {
+      "assets": [
+        {
+          "compatibility": {
+            "architectures": [],
+            "platforms": [
+              "macos"
+            ]
+          },
+          "id": 560881474,
+          "name": "computer-use.zip",
+          "sha256": "25115afb9be757078eddfafb9209aef4e6763969f11b86f96e3a764bfd8666a0",
+          "size": 17568,
+          "url": "https://github.com/computer-mcp/plugin-computer-use/releases/download/v1.0.0/computer-use.zip"
+        }
+      ],
+      "commit": "147b58afde902ce7b041d5b538eb5b5a623ff74a",
+      "compatibility": {
+        "architectures": [],
+        "maximum_host": null,
+        "minimum_host": null,
+        "platforms": [
+          "macos"
+        ]
+      },
+      "contributions": {
+        "cli": [],
+        "mcp": [
+          "native"
+        ],
+        "skills": [
+          "guidance"
+        ]
+      },
+      "dependencies": [
+        {
+          "applications": [
+            {
+              "bundle_identifier": "com.openai.sky.CUAService",
+              "executable": "Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient"
+            }
+          ],
+          "commands": [
+            "SkyComputerUseClient"
+          ],
+          "documentation": null,
+          "id": "computer-use-client",
+          "instructions": "Use the Computer Use client supplied by its vendor. Bind its actual executable in the host plugin settings if it is not on the host search path. Check vendor support, caller identity and system permissions before use."
+        }
+      ],
+      "manifest_blob_sha": "c8bce39527cf6a69e8b9bce7f9993ee0054c53fc",
+      "manifest_sha256": "4c8bd014d661ccf24eaa34a46652989b4baf12d3187b1d5d3629a0e3142f4607",
+      "name": "Computer Use",
+      "plugin_id": "computer-use",
+      "prerelease": false,
+      "published_at": "2026-09-13T08:36:43Z",
+      "release_id": 387841267,
+      "repository": "computer-mcp/plugin-computer-use",
+      "repository_id": 1368122624,
+      "summary": "Native Computer Use MCP registration and observe–act–verify guidance.",
+      "tag": "v1.0.0",
+      "version": "1.0.0",
+      "withdrawal_reason": null,
+      "withdrawn": false
+    },
+    {
+      "assets": [
+        {
+          "compatibility": {
+            "architectures": [],
+            "platforms": [
+              "macos"
+            ]
+          },
+          "id": 560881503,
+          "name": "swift-format.zip",
+          "sha256": "ed461f417626f63dd77f9a3f12d0657a914495b9cd8d03315138ada6b0060691",
+          "size": 59745,
+          "url": "https://github.com/computer-mcp/plugin-swift-format/releases/download/v1.0.0/swift-format.zip"
+        }
+      ],
+      "commit": "46161fa667c88dd8f31e9e03e7cb63101596358e",
+      "compatibility": {
+        "architectures": [],
+        "maximum_host": null,
+        "minimum_host": null,
+        "platforms": [
+          "macos"
+        ]
+      },
+      "contributions": {
+        "cli": [
+          "format"
+        ],
+        "mcp": [],
+        "skills": []
+      },
+      "dependencies": [
+        {
+          "applications": [],
+          "commands": [
+            "swift-format"
+          ],
+          "documentation": "https://github.com/swiftlang/swift-format",
+          "id": "formatter",
+          "instructions": "Use the swift-format supplied with Swift 6.3.1 and bind that actual executable in host plugin settings. Each authorized call checks its version and native interface against the verified baseline. A mismatch requires a compatible binding or a reviewed plugin update. This package does not install Swift or change PATH."
+        }
+      ],
+      "manifest_blob_sha": "9cd54b4cd3f733db5a806f40ecdee2af6782d07e",
+      "manifest_sha256": "869278ecc504c5d5199b67c10cd8903069c43a8bb4957d4732a3aad606a5f81c",
+      "name": "Swift Format",
+      "plugin_id": "swift-format",
+      "prerelease": false,
+      "published_at": "2026-09-13T08:36:44Z",
+      "release_id": 387841274,
+      "repository": "computer-mcp/plugin-swift-format",
+      "repository_id": 1368122634,
+      "summary": "Swift source formatting and linting through a verified native command-tree export.",
+      "tag": "v1.0.0",
+      "version": "1.0.0",
+      "withdrawal_reason": null,
+      "withdrawn": false
+    },
+    {
+      "assets": [
+        {
+          "compatibility": {
+            "architectures": [
+              "arm64"
+            ],
+            "platforms": [
+              "macos"
+            ]
+          },
+          "id": 597374287,
+          "name": "cursor.zip",
+          "sha256": "f11e274fb93a3c8e3845566e79d7b41f8e3ef657cfc2668ea2b36345af8adbfd",
+          "size": 103126,
+          "url": "https://github.com/computer-mcp/plugin-cursor/releases/download/v0.1.1/cursor.zip"
+        }
+      ],
+      "commit": "38d5a8879d2bbe016e58dc9d9d672d7ca6572bf9",
+      "compatibility": {
+        "architectures": [
+          "arm64"
+        ],
+        "maximum_host": null,
+        "minimum_host": "1.2.2",
+        "platforms": [
+          "macos"
+        ]
+      },
+      "contributions": {
+        "cli": [
+          "agent"
+        ],
+        "mcp": [
+          "acp"
+        ],
+        "skills": [
+          "cursor-agent"
+        ]
+      },
+      "dependencies": [
+        {
+          "applications": [],
+          "commands": [
+            "agent"
+          ],
+          "documentation": "https://cursor.com/docs/cli/overview",
+          "id": "cursor-agent",
+          "instructions": "Install and authenticate Cursor Agent separately. This plugin never installs, updates, logs in, or copies Cursor credentials."
+        },
+        {
+          "applications": [],
+          "commands": [
+            "python3"
+          ],
+          "documentation": "https://www.python.org/downloads/",
+          "id": "python-runtime",
+          "instructions": "Provide Python 3.13 or newer on the Computer MCP launch PATH. The plugin does not install Python."
+        }
+      ],
+      "manifest_blob_sha": "f7c427d7d17a5ddd2a72275435d0d8f2cd0ccd65",
+      "manifest_sha256": "0aaba65f74abd7439196cf99724bb331c5f83e1a11002892a85062bb7e79e5e2",
+      "name": "Cursor",
+      "plugin_id": "cursor",
+      "prerelease": false,
+      "published_at": "2026-09-29T05:42:28Z",
+      "release_id": 398853157,
+      "repository": "computer-mcp/plugin-cursor",
+      "repository_id": 1384745559,
+      "summary": "Cursor Agent CLI automation plus an ACP-to-MCP adapter.",
+      "tag": "v0.1.1",
+      "version": "0.1.1",
+      "withdrawal_reason": null,
+      "withdrawn": false
+    },
+    {
+      "assets": [
+        {
+          "compatibility": {
+            "architectures": [
+              "arm64"
+            ],
+            "platforms": [
+              "macos"
+            ]
+          },
+          "id": 597374962,
+          "name": "claude.zip",
+          "sha256": "eb52779e058e3129ddde19a7e87f57ea680e96ed3d0774a5bddb094b1d52e725",
+          "size": 86272,
+          "url": "https://github.com/computer-mcp/plugin-claude/releases/download/v0.1.1/claude.zip"
+        }
+      ],
+      "commit": "476520219efe6083adfaa90a118da98aaa962d82",
+      "compatibility": {
+        "architectures": [
+          "arm64"
+        ],
+        "maximum_host": null,
+        "minimum_host": "1.2.2",
+        "platforms": [
+          "macos"
+        ]
+      },
+      "contributions": {
+        "cli": [
+          "claude"
+        ],
+        "mcp": [
+          "stream"
+        ],
+        "skills": [
+          "claude-code"
+        ]
+      },
+      "dependencies": [
+        {
+          "applications": [],
+          "commands": [
+            "claude"
+          ],
+          "documentation": "https://docs.anthropic.com/en/docs/claude-code/cli-reference",
+          "id": "claude-code",
+          "instructions": "Install and authenticate Claude Code separately. This plugin never installs, updates, logs in, creates setup tokens, or copies Claude credentials."
+        },
+        {
+          "applications": [],
+          "commands": [
+            "python3"
+          ],
+          "documentation": "https://www.python.org/downloads/",
+          "id": "python-runtime",
+          "instructions": "Provide Python 3.13 or newer on the Computer MCP launch PATH. The plugin does not install Python."
+        }
+      ],
+      "manifest_blob_sha": "d27c6bfadb366dd2f569b61ba03da2207b9b8554",
+      "manifest_sha256": "8e9f92f5eaa47bc54fddb53a6695366e2149f9067e94770314ece7d0eeab5893",
+      "name": "Claude Code",
+      "plugin_id": "claude",
+      "prerelease": false,
+      "published_at": "2026-09-29T05:42:49Z",
+      "release_id": 398853296,
+      "repository": "computer-mcp/plugin-claude",
+      "repository_id": 1384746086,
+      "summary": "Claude Code headless CLI automation plus a streaming CLI-to-MCP adapter.",
+      "tag": "v0.1.1",
+      "version": "0.1.1",
+      "withdrawal_reason": null,
+      "withdrawn": false
+    }
+  ],
+  "revision": "b73c5aee4aed8e3e794886ece3b06e81653bd3465440159d23c48ae3fbd0c6ed",
+  "schema_version": 2
+}

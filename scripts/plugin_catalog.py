@@ -176,6 +176,29 @@ def release_key(record):
     return record["repository_id"], record["release_id"]
 
 
+def supersedes(new, old):
+    return (new["repository_id"] == old["repository_id"]
+            and new["repository"] == old["repository"]
+            and new["plugin_id"] == old["plugin_id"]
+            and (old["prerelease"] or not new["prerelease"])
+            and precedes(old["version"], new["version"]))
+
+
+def current_releases(records):
+    """Keep the stable tip and any newer prerelease, independent of API order."""
+    tips = {}
+    for record in records:
+        key = record["repository_id"], record["prerelease"]
+        old = tips.get(key)
+        if old is None or precedes(old["version"], record["version"]):
+            tips[key] = record
+        elif not precedes(record["version"], old["version"]):
+            require(release_key(record) == release_key(old), "Ambiguous current release version")
+    return [record for key, record in tips.items()
+            if not record["prerelease"] or (key[0], False) not in tips
+            or precedes(tips[(key[0], False)]["version"], record["version"])]
+
+
 def validate_target(value):
     object_keys(value, ("platforms", "architectures"))
     require(isinstance(value["platforms"], list) and bool(value["platforms"])
@@ -433,6 +456,10 @@ def validate_snapshot(snapshot):
     unique([release_key(r) for r in records])
     unique([(r["repository_id"], r["version"]) for r in records])
     unique([(r["repository_id"], r["tag"]) for r in records])
+    require({release_key(r) for r in current_releases(records)} == {release_key(r) for r in records},
+            "Catalog contains superseded releases")
+    require(all(len({r["plugin_id"] for r in records if r["repository_id"] == repository_id}) == 1
+                for repository_id in repo_names), "Repository plugin identity differs")
     content = {key: snapshot[key] for key in ("schema_version", "publisher", "releases")}
     require(hashlib.sha256(canonical(content)).hexdigest() == snapshot["revision"], "Catalog revision differs")
     require(len(canonical(snapshot)) <= MAX_INDEX, "Catalog exceeds byte budget")
@@ -449,7 +476,9 @@ def validate_policy_snapshot(policy, snapshot):
                 "Catalog repository is not admitted by policy")
         if record["withdrawn"]:
             observed[key] = record["withdrawal_reason"]
-    require(observed == withdrawals, "Catalog withdrawals differ from policy")
+    require(observed == {key: reason for key, reason in withdrawals.items()
+                         if key in {release_key(r) for r in snapshot["releases"]}},
+            "Catalog withdrawals differ from policy")
 
 
 def with_asset_targets(record):
@@ -477,8 +506,11 @@ def validate_successor(previous, current):
     records = {release_key(r): r for r in current["releases"]}
     for old in previous["releases"]:
         new = records.get(release_key(old))
-        require(new is not None and immutable_release(new) == immutable_release(old),
-                "Published release identity changed or disappeared")
+        if new is None:
+            require(any(supersedes(record, old) for record in current["releases"]),
+                    "Current release disappeared without a newer release")
+            continue
+        require(immutable_release(new) == immutable_release(old), "Published release identity changed")
         require(not old["withdrawn"] or new["withdrawn"], "A withdrawal cannot be silently undone")
 
 
@@ -651,7 +683,7 @@ def reconcile(github, policy, previous=None, now=None):
         validate_snapshot(previous)
     prior = {release_key(r): r for r in previous["releases"]} if previous else {}
     withdrawals = {release_key(r): r["reason"] for r in policy["withdrawals"]}
-    current = {}
+    current, listed = {}, {}
     for repo in sorted(policy["repositories"], key=lambda r: r["id"]):
         prefix = "/repos/" + repo["name"]
         source = github.json(prefix)
@@ -662,11 +694,24 @@ def reconcile(github, policy, previous=None, now=None):
                 and source["owner"].get("id") == PUBLISHER["id"]
                 and source["owner"].get("login") == PUBLISHER["login"]
                 and source["owner"].get("type") == "Organization", "Official repository identity differs")
+        candidates = []
         for release in github.listing(prefix + "/releases"):
             if release.get("draft") is True:
                 continue
+            release_identity(release, repo["name"])
             key = repo["id"], identity(release.get("id"))
-            require(key not in current, "Duplicate release")
+            require(key not in listed, "Duplicate release")
+            tag_version = release["tag_name"].removeprefix("v")
+            version(tag_version)
+            selection = {"repository_id": repo["id"], "release_id": key[1],
+                         "version": tag_version, "prerelease": release["prerelease"],
+                         "release": release}
+            listed[key] = selection
+            candidates.append(selection)
+            require(len(listed) <= MAX_RELEASES, "Too many releases")
+        for selection in current_releases(candidates):
+            release = selection["release"]
+            key = release_key(selection)
             if key in withdrawals and key in prior:
                 current[key] = copy.deepcopy(prior[key])
             else:
@@ -677,6 +722,8 @@ def reconcile(github, policy, previous=None, now=None):
             require(len(current) <= MAX_RELEASES, "Too many releases")
     for key, old in prior.items():
         if key not in current:
+            if any(supersedes(record, old) for record in current.values()):
+                continue
             require(key in withdrawals, "Published release disappeared without an explicit withdrawal")
             current[key] = copy.deepcopy(old)
         else:
@@ -684,11 +731,19 @@ def reconcile(github, policy, previous=None, now=None):
             require(immutable_release(current[key]) == immutable_release(old), "Published release identity changed")
         require(not old["withdrawn"] or key in withdrawals, "A withdrawal cannot be silently undone")
     for key, reason in withdrawals.items():
+        if key not in current:
+            require(key in prior or key in listed, "Withdrawal has no verified release record")
+            old = prior.get(key) or listed[key]
+            require(any(record["repository_id"] == old["repository_id"]
+                        and (old["prerelease"] or not record["prerelease"])
+                        and precedes(old["version"], record["version"])
+                        for record in current.values()), "Withdrawal has no current release record")
+            continue
         require(key in current, "Withdrawal has no verified release record")
         current[key]["withdrawn"] = True
         current[key]["withdrawal_reason"] = reason
     content = {"schema_version": 2, "publisher": PUBLISHER,
-               "releases": sorted((with_asset_targets(r) for r in current.values()),
+               "releases": sorted((with_asset_targets(r) for r in current_releases(current.values())),
                                   key=lambda r: (r["repository_id"], r["release_id"]))}
     revision = hashlib.sha256(canonical(content)).hexdigest()
     if previous and previous["revision"] == revision:
