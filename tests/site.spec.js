@@ -72,17 +72,19 @@ test("ships complete metadata and the GitHub Pages root contract", async ({ page
 
 test("separates host permissions from native Codex authority", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Switch to English" }).click();
   const security = page.locator("#security");
-  await expect(
-    security.getByRole("heading", { name: "Three host permission modes" }),
-  ).toBeVisible();
-  await expect(security).toContainText("independent of profile names or connection channels");
-  await expect(security).toContainText(
-    "Local full access alone does not grant tools or enable Full Shell",
-  );
-  await expect(security).toContainText("The owner approves in the App or management CLI");
-  await expect(security).toContainText("A model-supplied confirm field is not approval");
+  await expect(security.getByRole("heading", { name: "观察，或控制" })).toBeVisible();
+  await expect(security).toContainText("完全访问，默认仅本次会话");
+  await expect(security).toContainText("工作区不是沙箱");
+  await page.getByRole("button", { name: "Switch to English" }).click();
+  await expect(security.getByRole("heading", { name: "Observe or Control" })).toBeVisible();
+  await expect(security).toContainText("Observe permits inspection without system changes");
+  await expect(security).toContainText("never permits arbitrary execution");
+  await expect(security).toContainText("Approval defaults to This Session");
+  await expect(security).toContainText("Always Allow this Client is a separate choice");
+  await expect(security).toContainText("Changes apply to new requests immediately");
+  await expect(security).toContainText("a workspace is not a sandbox");
+  await expect(security).toContainText("macOS privacy permissions require their own authorization");
   const codex = page.locator(".codex-contract");
   await expect(codex).toContainText("App Server and Exec lifecycles through swift-codex");
   await expect(codex).toContainText(
@@ -103,7 +105,7 @@ test("states execution, integration and cancellation boundaries", async ({ page 
   const limits = page.locator(".limitations");
   await expect(limits).toContainText("A working directory or worktree is not an OS sandbox");
   await expect(limits).toContainText(
-    "Full Shell and native Codex Full Access carry the executing user's permissions",
+    "Host Full Access and native Codex Full Access carry the executing user's permissions",
   );
   await expect(limits).toContainText(
     "A cancellation request is not proof of completion or cleanup",
