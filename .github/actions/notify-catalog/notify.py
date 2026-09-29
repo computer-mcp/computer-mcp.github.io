@@ -52,7 +52,7 @@ def accepted_run(response, deadline, clock):
 
 def notify(token, *, opener=None, clock=time.monotonic, sleep=time.sleep):
     if not token or len(token) > 8192 or any(not 33 <= ord(c) <= 126 for c in token):
-        raise NotificationError("CATALOG_DISPATCH_TOKEN is missing or invalid; configure existing receiver-scoped authority")
+        raise NotificationError("CATALOG_DISPATCH_TOKEN is missing or invalid; check the catalog App token step")
     if opener is None:
         opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
     deadline = clock() + 90

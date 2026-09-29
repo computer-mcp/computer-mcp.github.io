@@ -185,17 +185,29 @@ reconciliation still use the same complete verification path.
 ## Plugin release notifications
 
 `.github/actions/notify-catalog` is the central composite action for notification senders. Pin it to
-a reviewed full commit in each plugin's workflow. It requires Python 3 on the runner, reads the
-provided `token` input through the environment, and sends only `{"ref":"main"}` to the fixed
-official `pages.yml` workflow. It cannot supply releases, replace policy or select another ref. It
-neither checks out nor executes the plugin package.
+a reviewed full commit in each plugin's workflow. It requires Python 3 on the runner, creates a
+short-lived installation token from its `client-id` and `private-key` inputs, and sends only
+`{"ref":"main"}` to the fixed official `pages.yml` workflow. It cannot supply releases, replace
+policy or select another ref. It neither checks out nor executes the plugin package.
 
-Use an existing reviewed GitHub App installation token or other fine-grained authority with Actions
-write access restricted to `computer-mcp/computer-mcp.github.io`. Plugin repositories do not need
-Contents write access to the website. For event/manual notification, supply the token as
-`CATALOG_DISPATCH_TOKEN`; an existing release job can pass its temporary token directly to the
-action. Missing or rejected authority fails notification visibly. No action creates, renews or
-persists a credential, and a plugin's own `GITHUB_TOKEN` does not provide cross-repository access.
+The organization-owned catalog GitHub App is installed only on
+`computer-mcp/computer-mcp.github.io`, with Actions write and mandatory Metadata read. Actions write
+also permits other Actions administration in that repository; GitHub does not offer a
+workflow-specific dispatch-only permission. The App has no website Contents write permission.
+Disable its webhook and user OAuth flows; the sender only needs installation authentication.
+
+Configure `CATALOG_APP_CLIENT_ID` as an Actions variable and `CATALOG_APP_PRIVATE_KEY` as an Actions
+secret in each authorized official plugin repository. The composite action pins GitHub's token
+action, explicitly scopes each token to the receiving repository and Actions write, and revokes the
+token when the job finishes. GitHub also expires installation tokens after one hour. Neither the
+private key nor token is written to artifacts or logs. A plugin's own `GITHUB_TOKEN` does not
+provide this cross-repository authority. Missing or rejected authority fails notification visibly.
+
+The organization owner controls the App and key rotation. Generate a replacement key, update the
+five authorized sender secrets, verify a manual notification, then revoke the previous key.
+Suspending the installation stops notification access immediately. Scheduled reconciliation in the
+website continues independently. Key provisioning and rotation are explicit owner operations;
+ordinary release jobs mint only temporary installation tokens.
 
 Plugin workflows subscribe to published and edited releases, support manual retry, and expose a
 reusable workflow for the final publication job. A release created with a repository job token does
