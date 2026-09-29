@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-29T07:36:43Z",
-  "generation": 1,
+  "generated_at": "2026-09-29T15:52:00Z",
+  "generation": 2,
   "publisher": {
     "id": 315005910,
     "login": "computer-mcp"
@@ -17,22 +17,39 @@
               "macos"
             ]
           },
-          "id": 581929511,
-          "name": "codex-plugin.zip",
-          "sha256": "a35b41d960159fdf154c0cef2394737cc4cdbbfe087def92dbc4c6a20af0fcc8",
-          "size": 13402792,
-          "url": "https://github.com/computer-mcp/plugin-codex/releases/download/v0.2.1/codex-plugin.zip"
+          "id": 598568427,
+          "name": "codex-plugin-macos-arm64.zip",
+          "sha256": "8a25dcbe9ffe5f4766903ea5c397b6e3a4413f39254cba6973053a9a128e80bb",
+          "size": 13624256,
+          "url": "https://github.com/computer-mcp/plugin-codex/releases/download/v0.3.0/codex-plugin-macos-arm64.zip"
+        },
+        {
+          "compatibility": {
+            "architectures": [
+              "x86_64"
+            ],
+            "platforms": [
+              "windows"
+            ]
+          },
+          "id": 598568567,
+          "name": "codex-plugin-windows-x86_64.zip",
+          "sha256": "4267d4ebe0a137b6cba36b7cc52b6025cbb02df22b6f9fc36bb80912acff8a80",
+          "size": 51769739,
+          "url": "https://github.com/computer-mcp/plugin-codex/releases/download/v0.3.0/codex-plugin-windows-x86_64.zip"
         }
       ],
-      "commit": "0c8be9e8ac61edeb2292da0935ab519f49765d60",
+      "commit": "b9f900dc2c7ca2fdf840c5799110135164e5b827",
       "compatibility": {
         "architectures": [
-          "arm64"
+          "arm64",
+          "x86_64"
         ],
         "maximum_host": null,
-        "minimum_host": null,
+        "minimum_host": "1.3.0",
         "platforms": [
-          "macos"
+          "macos",
+          "windows"
         ]
       },
       "contributions": {
@@ -43,18 +60,18 @@
         "skills": []
       },
       "dependencies": [],
-      "manifest_blob_sha": "81060065b37a9b2cc41dff5597e087063f21f60f",
-      "manifest_sha256": "4a21cc7e0476552c57da9feb1478d0743c8317aa84ecc40f0ec1d8a348007829",
+      "manifest_blob_sha": "9eae723dd7609263874c48046f3beb61fcee0616",
+      "manifest_sha256": "35ed150abd378cffbcf6df02db98a5eedad23f1cef43de99b6dde524da3f276c",
       "name": "Codex",
       "plugin_id": "codex",
       "prerelease": false,
-      "published_at": "2026-09-22T17:53:08Z",
-      "release_id": 393988620,
+      "published_at": "2026-09-29T15:51:31Z",
+      "release_id": 399291775,
       "repository": "computer-mcp/plugin-codex",
       "repository_id": 1368122608,
       "summary": "Codex execution and protocol inspection through standard MCP.",
-      "tag": "v0.2.1",
-      "version": "0.2.1",
+      "tag": "v0.3.0",
+      "version": "0.3.0",
       "withdrawal_reason": null,
       "withdrawn": false
     },
@@ -332,6 +349,6 @@
       "withdrawn": false
     }
   ],
-  "revision": "b73c5aee4aed8e3e794886ece3b06e81653bd3465440159d23c48ae3fbd0c6ed",
+  "revision": "145aa6911352e55e45269be5666399cf8b7bba92804aa00ae191490f08bca52c",
   "schema_version": 2
 }
