@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "source": "https://github.com/computer-mcp/computer-mcp",
+  "revision": "3c498108b1b847ae126fd2593cd0d3ddb4d0d9858d0dae214b1439ff69226e50",
+  "consumer": "computer-mcp.github.io",
+  "name": "Computer MCP",
+  "promise": {
+    "en": "Let ChatGPT use your local tools.",
+    "zh-CN": "\u8ba9 ChatGPT\uff0c\u7528\u4e0a\u4f60\u7684\u672c\u673a\u5de5\u5177\u3002"
+  },
+  "files": {
+    "public/brand/mark.svg": "7bb502a5fdef1fa0bac048e2d4cf95f82418bc6a44ede6c2ebb84a3026a70256",
+    "public/brand/mark.png": "0512e783fc7ae6d244bcd35ab637acc1a6f4e34ca2b3bad3ca69487b4678275d",
+    "public/brand/favicon.png": "b2b4bb1779d1612af9167c44b1f0e28eac02109f57ab4201e63d7c5c09a14522",
+    "public/brand/apple-touch-icon.png": "e3cdaf5d402dd60594939d7e6c8629115637fec84c30a8d0c3ac40a8ab7e1798",
+    "public/brand/social-en.png": "01cc43dafa0c3501e5fefe71b89d9fe2e1fc175893b10c6e8a43be38ec962768",
+    "public/brand/social-zh-CN.png": "591b8634070b6c172f0dd2893d4e39a89f6c02b57fb1fb31cccb996d1157b512",
+    "scripts/check-brand.py": "2ec3c64469774b48fbfa6fbfa7f6a35c6a172fe4de347beb1881766632fbfdde"
+  }
+}

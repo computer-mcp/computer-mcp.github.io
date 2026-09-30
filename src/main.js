@@ -58,8 +58,8 @@ languageToggle?.addEventListener("click", () => {
     ?.setAttribute(
       "content",
       message(
-        "连接 CLI、Codex、MCP 和 Skills，在 ChatGPT 对话里写代码、处理文件、运行你的 Mac 工具。按需接入，权限由你配置。",
-        "Connect ChatGPT to your Mac's CLI tools, Codex, MCP servers and Skills. Write code, work with files and run your tools, with permissions you choose.",
+        "让 ChatGPT，用上你的本机工具。直接组合 CLI、MCP、Skills 与 Computer Use，跨多台电脑工作，每台宿主独立管理权限。Codex 是可选集成。",
+        "Let ChatGPT use your local tools. Compose CLI, MCP, Skills and Computer Use across your computers, with governed access on each host. Codex is optional.",
       ),
     );
   window.clearTimeout(toastTimer);

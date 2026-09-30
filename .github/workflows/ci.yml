@@ -36,6 +36,9 @@ jobs:
       - name: Validate catalog publisher policy
         run: npm run catalog:check-policy
 
+      - name: Verify canonical brand delivery
+        run: npm run brand:check
+
       - name: Check formatting
         run: npm run format:check
 
