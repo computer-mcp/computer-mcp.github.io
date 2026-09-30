@@ -6,36 +6,34 @@
     <title>Computer MCP — 让 ChatGPT，用上你的本机工具。</title>
     <meta
       name="description"
-      content="连接 CLI、Codex、MCP 和 Skills，在 ChatGPT 对话里写代码、处理文件、运行你的 Mac 工具。按需接入，权限由你配置。"
+      content="让 ChatGPT，用上你的本机工具。直接组合 CLI、MCP、Skills 与 Computer Use，跨多台电脑工作，每台宿主独立管理权限。Codex 是可选集成。"
     />
     <meta name="theme-color" content="#171819" />
     <meta name="color-scheme" content="dark" />
     <meta name="robots" content="index,follow" />
     <link rel="canonical" href="https://computer-mcp.github.io/" />
-    <link rel="icon" href="/brand/mark.png" type="image/png" />
+    <link rel="icon" href="/brand/favicon.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" sizes="180x180" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Computer MCP" />
-    <meta property="og:title" content="Computer MCP — Your tools. One conversation." />
+    <meta property="og:title" content="Computer MCP — Let ChatGPT use your local tools." />
     <meta
       property="og:description"
-      content="Connect ChatGPT to your Mac's CLI tools, Codex, MCP servers and Skills. Write code, work with files and run your tools, with permissions you choose."
+      content="Direct, composable access to local tools across your computers. CLI, MCP, Skills and Computer Use, with governed access on each host. Codex is optional."
     />
     <meta property="og:url" content="https://computer-mcp.github.io/" />
-    <meta property="og:image" content="https://computer-mcp.github.io/og-image.png" />
-    <meta property="og:image:width" content="1729" />
-    <meta property="og:image:height" content="910" />
-    <meta
-      property="og:image:alt"
-      content="Computer MCP — Your tools. One conversation. CLI, Codex, MCP and Skills."
-    />
+    <meta property="og:image" content="https://computer-mcp.github.io/brand/social-en.png" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
+    <meta property="og:image:alt" content="Computer MCP — Let ChatGPT use your local tools." />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Computer MCP — Your tools. One conversation." />
+    <meta name="twitter:title" content="Computer MCP — Let ChatGPT use your local tools." />
     <meta
       name="twitter:description"
-      content="Connect ChatGPT to your Mac's tools. CLI · Codex · MCP · Skills."
+      content="Direct · Local · Composable · Multi-computer · Governed"
     />
-    <meta name="twitter:image" content="https://computer-mcp.github.io/og-image.png" />
+    <meta name="twitter:image" content="https://computer-mcp.github.io/brand/social-en.png" />
     <link rel="stylesheet" href="/src/styles.css" />
     <script type="module" src="/src/main.js"></script>
   </head>
@@ -44,7 +42,7 @@
     <header class="site-header" data-header>
       <div class="nav-shell">
         <a class="brand" href="#top" aria-label="Computer MCP home">
-          <img src="/brand/mark.png" width="40" height="40" alt="" />
+          <img src="/brand/mark.svg" width="40" height="40" alt="" />
           <span>Computer MCP</span>
         </a>
         <div class="nav-controls">
@@ -86,17 +84,14 @@
             <span data-en="Let ChatGPT">让 ChatGPT，</span
             ><span data-en="use your local tools.">用上你的本机工具。</span>
           </h1>
-          <p
-            class="hero-lede"
-            data-en="Connect CLI tools, Codex, MCP and Skills. Put your conversations to work."
-          >
-            连接 CLI、Codex、MCP 和 Skills，在对话里推进实际工作。
+          <p class="hero-lede" data-en="Direct access to local tools, across your computers.">
+            直接使用本机工具，跨多台电脑推进工作。
           </p>
           <p
             class="hero-support"
-            data-en="Write code. Find answers. Work with files. Run your tools."
+            data-en="Compose CLI, MCP, Skills and Computer Use. Add Codex when you need it."
           >
-            写代码、查资料、处理文件、运行工具。
+            组合 CLI、MCP、Skills 与 Computer Use，按需接入 Codex。
           </p>
           <div class="hero-actions">
             <a class="button button-primary" href="#get-started" data-en="Get started">开始使用</a>
@@ -117,7 +112,7 @@
         <div class="tool-stage" id="capabilities">
           <div class="stage-heading">
             <span>ChatGPT</span><span class="stage-divider" aria-hidden="true">/</span>
-            <img src="/brand/mark.png" alt="" width="28" height="28" />
+            <img src="/brand/mark.svg" alt="" width="28" height="28" />
             <span>Computer MCP</span>
           </div>
           <p class="stage-label" data-en="One connection. Choose a capability to explore.">
@@ -299,6 +294,34 @@
             </p>
           </article>
         </div>
+        <div class="host-model">
+          <div>
+            <h3 data-en="Choose a computer. Then a workspace.">选择电脑，再选择它的工作区。</h3>
+            <p
+              data-en="Connect each host to ChatGPT or another compatible MCP client. Tools execute on the selected computer; Codex is optional."
+            >
+              将各台宿主连接到 ChatGPT 或其他兼容 MCP 的客户端。工具在选定的电脑上执行，Codex
+              是可选集成。
+            </p>
+          </div>
+          <ul class="host-connections" aria-label="Independent host connections">
+            <li>
+              <strong>Mac A</strong
+              ><span data-en="Its tools · Its workspaces">本机工具 · 本机工作区</span>
+            </li>
+            <li>
+              <strong>Mac B</strong
+              ><span data-en="Its tools · Its workspaces">本机工具 · 本机工作区</span>
+            </li>
+          </ul>
+          <p
+            class="host-boundary"
+            data-en="Each host keeps its own credentials, policy, approvals and audit. Workspace IDs are host-scoped; connections do not share files or migrate running work."
+          >
+            每台宿主独立保有凭据、策略、审批和审计。工作区 ID
+            仅属于对应宿主，连接不会共享文件或迁移运行中的工作。
+          </p>
+        </div>
       </section>
       <section id="security" class="section-block trust-section">
         <div class="section-shell trust-layout">
@@ -349,6 +372,83 @@
             </article>
           </div>
         </div>
+      </section>
+      <section id="comparison" class="section-block section-shell comparison-section">
+        <div class="section-heading">
+          <p class="eyebrow" data-en="Different jobs. Different execution models.">
+            不同工作，不同执行模型。
+          </p>
+          <h2 data-en="Choose what fits the task.">选择适合任务的方式。</h2>
+          <p data-en="Computer MCP, OpenAI Dots and Codex Remote can complement one another.">
+            Computer MCP、OpenAI Dots 与 Codex Remote 可以互相配合。
+          </p>
+        </div>
+        <div class="comparison-grid">
+          <article>
+            <h3>Computer MCP</h3>
+            <p
+              data-en="Direct, composable, governed access to general local capabilities from ChatGPT or compatible MCP clients."
+            >
+              从 ChatGPT 或兼容 MCP 的客户端直接组合使用受治理的通用本机能力。
+            </p>
+            <p
+              data-en="Connect independent hosts and choose their workspaces. Ordinary tools do not require a Codex task."
+            >
+              连接独立宿主，选择对应工作区。调用普通工具不要求启动 Codex 任务。
+            </p>
+          </article>
+          <article>
+            <h3>OpenAI Dots</h3>
+            <p
+              data-en="Always-on cloud agents with memory, apps and proactive work, plus their own cloud computer."
+            >
+              带记忆、应用和主动工作的常驻云端 Agent，拥有自己的云端电脑。
+            </p>
+            <p
+              data-en="A dot connects to one personal computer at a time. It can delegate local ChatGPT Work or Codex tasks."
+            >
+              一个 Dot 同时连接一台个人电脑，可以委派本地 ChatGPT Work 或 Codex 任务。
+            </p>
+          </article>
+          <article>
+            <h3>Codex Remote</h3>
+            <p
+              data-en="First-party remote coding: start or continue Codex tasks, steer, approve actions and review diffs and tests."
+            >
+              第一方远程编程：启动或继续 Codex 任务、跟进、审批操作并审查 Diff 和测试结果。
+            </p>
+            <p data-en="Switch among connected computers. The selected host runs the Codex task.">
+              在已连接的多台电脑间切换，由选定的宿主执行 Codex 任务。
+            </p>
+          </article>
+        </div>
+        <p
+          class="comparison-note"
+          data-en="Client and service usage terms still apply. OpenAI states that Dot conversations do not count toward ChatGPT usage limits; delegated Codex and ChatGPT Work tasks use their normal limits."
+        >
+          客户端与服务用量条款仍然适用。OpenAI 表示 Dot 对话不计入 ChatGPT 用量限制，委派的 Codex 与
+          ChatGPT Work 任务按各自的正常限制计量。
+        </p>
+        <p class="comparison-sources">
+          <span data-en="Official sources checked 2026-10-01:">官方来源核实于 2026-10-01：</span>
+          <a href="https://learn.chatgpt.com/docs/dots/computers-and-apps" data-en="Dots computers"
+            >Dots 电脑</a
+          >
+          ·
+          <a href="https://openai.com/index/introducing-dots/" data-en="Introducing Dots"
+            >Dots 介绍</a
+          >
+          · <a href="https://learn.chatgpt.com/docs/remote">Codex Remote</a> ·
+          <a href="https://learn.chatgpt.com/docs/remote-connections" data-en="Remote connections"
+            >远程连接</a
+          >
+          ·
+          <a
+            href="https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Reference/ProductComparison.md"
+            data-en="Full comparison"
+            >完整对比</a
+          >
+        </p>
       </section>
       <section id="get-started" class="section-block section-shell start-section">
         <div class="section-heading">
@@ -493,14 +593,14 @@
       </section>
       <section class="closing-section section-shell">
         <p class="eyebrow">Computer MCP</p>
-        <h2 data-en="Your tools. One conversation.">你的工具，一个对话。</h2>
+        <h2 data-en="Let ChatGPT use your local tools.">让 ChatGPT，用上你的本机工具。</h2>
         <a class="button button-primary" href="#get-started" data-en="Get started">开始使用</a>
       </section>
     </main>
     <footer class="site-footer section-shell">
       <div class="footer-top">
         <a class="brand" href="#top" aria-label="Computer MCP home"
-          ><img src="/brand/mark.png" width="36" height="36" alt="" /><span>Computer MCP</span></a
+          ><img src="/brand/mark.svg" width="36" height="36" alt="" /><span>Computer MCP</span></a
         >
         <p data-en="Connect your conversations to your Mac.">连接你的对话与你的 Mac。</p>
       </div>

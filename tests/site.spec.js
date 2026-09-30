@@ -58,9 +58,10 @@ test("ships complete metadata and the GitHub Pages root contract", async ({ page
   );
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
     "content",
-    "https://computer-mcp.github.io/og-image.png",
+    "https://computer-mcp.github.io/brand/social-en.png",
   );
   await expect((await request.get("/og-image.png")).status()).toBe(200);
+  await expect((await request.get("/brand/social-en.png")).status()).toBe(200);
   await expect((await request.get("/brand/mark.png")).status()).toBe(200);
   await expect((await request.get("/site.webmanifest")).status()).toBe(200);
   const releaseResponse = await request.get("/release.json");

@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "assets:build": "node scripts/build-og.mjs",
+    "brand:check": "python3 scripts/check-brand.py",
+    "assets:build": "npm run brand:check && node scripts/build-og.mjs",
     "build": "npm run assets:build && vite build",
     "preview": "vite preview",
+    "design:references": "node scripts/capture-design.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check:html": "html-validate index.html",
@@ -21,7 +23,7 @@
     "release:update": "node scripts/release.mjs update",
     "release:verify-public": "node scripts/release.mjs verify-public",
     "test:install": "playwright install chromium",
-    "check": "npm run release:check && npm run catalog:check-policy && npm run format:check && npm run check:html && npm run build && npm run check:links && npm run test"
+    "check": "npm run brand:check && npm run release:check && npm run catalog:check-policy && npm run format:check && npm run check:html && npm run build && npm run check:links && npm run test"
   },
   "engines": {
     "node": ">=22"

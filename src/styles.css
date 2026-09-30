@@ -376,6 +376,71 @@ h3 {
 .feature-grid p {
   font-size: 16px;
 }
+.host-model {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 28px 64px;
+  margin-top: 64px;
+  padding: 36px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+}
+.host-model h3 + p {
+  margin-top: 18px;
+}
+.host-connections {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.host-connections li {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.host-connections span {
+  color: var(--muted);
+  font-size: 14px;
+}
+.host-boundary {
+  grid-column: 1 / -1;
+  font-size: 14px;
+}
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 48px;
+}
+.comparison-grid article {
+  border-top: 1px solid var(--line);
+  padding-top: 26px;
+}
+.comparison-grid p {
+  margin-top: 18px;
+}
+.comparison-note {
+  margin-top: 36px;
+  font-size: 14px;
+}
+.comparison-sources {
+  margin-top: 18px;
+  font-size: 13px;
+}
+@media (max-width: 780px) {
+  .host-model,
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+  .host-model {
+    padding: 24px;
+  }
+}
 .trust-section {
   background: #1d1e20;
 }

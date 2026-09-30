@@ -1,7 +1,7 @@
 {
   "name": "Computer MCP",
   "short_name": "Computer MCP",
-  "description": "Connect ChatGPT to your Mac’s CLI tools, Codex, MCP servers and Skills.",
+  "description": "Let ChatGPT use your local tools.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#171819",
@@ -9,7 +9,7 @@
   "icons": [
     {
       "src": "/brand/mark.png",
-      "sizes": "1254x1254",
+      "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any"
     }

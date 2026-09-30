@@ -1,3 +1,5 @@
+![Computer MCP — Let ChatGPT use your local tools.](public/brand/social-en.png)
+
 # Computer MCP product website
 
 This repository owns the static product website published at
@@ -22,6 +24,7 @@ Run every repository gate:
 
 ```sh
 npm run catalog:check-policy
+npm run brand:check
 npm run format:check
 npm run check:html
 npm run build
@@ -75,15 +78,17 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) before opening a change.
 
 ## Brand and copy
 
-[DESIGN.md](DESIGN.md) is the approved website design baseline. It records the positioning, tokens,
-composition, shared assets, responsive behavior and rendered reference images. Read it before
-changing the visual identity.
+[Product Identity](https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Architecture/ProductIdentity.md)
+and [BRAND.md](https://github.com/computer-mcp/computer-mcp/blob/master/Assets/Brand/BRAND.md) in
+the main repository own positioning and shared identity. [DESIGN.md](DESIGN.md) records their
+website-specific composition, tokens, responsive behavior and rendered references.
 
-The homepage leads with “Let ChatGPT use your local tools” and gives CLI, Codex, MCP and Skills
-equal placement. Main-repository documentation owns capability and permission facts; website copy
-follows that contract.
+The homepage leads with “Let ChatGPT use your local tools.” and gives CLI, Codex, MCP and Skills
+equal placement. It explains independent host connections and optional Codex integration.
+Main-repository documentation owns capability and permission facts; website copy follows it.
 
-`npm run assets:build` checks the share-card dimensions and copies the source to
-`public/og-image.png`. Verify the approved source images from `public/brand/` with
-`shasum -a 256 -c SHA256SUMS`. Keep shared assets synchronized with the main repository's
-`Assets/Brand/` directory.
+`npm run brand:check` verifies the imported stable copy and exact delivery against
+`public/brand/brand.lock.json`. Update that delivery with the main repository's
+`python3 Scripts/brand.py sync ../computer-mcp.github.io`; then commit the synchronized files.
+`npm run assets:build` checks the lock and share-card dimensions and copies the accepted card to
+`public/og-image.png`. The renderer remains in the main repository.

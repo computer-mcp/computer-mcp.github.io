@@ -1,19 +1,23 @@
 # Computer MCP website design
 
-Status: approved product design baseline.
+Status: approved website application baseline.
 
-This file owns the website's visual identity and composition. `src/styles.css` implements its tokens
-and responsive rules. Product behavior remains owned by the main Computer MCP repository.
-`README.md` owns website development and build instructions; `Assets/Brand/README.md` in the main
-repository owns asset usage.
+This file owns website-specific composition and responsive application. `src/styles.css` implements
+the layout. The main repository's
+[Product Identity](https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Architecture/ProductIdentity.md)
+owns product meaning;
+[BRAND.md](https://github.com/computer-mcp/computer-mcp/blob/master/Assets/Brand/BRAND.md) and
+[brand.json](https://github.com/computer-mcp/computer-mcp/blob/master/Assets/Brand/brand.json) own
+shared identity. `README.md` owns website development and build instructions.
 
 ## Identity and message
 
 - Product and public attribution: **Computer MCP**, the organization name.
 - Primary Chinese message: **让 ChatGPT，用上你的本机工具。**
 - English equivalent: **Let ChatGPT use your local tools.**
-- Supporting brand line: **Your tools. One conversation.** / **你的工具，一个对话。**
-- CLI, Codex, MCP and Skills are parallel ways to connect local capabilities.
+- Import exact stable copy and delivery through `public/brand/brand.lock.json`.
+- Direct, Local, Composable, Multi-computer and Governed frame the product.
+- CLI, MCP, Skills, Computer Use and optional Codex connect local capabilities.
 - Explain tasks first, then prerequisites, permissions and capability maturity.
 - The homepage is Chinese by default and provides a complete English switch.
 
@@ -21,7 +25,7 @@ repository owns asset usage.
 
 Graphite surfaces, silver-white type, neutral secondary text, system fonts and precise spacing
 create the product's restrained appearance. Typography and working UI establish the hierarchy. The
-computer-window symbol provides the shared visual identity.
+rounded-display symbol provides the shared visual identity.
 
 ## Tokens
 
@@ -48,9 +52,11 @@ Text must remain readable in both languages and at narrow widths.
    concise prerequisites line.
 3. Four equally weighted capability tabs: CLI, Codex, MCP and Skills. The selected tab exposes a
    labelled task example, explanation and working reference link.
-4. Workflow explanation, host permissions and native Codex boundaries.
-5. Three setup steps and an actionable first read-only tool call.
-6. FAQ, closing message, organization footer and project links.
+4. Workflow explanation and independent host connections, followed by host permissions and native
+   Codex boundaries.
+5. A dated, sourced comparison of Computer MCP, Dots and Codex Remote by job and execution model.
+6. Three setup steps and an actionable first read-only tool call.
+7. FAQ, closing promise, organization footer and project links.
 
 The standard desktop content width is capped at 1180px with 112px section spacing. The current
 breakpoints are 900px, 780px and 370px. Mobile content uses 24px side margins, reduced to 16px on
@@ -62,12 +68,13 @@ support. Body copy, setup links and FAQ remain live HTML.
 
 ## Assets and visual references
 
-- `public/brand/mark.png`: approved window symbol; 1254 × 1254 opaque PNG.
-- `public/brand/social.png`: approved share card; 1729 × 910 opaque PNG.
-- `public/brand/SHA256SUMS`: content fingerprints for those exact source assets. Verify from that
-  directory with `shasum -a 256 -c SHA256SUMS`.
-- `public/og-image.png` is built from the share-card source; dimensions in Open Graph metadata match
-  the source. Preserve aspect ratio and its surrounding space.
+- `public/brand/mark.svg` and `mark.png`: canonical master mark; PNG is 1024 × 1024.
+- `public/brand/favicon.png` and `apple-touch-icon.png`: supplied 32 px and 180 px icon exports.
+- `public/brand/social-en.png` and `social-zh-CN.png`: canonical 1280 × 640 share cards.
+- `public/brand/brand.lock.json`: imported stable copy, brand revision and file digests. Run
+  `npm run brand:check` to verify the locked delivery without a main-repository checkout.
+- Open Graph points to the English share card. `public/og-image.png` is a byte-identical
+  compatibility copy generated at build time. Preserve the supplied aspect ratio and clear space.
 - [Desktop reference](Design/References/desktop.png): 1488 × 1058, Chinese hero, default CLI panel,
   no browser chrome.
 - [Mobile reference](Design/References/mobile.png): 393 × 851, Chinese hero, default CLI panel,
@@ -77,15 +84,17 @@ These are rendered website references. They guide comparison at the same size, l
 The screenshots cover the hero; current semantic HTML and this specification define the remaining
 page structure.
 
+After building, start `npm run preview -- --host 127.0.0.1` and run `npm run design:references` to
+refresh these exact viewport/state references.
+
 ## Maintaining the baseline
 
-Routine copy updates, bug fixes and accessibility improvements use this identity. Keep shared
-styling in the existing tokens and components. A request for a new visual direction changes the
-baseline only within the user's stated scope.
+Routine copy updates, bug fixes and accessibility improvements follow the main brand contract. Keep
+website styling in the existing tokens and components.
 
-When an accepted change affects identity, core composition or source artwork, update this file, the
-relevant references and asset fingerprints together. Keep the website and main repository's shared
-assets synchronized. Existing brand requirements remain in force for unrelated edits.
+When a canonical identity revision is accepted, import its assets and lock using the main
+repository's `Scripts/brand.py sync`. Update affected website composition rules and rendered
+references together. Website edits do not redefine the master brand.
 
 Validate affected interactions and both desktop/mobile layouts according to `CONTRIBUTING.md`. Use a
 Git commit as the recoverable version boundary; this specification and the fingerprints guide review
