@@ -49,6 +49,8 @@ jobs:
         run: npm run build
 
       - name: Validate links
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: npm run check:links
 
       - name: Install browser

@@ -36,6 +36,14 @@ npm test
 The production build is written to `dist/`. GitHub Pages deploys only that artifact from the
 official repository's `main` branch after validation and catalog reconciliation.
 
+Link validation retries transient HTTP errors with bounded concurrency. When an official GitHub
+repository, file, directory, release or security-policy link returns a server error, it verifies the
+corresponding public target through the GitHub API. Client errors, missing targets and API failures
+still fail validation. `GH_TOKEN` or `GITHUB_TOKEN` can provide API authentication; the token is
+sent only to the GitHub API. Workflows use their repository token for read-only API requests.
+Content verification covers `main`, `master` and full commit hashes; other content refs retain HTTP
+validation.
+
 `public/release.json` binds the deployed site to the product's delivered commit and release tag. The
 private website package version describes this build project, not the product version. After the
 main repository publishes an accepted release, run `npm run release:update -- vX.Y.Z` to import its

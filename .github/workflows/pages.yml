@@ -64,6 +64,8 @@ jobs:
         run: npm ci
 
       - name: Verify website
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           npm run release:check
           npm run catalog:check-policy
