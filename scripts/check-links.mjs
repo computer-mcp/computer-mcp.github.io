@@ -35,6 +35,7 @@ export function githubTarget(link) {
 export async function githubJSON(endpoint) {
   const token = process.env.GH_TOKEN || process.env.GITHUB_TOKEN;
   const response = await fetch(`https://api.github.com/${endpoint}`, {
+    method: "GET",
     headers: {
       Accept: "application/vnd.github+json",
       "User-Agent": "computer-mcp-website-link-check",

@@ -141,6 +141,7 @@ test("API credentials are confined to the fixed GitHub API origin", async () => 
   process.env.GH_TOKEN = "test-credential";
   globalThis.fetch = async (url, options) => {
     assert.equal(new URL(url).origin, "https://api.github.com");
+    assert.equal(options.method, "GET");
     assert.equal(options.headers.Authorization, "Bearer test-credential");
     assert.equal(options.redirect, "error");
     return { ok: true, json: async () => repository };

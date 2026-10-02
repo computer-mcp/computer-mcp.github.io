@@ -40,8 +40,9 @@ Link validation retries transient HTTP errors with bounded concurrency. When an 
 repository, file, directory, release or security-policy link returns a server error, it verifies the
 corresponding public target through the GitHub API. Client errors, missing targets and API failures
 still fail validation. `GH_TOKEN` or `GITHUB_TOKEN` can provide API authentication; the token is
-sent only to the GitHub API. CI uses its read-only repository token. Content verification covers
-`main`, `master` and full commit hashes; other content refs retain HTTP validation.
+sent only to the GitHub API. Workflows use their repository token for read-only API requests.
+Content verification covers `main`, `master` and full commit hashes; other content refs retain HTTP
+validation.
 
 `public/release.json` binds the deployed site to the product's delivered commit and release tag. The
 private website package version describes this build project, not the product version. After the
