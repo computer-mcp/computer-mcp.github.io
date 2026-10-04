@@ -60,7 +60,7 @@ def notify(token, *, opener=None, clock=time.monotonic, sleep=time.sleep):
         remaining = deadline - clock()
         if remaining <= 0:
             raise NotificationError("Catalog notification exhausted its retry budget")
-        request = urllib.request.Request(ENDPOINT, data=b'{"ref":"main"}', method="POST", headers={
+        request = urllib.request.Request(ENDPOINT, data=b'{"ref":"master"}', method="POST", headers={
             "Accept": "application/vnd.github+json", "Content-Type": "application/json",
             "Authorization": "Bearer " + token, "X-GitHub-Api-Version": "2026-03-10",
             "User-Agent": "computer-mcp-catalog-notification",

@@ -11,7 +11,7 @@ downloaded bytes and package using its existing installation rules.
 
 The generator, policy, serialized publication workflow and offline tests are available in this
 repository. Public catalog delivery requires a complete verified initial snapshot committed to
-`main`. Until that prerequisite is satisfied, publication fails before upload and retains the
+`master`. Until that prerequisite is satisfied, publication fails before upload and retains the
 deployed site. Plugin notification delivery and the live endpoint require separate acceptance.
 
 The host's
@@ -151,21 +151,21 @@ events are idempotent; a complete reconciliation discovers releases even when th
 missed. A detected external edit aborts publication. File and directory synchronization make the
 replacement durable; failures before replacement leave the previous bytes intact.
 
-The committed canonical `public/plugins/index.json` on `main` is the durable generation authority.
+The committed canonical `public/plugins/index.json` on `master` is the durable generation authority.
 Initialize it by generating and reviewing a complete verified snapshot, then committing it with the
 publisher policy. Automation never uses a missing file as permission to reset generation, and never
 restores authority from a CDN response, an Actions cache or an expiring artifact.
 
-The official repository's `pages.yml` workflow reconciles hourly at minute 37, on `main` pushes and
-through `workflow_dispatch`. One `pages` concurrency group covers generation through deployment;
-active runs are not cancelled. Each run checks out current `main` after entering the group and
+The official repository's `pages.yml` workflow reconciles hourly at minute 37, on `master` pushes
+and through `workflow_dispatch`. One `pages` concurrency group covers generation through deployment;
+active runs are not cancelled. Each run checks out current `master` after entering the group and
 verifies its seed before requesting release metadata. It always scans every admitted repository, so
 missed notifications and replaced pending runs are repaired by the next successful reconciliation.
 
 After generation, the workflow validates and tests the complete site. The publication helper checks
 the catalog successor, exact built index bytes and unchanged source, then commits only the new index
 as a child of the checked-out commit. It uses a normal fast-forward push, never a force push. A
-concurrent source update rejects publication; the next run starts from current `main`. Identical
+concurrent source update rejects publication; the next run starts from current `master`. Identical
 catalog content creates no commit. Unrelated local or staged changes are rejected and preserved.
 
 Only then does Pages upload and deploy the complete artifact. Generation, validation or commit
@@ -176,7 +176,7 @@ read-only website CI, without contacting release sources.
 
 The central build job uses its short-lived GitHub job token with `contents: write` to persist the
 index; the deployment job has Pages and identity-token permissions. Plugin notification senders
-should invoke `pages.yml` on `main` using `workflow_dispatch`, with Actions write access scoped to
+should invoke `pages.yml` on `master` using `workflow_dispatch`, with Actions write access scoped to
 this receiving repository. They do not need website Contents write access. Notification payloads
 provide no metadata or policy overrides. Existing GitHub authentication is an operator input; this
 repository does not create credentials. If notifications are unavailable, scheduled and manual
@@ -187,7 +187,7 @@ reconciliation still use the same complete verification path.
 `.github/actions/notify-catalog` is the central composite action for notification senders. Pin it to
 a reviewed full commit in each plugin's workflow. It requires Python 3 on the runner, creates a
 short-lived installation token from its `client-id` and `private-key` inputs, and sends only
-`{"ref":"main"}` to the fixed official `pages.yml` workflow. It cannot supply releases, replace
+`{"ref":"master"}` to the fixed official `pages.yml` workflow. It cannot supply releases, replace
 policy or select another ref. It neither checks out nor executes the plugin package.
 
 The organization-owned catalog GitHub App is installed only on

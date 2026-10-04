@@ -46,7 +46,7 @@ class NotificationTests(unittest.TestCase):
         request = opener.open.call_args.args[0]
         self.assertEqual(request.full_url, notification.ENDPOINT)
         self.assertEqual(request.method, "POST")
-        self.assertEqual(json.loads(request.data), {"ref": "main"})
+        self.assertEqual(json.loads(request.data), {"ref": "master"})
         self.assertEqual(request.get_header("Authorization"), "Bearer " + TOKEN)
         self.assertEqual(request.get_header("X-github-api-version"), "2026-03-10")
         self.assertLessEqual(opener.open.call_args.kwargs["timeout"], 20)
