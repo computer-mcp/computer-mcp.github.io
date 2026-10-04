@@ -19,7 +19,7 @@ class PublicationTests(unittest.TestCase):
         self.root, self.remote = base / "source", base / "remote.git"
         self.root.mkdir()
         self.command(base, "init", "--bare", str(self.remote))
-        self.command(self.root, "init", "-b", "main")
+        self.command(self.root, "init", "-b", "master")
         self.command(self.root, "remote", "add", "origin", str(self.remote))
         self.source = Source()
         self.source.release["prerelease"] = True
@@ -32,7 +32,7 @@ class PublicationTests(unittest.TestCase):
         (self.root / ".gitignore").write_text("dist/\n")
         self.command(self.root, "add", ".")
         self.commit(self.root)
-        self.command(self.root, "push", "origin", "main")
+        self.command(self.root, "push", "origin", "master")
         self.head = self.command(self.root, "rev-parse", "HEAD").strip()
         self.source.release["prerelease"] = False
         self.current = catalog.reconcile(self.source, self.source.policy, self.previous, now=NOW)
@@ -56,11 +56,11 @@ class PublicationTests(unittest.TestCase):
 
     def advance_remote(self):
         other = Path(self.temporary.name) / "other"
-        self.command(other.parent, "clone", "--branch", "main", str(self.remote), str(other))
+        self.command(other.parent, "clone", "--branch", "master", str(self.remote), str(other))
         (other / "concurrent.txt").write_text("Concurrent source change\n")
         self.command(other, "add", "concurrent.txt")
         self.commit(other)
-        self.command(other, "push", "origin", "main")
+        self.command(other, "push", "origin", "master")
         return self.command(other, "rev-parse", "HEAD").strip()
 
     def test_commits_exact_snapshot_without_changing_worktree_head_or_index(self):
@@ -83,7 +83,7 @@ class PublicationTests(unittest.TestCase):
         (self.root / publication.INDEX).write_bytes(catalog.canonical(self.previous))
         self.command(self.root, "rm", publication.INDEX)
         self.commit(self.root)
-        self.command(self.root, "push", "origin", "main")
+        self.command(self.root, "push", "origin", "master")
         head = self.command(self.root, "rev-parse", "HEAD").strip()
         self.write_candidate()
         with self.assertRaises(catalog.CatalogError):
@@ -113,7 +113,7 @@ class PublicationTests(unittest.TestCase):
         (self.root / publication.POLICY).write_bytes(catalog.canonical(self.source.policy))
         self.command(self.root, "add", publication.POLICY)
         self.commit(self.root)
-        self.command(self.root, "push", "origin", "main")
+        self.command(self.root, "push", "origin", "master")
         head = self.command(self.root, "rev-parse", "HEAD").strip()
         self.assertEqual(publication.verify_seed(self.root, head), self.previous)
         current, changed = catalog.publish(self.source, self.source.policy,
@@ -167,7 +167,7 @@ class PublicationTests(unittest.TestCase):
 
     def test_remote_update_before_publication_is_not_overwritten(self):
         other = self.advance_remote()
-        with self.assertRaisesRegex(catalog.CatalogError, "Remote main changed"):
+        with self.assertRaisesRegex(catalog.CatalogError, "Remote master changed"):
             publication.publish_commit(self.root, self.head)
         self.assertEqual(publication.remote_head(self.root), other)
 
@@ -184,12 +184,12 @@ class PublicationTests(unittest.TestCase):
             with self.assertRaisesRegex(catalog.CatalogError, "push failed"):
                 publication.publish_commit(self.root, self.head)
         self.assertEqual(publication.remote_head(self.root), other[0])
-        self.assertEqual(json.loads(self.command(self.remote, "show", "main:" + publication.INDEX)), self.previous)
+        self.assertEqual(json.loads(self.command(self.remote, "show", "master:" + publication.INDEX)), self.previous)
 
     def test_deployment_failure_can_retry_same_committed_snapshot(self):
         commit = publication.publish_commit(self.root, self.head)
         retry = Path(self.temporary.name) / "retry"
-        self.command(retry.parent, "clone", "--branch", "main", str(self.remote), str(retry))
+        self.command(retry.parent, "clone", "--branch", "master", str(self.remote), str(retry))
         artifact = retry / "dist/plugins/index.json"
         artifact.parent.mkdir(parents=True)
         artifact.write_bytes((retry / publication.INDEX).read_bytes())

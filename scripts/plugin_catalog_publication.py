@@ -15,7 +15,7 @@ import plugin_catalog as catalog
 ROOT = Path(__file__).resolve().parent.parent
 INDEX = "public/plugins/index.json"
 POLICY = "scripts/plugin-catalog-policy.json"
-BRANCH = "refs/heads/main"
+BRANCH = "refs/heads/master"
 REMOTE = "https://github.com/computer-mcp/computer-mcp.github.io"
 
 
@@ -30,7 +30,7 @@ def git(root, *arguments, data=None, environment=None):
 def remote_head(root):
     fields = git(root, "ls-remote", "--exit-code", "origin", BRANCH).decode().split()
     catalog.require(len(fields) == 2 and fields[1] == BRANCH
-                    and re.fullmatch(r"[0-9a-f]{40}", fields[0]), "Invalid remote main identity")
+                    and re.fullmatch(r"[0-9a-f]{40}", fields[0]), "Invalid remote master identity")
     return fields[0]
 
 
@@ -72,7 +72,7 @@ def publish_commit(root, expected_head):
     catalog.require(catalog.read_json_bytes(root / "dist/plugins/index.json") == data,
                     "Pages artifact does not contain the verified catalog bytes")
     catalog.require(remote_head(root) == expected_head,
-                    "Remote main changed; reconcile from the current source before deployment")
+                    "Remote master changed; reconcile from the current source before deployment")
     if current == previous:
         return expected_head
     # Construct the tree from the verified bytes and parent, without touching the caller's index
@@ -105,7 +105,7 @@ def main():
         catalog.require(os.environ.get("GITHUB_ACTIONS") == "true"
                         and os.environ.get("GITHUB_REPOSITORY_ID") == "1353589608"
                         and os.environ.get("GITHUB_REF") == BRANCH,
-                        "Publication requires the official website main workflow")
+                        "Publication requires the official website master workflow")
         origin = git(ROOT, "remote", "get-url", "origin").decode().strip()
         catalog.require(origin in (REMOTE, REMOTE + ".git"), "Unexpected publication repository")
         if args.check_seed:

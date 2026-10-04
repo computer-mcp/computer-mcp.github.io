@@ -34,7 +34,7 @@ npm test
 ```
 
 The production build is written to `dist/`. GitHub Pages deploys only that artifact from the
-official repository's `main` branch after validation and catalog reconciliation.
+official repository's `master` branch after validation and catalog reconciliation.
 
 Link validation retries transient HTTP errors with bounded concurrency. When an official GitHub
 repository, file, directory, release or security-policy link returns a server error, it verifies the
@@ -65,7 +65,7 @@ GitHub CLI authentication, or provide `GH_TOKEN`/`GITHUB_TOKEN` in the process e
 publisher also works without authentication within GitHub's public API limits. It downloads and
 verifies release archives without running package code. `npm run catalog:check-policy` and
 `npm run catalog:test` run offline; `npm run catalog:check` validates a generated snapshot.
-Automatic publication requires a complete verified snapshot committed to `main`; a missing seed
+Automatic publication requires a complete verified snapshot committed to `master`; a missing seed
 fails Pages publication before upload and preserves the deployed site. Runs reconcile hourly, on
 source pushes and on manual workflow dispatch, persist changed generations and deploy one complete
 artifact. See [the plugin catalog contract](docs/plugin-catalog.md) for provenance, withdrawals,

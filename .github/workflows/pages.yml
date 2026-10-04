@@ -3,7 +3,7 @@ name: Deploy GitHub Pages
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
   schedule:
     - cron: "37 * * * *"
@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   build:
-    if: github.repository_id == '1353589608' && github.ref == 'refs/heads/main'
+    if: github.repository_id == '1353589608' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     permissions:
@@ -28,7 +28,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          ref: main
+          ref: master
 
       - name: Record current source
         id: source
