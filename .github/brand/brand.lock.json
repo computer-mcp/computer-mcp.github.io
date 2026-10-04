@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "authority": "https://github.com/computer-mcp/.github",
+  "revision": "9042c987ef8b3482f63e3a037ae0d0d2fdeffb9a7768c03295c9a6a6c5a43ae2",
+  "consumer": "computer-mcp.github.io",
+  "files": {
+    "public/brand/icon.svg": "28250027a8aeafb3ec79defabd89d2279c4329fd2fd64cfc923b8803a78416f9",
+    "public/brand/favicon.svg": "a60dff8e1adb06eb431d09b113b12f5e47b75a5f759fcbcc91083ddf1305d292",
+    "public/brand/favicon-32.png": "50ca36c37a8b480d4081fd4bcb7b9fdc1be10272ca8e51f554adcf343999900f",
+    "public/brand/apple-touch-icon.png": "198e9dfabecc73bfcc2608cb0ff963694e0811bbfa23337cadcfd7a4da38e0af",
+    "public/brand/social-en.png": "2dcb1c201e9ae2d6358b2d893c315d4291f28597eea5753bda7d26a101cbb93d",
+    "public/brand/social-zh-CN.png": "ec008afcda87f8bc5957eb45060072a317d5f09b380ba896186f8a965bca7f00",
+    "public/brand/icons/plugin-codex.svg": "c482350f0ebd76536cd54da6ebb3e4a86cb2529319bb6492dbe0352ac5b63569",
+    "public/brand/icons/plugin-computer-use.svg": "1d848bfa746345d91cf4b5eb9c72b8867b9b8b7c6ce87b3289b85aac7bf42448",
+    "public/brand/icons/plugin-claude.svg": "a3b8c20af24a0043ff6e4739e3915b523684347a693121e435a1c7501767e7e1",
+    "public/brand/icons/plugin-cursor.svg": "f19e591ff6ba15a4f7d38b080daf4b2773f1c947310ba723e78c9a00c57889d4",
+    "public/brand/icons/plugin-swift-format.svg": "13c00eb123261f16af3af6af58dc6e4c1e94575c4a48440127eee38ded5b5e17",
+    "public/brand/icons/plugin-trae.svg": "2ad5ea06b14a2347536bdb466afdc82b8ac0d24383e80b789c0205212216bf07",
+    "public/brand/icons/apple-cli.svg": "e98242d30635e488f7ecda934f1738901aea3b8355dde81a72536081c224fbcd"
+  },
+  "entries": {
+    "index.html": [
+      "brand/social-en.png",
+      "brand/favicon.svg",
+      "Wherever you chat, your computer is there.",
+      "聊天在哪，你的电脑就在哪。"
+    ]
+  }
+}

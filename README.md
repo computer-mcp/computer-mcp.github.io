@@ -1,9 +1,10 @@
-![Computer MCP — Let ChatGPT use your local tools.](public/brand/social-en.png)
+![Computer MCP — Wherever you chat, your computer is there.](public/brand/social-en.png)
 
 # Computer MCP product website
 
 This repository owns the static product website published at
-[computer-mcp.github.io](https://computer-mcp.github.io/). Product code, architecture, operator
+[computer-mcp.github.io](https://computer-mcp.github.io/): the homepage and the
+[setup guide](https://computer-mcp.github.io/guide/). Product code, architecture, operator
 documentation, issues, and releases live in the
 [main Computer MCP repository](https://github.com/computer-mcp/computer-mcp).
 
@@ -23,15 +24,12 @@ npm run dev
 Run every repository gate:
 
 ```sh
-npm run catalog:check-policy
-npm run brand:check
-npm run format:check
-npm run check:html
-npm run build
-npm run check:links
 npm run test:install
-npm test
+npm run check
 ```
+
+`npm run check` verifies the bundled fonts, the release record and the catalog policy, then checks
+formatting and HTML, builds the site, validates links and runs the browser tests.
 
 The production build is written to `dist/`. GitHub Pages deploys only that artifact from the
 official repository's `master` branch after validation and catalog reconciliation.
@@ -86,17 +84,31 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) before opening a change.
 
 ## Brand and copy
 
+The organization [DESIGN.md](https://github.com/computer-mcp/.github/blob/master/DESIGN.md) owns
+tokens, typography, the mark and the plane compositions; `src/styles.css` implements them for the
+web.
 [Product Identity](https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Architecture/ProductIdentity.md)
-and [BRAND.md](https://github.com/computer-mcp/computer-mcp/blob/master/Assets/Brand/BRAND.md) in
-the main repository own positioning and shared identity. [DESIGN.md](DESIGN.md) records their
-website-specific composition, tokens, responsive behavior and rendered references.
+owns positioning and the tagline “Wherever you chat, your computer is there.”
+(「聊天在哪，你的电脑就在哪。」). Main-repository documentation owns capability, permission and
+connection facts; website copy follows it. The comparison section carries the date its external
+facts were verified and their sources.
 
-The homepage leads with “Let ChatGPT use your local tools.” and gives CLI, Codex, MCP and Skills
-equal placement. It explains independent host connections and optional Codex integration.
-Main-repository documentation owns capability and permission facts; website copy follows it.
+Pages are written in Chinese. English text lives in `data-en`, `data-en-href` and `data-en-content`
+attributes; the language toggle remembers the choice, and `?lang=en` or `?lang=zh-CN` selects one
+directly.
 
-`npm run brand:check` verifies the imported stable copy and exact delivery against
-`public/brand/brand.lock.json`. Update that delivery with the main repository's
-`python3 Scripts/brand.py sync ../computer-mcp.github.io`; then commit the synchronized files.
-`npm run assets:build` checks the lock and share-card dimensions and copies the accepted card to
-`public/og-image.png`. The renderer remains in the main repository.
+`public/brand/` and `.github/brand/brand.lock.json` are imports from the organization repository.
+Update them from an organization checkout with `python3 Brand/brand.py sync <website-checkout>` and
+commit the result. CI verifies the lock with the organization's shared brand check.
+
+`src/fonts/` holds WOFF2 subsets of Bricolage Grotesque, JetBrains Mono and Noto Sans SC. After a
+copy change, regenerate them from their pinned sources with
+`uv run --no-project --with fonttools --with brotli python3 scripts/fonts.py update`;
+`npm run fonts:check` fails when a page uses a character the subset lacks.
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) carries the font licenses.
+
+## License
+
+Computer MCP-owned website code and content use the
+[Functional Source License 1.1, Apache 2.0 Future License](LICENSE) (FSL-1.1-ALv2). The bundled
+fonts keep their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

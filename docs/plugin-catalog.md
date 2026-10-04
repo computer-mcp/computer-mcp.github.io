@@ -9,10 +9,8 @@ grants no execution permission and is not an artifact signature. The host instal
 revalidate the selected GitHub Release, repository identity and asset membership, then verify the
 downloaded bytes and package using its existing installation rules.
 
-The generator, policy, serialized publication workflow and offline tests are available in this
-repository. Public catalog delivery requires a complete verified initial snapshot committed to
-`master`. Until that prerequisite is satisfied, publication fails before upload and retains the
-deployed site. Plugin notification delivery and the live endpoint require separate acceptance.
+Publication requires a complete verified snapshot committed to `master`; without one, publication
+fails before upload and the deployed site is retained.
 
 The host's
 [plugin package reference](https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Reference/PluginPackages.md)

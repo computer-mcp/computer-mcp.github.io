@@ -36,8 +36,8 @@ jobs:
       - name: Validate catalog publisher policy
         run: npm run catalog:check-policy
 
-      - name: Verify canonical brand delivery
-        run: npm run brand:check
+      - name: Verify bundled fonts
+        run: npm run fonts:check
 
       - name: Check formatting
         run: npm run format:check
@@ -58,3 +58,6 @@ jobs:
 
       - name: Run accessibility and smoke tests
         run: npm test
+
+  brand:
+    uses: computer-mcp/.github/.github/workflows/brand-check.yml@43abe15c93db0a0731f81bf806edd89a7a5b2136 # master

@@ -5,15 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "brand:check": "python3 scripts/check-brand.py",
-    "assets:build": "npm run brand:check && node scripts/build-og.mjs",
-    "build": "npm run assets:build && vite build",
+    "build": "vite build",
     "preview": "vite preview",
-    "design:references": "node scripts/capture-design.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check:html": "html-validate index.html",
+    "check:html": "html-validate index.html guide/index.html",
     "check:links": "node scripts/check-links.mjs",
+    "fonts:check": "python3 scripts/fonts.py check",
     "test": "npm run catalog:test && node --test scripts/release.test.mjs scripts/check-links.test.mjs && playwright test",
     "catalog:test": "python3 -m unittest discover -s scripts -p 'test_plugin_catalog*.py'",
     "catalog:check": "python3 scripts/plugin_catalog.py check",
@@ -23,7 +21,7 @@
     "release:update": "node scripts/release.mjs update",
     "release:verify-public": "node scripts/release.mjs verify-public",
     "test:install": "playwright install chromium",
-    "check": "npm run brand:check && npm run release:check && npm run catalog:check-policy && npm run format:check && npm run check:html && npm run build && npm run check:links && npm run test"
+    "check": "npm run fonts:check && npm run release:check && npm run catalog:check-policy && npm run format:check && npm run check:html && npm run build && npm run check:links && npm run test"
   },
   "engines": {
     "node": ">=22"
@@ -34,7 +32,6 @@
     "html-validate": "^11.11.0",
     "linkinator": "^8.1.0",
     "prettier": "^3.9.6",
-    "sharp": "^0.35.4",
     "vite": "^8.2.2"
   }
 }
