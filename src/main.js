@@ -3,11 +3,22 @@ const menu = document.querySelector("[data-menu]");
 const menuToggle = document.querySelector("[data-menu-toggle]");
 const languageToggle = document.querySelector("[data-language]");
 const copyToast = document.querySelector("[data-copy-toast]");
-const translations = [...document.querySelectorAll("[data-en]")].map((element) => ({
-  element,
-  zh: element.textContent,
-  en: element.dataset.en,
-}));
+const storageKey = "computer-mcp-language";
+const translations = [
+  ["data-en", null],
+  ["data-en-href", "href"],
+  ["data-en-content", "content"],
+].flatMap(([source, target]) =>
+  [...document.querySelectorAll(`[${source}]`)].map((element) => {
+    const zh = target ? element.getAttribute(target) : element.textContent;
+    const en = element.getAttribute(source);
+    return (english) => {
+      const value = english ? en : zh;
+      if (target) element.setAttribute(target, value);
+      else element.textContent = value;
+    };
+  }),
+);
 let language = "zh";
 let toastTimer;
 const message = (zh, en) => (language === "zh" ? zh : en);
@@ -24,7 +35,7 @@ menuToggle?.addEventListener("click", () => {
 });
 menu?.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
 window.addEventListener("resize", () => {
-  if (window.innerWidth > 780) closeMenu();
+  if (window.innerWidth > 900) closeMenu();
 });
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && menuToggle?.getAttribute("aria-expanded") === "true") {
@@ -41,58 +52,42 @@ const updateCopyLabels = () => {
     control.setAttribute("aria-label", message("复制 ", "Copy ") + control.dataset.copy);
   });
 };
-languageToggle?.addEventListener("click", () => {
-  language = language === "zh" ? "en" : "zh";
-  document.documentElement.lang = language === "zh" ? "zh-CN" : "en";
-  translations.forEach(({ element, zh, en }) => {
-    element.textContent = language === "zh" ? zh : en;
-  });
-  languageToggle.textContent = message("EN", "中文");
-  languageToggle.setAttribute("aria-label", message("Switch to English", "切换为中文"));
-  document.title = message(
-    "Computer MCP — 让 ChatGPT，用上你的本机工具。",
-    "Computer MCP — Let ChatGPT use your local tools.",
-  );
-  document
-    .querySelector('meta[name="description"]')
-    ?.setAttribute(
-      "content",
-      message(
-        "让 ChatGPT，用上你的本机工具。直接组合 CLI、MCP、Skills 与 Computer Use，跨多台电脑工作，每台宿主独立管理权限。Codex 是可选集成。",
-        "Let ChatGPT use your local tools. Compose CLI, MCP, Skills and Computer Use across your computers, with governed access on each host. Codex is optional.",
-      ),
-    );
+
+const setLanguage = (next) => {
+  language = next;
+  const english = language === "en";
+  document.documentElement.lang = english ? "en" : "zh-CN";
+  translations.forEach((apply) => apply(english));
+  if (languageToggle) {
+    languageToggle.textContent = message("EN", "中文");
+    languageToggle.lang = english ? "zh-CN" : "en";
+    languageToggle.setAttribute("aria-label", message("Switch to English", "切换为中文"));
+  }
   window.clearTimeout(toastTimer);
   copyToast?.classList.remove("visible");
   updateCopyLabels();
-});
-updateCopyLabels();
-
-const tabs = [...document.querySelectorAll("[data-tool]")];
-const selectTool = (selected) => {
-  tabs.forEach((tab) => {
-    const active = tab === selected;
-    tab.setAttribute("aria-selected", String(active));
-    tab.tabIndex = active ? 0 : -1;
-    const panel = document.getElementById(tab.getAttribute("aria-controls"));
-    if (panel) panel.hidden = !active;
-  });
 };
-tabs.forEach((tab, index) => {
-  tab.addEventListener("click", () => selectTool(tab));
-  tab.addEventListener("keydown", (event) => {
-    let next;
-    if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
-    if (event.key === "ArrowLeft") next = (index - 1 + tabs.length) % tabs.length;
-    if (event.key === "Home") next = 0;
-    if (event.key === "End") next = tabs.length - 1;
-    if (next !== undefined) {
-      event.preventDefault();
-      selectTool(tabs[next]);
-      tabs[next].focus();
-    }
-  });
+
+const storedLanguage = () => {
+  const requested = new URLSearchParams(window.location.search).get("lang");
+  if (requested === "en" || requested === "zh-CN") return requested === "en" ? "en" : "zh";
+  try {
+    return window.localStorage.getItem(storageKey) === "en" ? "en" : "zh";
+  } catch {
+    return "zh";
+  }
+};
+
+languageToggle?.addEventListener("click", () => {
+  setLanguage(language === "zh" ? "en" : "zh");
+  try {
+    window.localStorage.setItem(storageKey, language);
+  } catch {
+    // The choice still applies to this page when storage is unavailable.
+  }
 });
+if (storedLanguage() === "en") setLanguage("en");
+updateCopyLabels();
 
 const selectCommandText = (control) => {
   const command = control.parentElement?.querySelector("code");

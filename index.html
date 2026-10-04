@@ -3,57 +3,75 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Computer MCP — 让 ChatGPT，用上你的本机工具。</title>
+    <title data-en="Computer MCP — Wherever you chat, your computer is there.">
+      Computer MCP — 聊天在哪，你的电脑就在哪。
+    </title>
     <meta
       name="description"
-      content="让 ChatGPT，用上你的本机工具。直接组合 CLI、MCP、Skills 与 Computer Use，跨多台电脑工作，每台宿主独立管理权限。Codex 是可选集成。"
+      content="在 ChatGPT 里读写代码、运行命令，使用本机的 CLI、MCP、Skills 和 Computer Use，需要时交给 Codex、Claude Code 或 Cursor。每台电脑自己决定允许什么。"
+      data-en-content="Read and write code and run commands from ChatGPT, use your local CLI tools, MCP servers, Skills and Computer Use, and hand work to Codex, Claude Code or Cursor. Each computer decides what it allows."
     />
-    <meta name="theme-color" content="#171819" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#FBFAF6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#121418" media="(prefers-color-scheme: dark)" />
     <meta name="robots" content="index,follow" />
     <link rel="canonical" href="https://computer-mcp.github.io/" />
-    <link rel="icon" href="/brand/favicon.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/brand/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/brand/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" sizes="180x180" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Computer MCP" />
-    <meta property="og:title" content="Computer MCP — Let ChatGPT use your local tools." />
+    <meta property="og:title" content="Computer MCP — Wherever you chat, your computer is there." />
     <meta
       property="og:description"
-      content="Direct, composable access to local tools across your computers. CLI, MCP, Skills and Computer Use, with governed access on each host. Codex is optional."
+      content="Read and write code, run commands and use your local tools from ChatGPT. Each computer decides what it allows."
     />
     <meta property="og:url" content="https://computer-mcp.github.io/" />
     <meta property="og:image" content="https://computer-mcp.github.io/brand/social-en.png" />
     <meta property="og:image:width" content="1280" />
     <meta property="og:image:height" content="640" />
-    <meta property="og:image:alt" content="Computer MCP — Let ChatGPT use your local tools." />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Computer MCP — Let ChatGPT use your local tools." />
     <meta
-      name="twitter:description"
-      content="Direct · Local · Composable · Multi-computer · Governed"
+      property="og:image:alt"
+      content="Computer MCP — Wherever you chat, your computer is there."
     />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://computer-mcp.github.io/brand/social-en.png" />
     <link rel="stylesheet" href="/src/styles.css" />
     <script type="module" src="/src/main.js"></script>
   </head>
   <body>
-    <a class="skip-link" href="#main-content" data-en="Skip to main content">跳转到正文</a>
+    <a class="skip-link" href="#main-content" data-en="Skip to main content">跳到正文</a>
     <header class="site-header" data-header>
       <div class="nav-shell">
-        <a class="brand" href="#top" aria-label="Computer MCP home">
-          <img src="/brand/mark.svg" width="40" height="40" alt="" />
+        <a class="brand" href="/">
+          <img src="/brand/icon.svg" width="32" height="32" alt="" />
           <span>Computer MCP</span>
         </a>
+        <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation" data-menu>
+          <a href="#capabilities" data-en="Capabilities">能力</a>
+          <a href="#connect" data-en="Connections">连接</a>
+          <a href="#permissions" data-en="Permissions">权限</a>
+          <a href="#comparison" data-en="Compare">对比</a>
+          <a href="/guide/" data-en="Setup guide">配置指南</a>
+          <a href="https://github.com/computer-mcp/computer-mcp">GitHub</a>
+        </nav>
         <div class="nav-controls">
           <button
             type="button"
             class="language-toggle"
             data-language
             aria-label="Switch to English"
+            lang="en"
           >
             EN
           </button>
+          <a
+            class="button button-primary button-small"
+            href="https://github.com/computer-mcp/computer-mcp/releases/latest"
+            data-en="Download"
+            >下载</a
+          >
           <button
             class="menu-toggle"
             type="button"
@@ -65,273 +83,309 @@
             菜单
           </button>
         </div>
-        <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation" data-menu>
-          <a href="#capabilities" data-en="Explore">功能</a>
-          <a
-            href="https://github.com/computer-mcp/computer-mcp/tree/master/Documentation"
-            data-en="Docs"
-            >文档</a
-          >
-          <a href="https://github.com/computer-mcp/computer-mcp">GitHub</a>
-          <a class="nav-cta" href="#get-started" data-en="Get started">开始使用</a>
-        </nav>
       </div>
     </header>
     <main id="main-content">
-      <section id="top" class="hero section-shell">
+      <section id="top" class="hero shell">
         <div class="hero-copy">
-          <h1>
-            <span data-en="Let ChatGPT">让 ChatGPT，</span
-            ><span data-en="use your local tools.">用上你的本机工具。</span>
-          </h1>
-          <p class="hero-lede" data-en="Direct access to local tools, across your computers.">
-            直接使用本机工具，跨多台电脑推进工作。
-          </p>
+          <p class="eyebrow hero-meta">Computer MCP · macOS 14+</p>
+          <h1 data-en="Wherever you chat, your computer is there.">聊天在哪，你的电脑就在哪。</h1>
           <p
-            class="hero-support"
-            data-en="Compose CLI, MCP, Skills and Computer Use. Add Codex when you need it."
+            class="hero-lede"
+            data-en="Read and write code and run commands from ChatGPT, use your local CLI tools, MCP servers, Skills and Computer Use, and hand work to Codex, Claude Code or Cursor when that helps."
           >
-            组合 CLI、MCP、Skills 与 Computer Use，按需接入 Codex。
+            在 ChatGPT 里读写代码、运行命令，使用本机的 CLI、MCP、Skills 和 Computer Use，需要时交给
+            Codex、Claude Code 或 Cursor。
+          </p>
+          <p class="hero-support" data-en="Each computer decides what it allows.">
+            每台电脑自己决定允许什么。
           </p>
           <div class="hero-actions">
-            <a class="button button-primary" href="#get-started" data-en="Get started">开始使用</a>
             <a
-              class="button button-secondary"
-              href="https://github.com/computer-mcp/computer-mcp"
-              data-en="View on GitHub"
-              >查看 GitHub</a
+              class="button button-primary"
+              href="https://github.com/computer-mcp/computer-mcp/releases/latest"
+              data-en="Download for Mac"
+              >下载 Mac 版</a
             >
+            <a class="button button-secondary" href="/guide/" data-en="Setup guide">配置指南</a>
           </div>
-          <p
-            class="hero-notes"
-            data-en="macOS 14+ · Connect what you need · Choose your permissions"
-          >
-            macOS 14+ · 按需接入 · 权限由你配置
-          </p>
+          <ul class="chips" aria-label="Capabilities">
+            <li>Files</li>
+            <li>Shell</li>
+            <li>CLI</li>
+            <li>MCP</li>
+            <li>Skills</li>
+            <li>Computer Use</li>
+          </ul>
         </div>
-        <div class="tool-stage" id="capabilities">
-          <div class="stage-heading">
-            <span>ChatGPT</span><span class="stage-divider" aria-hidden="true">/</span>
-            <img src="/brand/mark.svg" alt="" width="28" height="28" />
-            <span>Computer MCP</span>
-          </div>
-          <p class="stage-label" data-en="One connection. Choose a capability to explore.">
-            一个入口。看看你的工具能做什么。
-          </p>
-          <div class="tool-tabs" role="tablist" aria-label="Integrations">
-            <button
-              type="button"
-              role="tab"
-              id="tab-cli"
-              aria-selected="true"
-              aria-controls="panel-cli"
-              data-tool="cli"
-            >
-              <strong>CLI</strong><span data-en="Your commands">你的命令行</span>
-            </button>
-            <button
-              type="button"
-              role="tab"
-              id="tab-codex"
-              aria-selected="false"
-              aria-controls="panel-codex"
-              tabindex="-1"
-              data-tool="codex"
-            >
-              <strong>Codex</strong><span data-en="Your coding agent">你的编码助手</span>
-            </button>
-            <button
-              type="button"
-              role="tab"
-              id="tab-mcp"
-              aria-selected="false"
-              aria-controls="panel-mcp"
-              tabindex="-1"
-              data-tool="mcp"
-            >
-              <strong>MCP</strong><span data-en="Your connected tools">你的工具服务</span>
-            </button>
-            <button
-              type="button"
-              role="tab"
-              id="tab-skills"
-              aria-selected="false"
-              aria-controls="panel-skills"
-              tabindex="-1"
-              data-tool="skills"
-            >
-              <strong>Skills</strong><span data-en="Your reusable methods">你的工作方法</span>
-            </button>
-          </div>
-          <div class="tool-panels">
-            <div id="panel-cli" role="tabpanel" aria-labelledby="tab-cli" tabindex="0">
-              <p class="example-label" data-en="Example request">示例任务</p>
-              <p class="example-request" data-en="“Format this Swift project with my local tools.”">
-                “用本机工具，格式化这个 Swift 项目。”
-              </p>
-              <p
-                class="example-detail"
-                data-en="Register a CLI or install a CLI plugin. ChatGPT can invoke its exposed commands and read the results."
-              >
-                注册 CLI 或安装 CLI 插件，让 ChatGPT 调用已开放的命令、读取执行结果。
-              </p>
-              <a
-                href="https://github.com/computer-mcp/plugin-swift-format"
-                data-en="Explore the Swift Format plugin"
-                >了解 Swift Format 插件</a
-              >
-            </div>
-            <div id="panel-codex" role="tabpanel" aria-labelledby="tab-codex" tabindex="0" hidden>
-              <p
-                class="example-label"
-                data-en="Example request · Advanced orchestration is experimental"
-              >
-                示例任务 · 高级编排为实验能力
-              </p>
-              <p
-                class="example-request"
-                data-en="“Ask Codex to fix this issue, then run the tests.”"
-              >
-                “让 Codex 修复这个问题，再运行测试。”
-              </p>
-              <p
-                class="example-detail"
-                data-en="Install the Codex plugin and configure local Codex. Start a coding task, follow its progress and return to the result in your conversation."
-              >
-                安装 Codex 插件并配置本机 Codex，在对话里启动编码任务、跟进进度、查看结果。
-              </p>
-              <a
-                href="https://github.com/computer-mcp/plugin-codex"
-                data-en="Explore the Codex plugin"
-                >了解 Codex 插件</a
-              >
-            </div>
-            <div id="panel-mcp" role="tabpanel" aria-labelledby="tab-mcp" tabindex="0" hidden>
-              <p class="example-label" data-en="Example request">示例任务</p>
-              <p
-                class="example-request"
-                data-en="“Use my connected research tool to find the project references.”"
-              >
-                “用已接入的资料工具，查找这个项目的参考信息。”
-              </p>
-              <p
-                class="example-detail"
-                data-en="Register an MCP server directly or through a plugin. Expose all its tools or choose an exact allowlist."
-              >
-                直接注册 MCP 服务，或通过插件接入。开放全部工具，或只选择你需要的工具。
-              </p>
-              <a
-                href="https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Reference/PluginPackages.md"
-                data-en="Read the integration guide"
-                >查看接入指南</a
-              >
-            </div>
-            <div id="panel-skills" role="tabpanel" aria-labelledby="tab-skills" tabindex="0" hidden>
-              <p class="example-label" data-en="Example request">示例任务</p>
-              <p
-                class="example-request"
-                data-en="“Read the project's Skill, then follow its release checklist.”"
-              >
-                “先读取项目的 Skill，再按它的清单准备发布。”
-              </p>
-              <p
-                class="example-detail"
-                data-en="Make reusable instructions and resources available alongside your tools. Clients can read them to guide a task; tool execution still follows its own permissions."
-              >
-                把可复用的说明和资源与工具一起提供给客户端，用于指导任务；实际工具执行仍遵循各自的授权。
-              </p>
-              <a
-                href="https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Reference/PluginPackages.md"
-                data-en="Explore plugin packages"
-                >了解插件包</a
-              >
-            </div>
-          </div>
-          <p
-            class="stage-note"
-            data-en="Tools require installation and configuration. Examples illustrate tasks, not recorded execution results."
+        <figure class="scene" aria-labelledby="scene-caption">
+          <figcaption
+            id="scene-caption"
+            class="visually-hidden"
+            data-en="A ChatGPT request travels over one secure link into a stack of capability planes on a MacBook Pro, which edits a file and runs the tests."
           >
-            工具需安装并配置。以上为任务示例。
-          </p>
-        </div>
+            ChatGPT 的请求沿一条安全连接进入 MacBook Pro 上的能力层，修改文件并运行测试。
+          </figcaption>
+          <div class="chat-card">
+            <p class="chat-title">ChatGPT</p>
+            <p
+              class="chat-request"
+              data-en="Set the checkout timeout to 30 seconds, then run the tests."
+            >
+              把结账页的超时改成 30 秒，再跑一下测试。
+            </p>
+          </div>
+          <div class="link" aria-hidden="true">
+            <span class="signal"></span>
+            <span class="packet"><span class="packet-arrow">→</span> file.write</span>
+            <span class="packet"><span class="packet-arrow">→</span> shell.run</span>
+          </div>
+          <div class="stack">
+            <div class="plane plane-workspace"><span>~/Developer/shop</span></div>
+            <div class="plane plane-capabilities">
+              <span data-en="Tools you allow">你允许的工具</span>
+            </div>
+            <div class="plane plane-result">
+              <p class="result-head">
+                <span class="result-host">MacBook Pro</span>
+                <span class="result-status" data-en="● connected">● 已连接</span>
+              </p>
+              <p class="result-file">Sources/Checkout/Session.swift</p>
+              <p class="result-removed">− timeout = 15</p>
+              <p class="result-added">+ timeout = 30</p>
+              <p><span class="prompt">$</span> swift test</p>
+              <p class="result-pass">
+                <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true">
+                  <path d="M2 6.5 5 9.5 10.5 2.5" />
+                </svg>
+                128 tests passed · 6.2s
+              </p>
+            </div>
+          </div>
+        </figure>
       </section>
-      <section id="workflow" class="section-block section-shell workflow-section">
+
+      <section id="capabilities" class="section shell" aria-labelledby="capabilities-title">
         <div class="section-heading">
-          <p class="eyebrow" data-en="From conversation to action">从对话，到行动</p>
-          <h2 data-en="Keep the conversation. Bring your tools.">熟悉的对话。熟悉的工具。</h2>
+          <p class="eyebrow" data-en="What you can do">能做什么</p>
+          <h2 id="capabilities-title" data-en="Ask in the chat. It happens on your computer.">
+            在对话里提，在你的电脑上做。
+          </h2>
           <p
-            data-en="Your local projects and tools become part of the task. Computer MCP connects the pieces; you decide what is available."
+            data-en="Every capability runs on the computer you choose, with only the tools and folders you open to it."
           >
-            把本地项目和工具带进任务。Computer MCP 负责连接，你决定开放哪些能力。
+            每个能力都在你选定的电脑上执行，只能用到你开放的工具和文件夹。
           </p>
         </div>
-        <div class="feature-grid">
-          <article>
-            <span class="feature-category">01 / CONNECT</span>
-            <h3 data-en="Bring what you already use.">接上你正在用的工具。</h3>
-            <p
-              data-en="Use direct registrations or install plugins that combine MCP, CLI and Skills. External runtimes and sign-ins remain yours to manage."
-            >
-              直接注册，或安装组合了 MCP、CLI 和 Skills 的插件。外部工具与账号登录继续由你管理。
+        <div class="capability-grid">
+          <article class="capability">
+            <p class="capability-kind">Files · Shell</p>
+            <h3 data-en="Files and commands">文件与命令</h3>
+            <p class="ask" data-en="Read Package.swift, then run the tests.">
+              看看 Package.swift，再跑一遍测试。
             </p>
-          </article>
-          <article>
-            <span class="feature-category">02 / WORK</span>
-            <h3 data-en="Move the task forward.">在对话里把事做下去。</h3>
+            <ul class="packets" aria-label="Tools">
+              <li>file.read</li>
+              <li>shell.run</li>
+            </ul>
             <p
-              data-en="Read a project, invoke a command, hand work to Codex and inspect the result. Combine authorized tools around the job at hand."
+              data-en="Read and write files, search code and review Git changes in authorized workspaces. Arbitrary Shell commands need Full Access and are enabled separately."
             >
-              读取项目、调用命令、交给 Codex 实现，再查看结果。围绕任务，组合已经授权的工具。
+              在授权的工作区里读写文件、搜索代码、查看 Git 改动。任意 Shell
+              命令需要完全访问，并且要单独开启。
             </p>
-          </article>
-          <article>
-            <span class="feature-category">03 / FOLLOW</span>
-            <h3 data-en="Stay with the result.">进度和结果，有据可查。</h3>
-            <p
-              data-en="Follow supported runs, read bounded results and inspect redacted audit records. A cancellation request and confirmed cleanup have distinct states."
+            <a
+              href="https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Reference/Tools.md"
+              data-en="Tools reference"
+              >工具参考</a
             >
-              跟进支持的运行任务、读取有界结果、查看脱敏审计记录。取消请求与确认清理分别记录。
+          </article>
+          <article class="capability">
+            <p class="capability-kind">CLI</p>
+            <h3 data-en="Your command-line tools">你的命令行工具</h3>
+            <p class="ask" data-en="Format this Swift project with my local tools.">
+              用本机工具格式化这个 Swift 项目。
+            </p>
+            <ul class="packets" aria-label="Tools">
+              <li>cli.exec</li>
+            </ul>
+            <p
+              data-en="Register commands or install a CLI plugin, and ChatGPT can call the exposed commands and read their results."
+            >
+              注册命令或安装 CLI 插件，ChatGPT 就能调用开放的命令、读取结果。
+            </p>
+            <a
+              href="https://github.com/computer-mcp/plugin-swift-format"
+              data-en="Swift Format plugin"
+              >Swift Format 插件</a
+            >
+          </article>
+          <article class="capability">
+            <p class="capability-kind">MCP</p>
+            <h3 data-en="Your connected services">你接入的服务</h3>
+            <p class="ask" data-en="Use my connected research tool to find the project references.">
+              用已接入的资料工具，查一下项目参考。
+            </p>
+            <ul class="packets" aria-label="Tools">
+              <li>mcp.tools.call</li>
+            </ul>
+            <p
+              data-en="Register an MCP server directly or through a plugin. Expose all of its tools or only the ones you choose."
+            >
+              直接注册 MCP 服务，或通过插件接入；开放全部工具，或只开放你选的那几个。
+            </p>
+            <a
+              href="https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Reference/PluginPackages.md"
+              data-en="Integration guide"
+              >接入说明</a
+            >
+          </article>
+          <article class="capability">
+            <p class="capability-kind">Skills</p>
+            <h3 data-en="Your ways of working">你的工作方法</h3>
+            <p class="ask" data-en="Read the project's Skill, then follow its release checklist.">
+              先读项目的 Skill，再按清单准备发布。
+            </p>
+            <ul class="packets" aria-label="Tools">
+              <li>skills.read</li>
+            </ul>
+            <p
+              data-en="Give clients reusable instructions and resources to guide a task. Execution still follows each tool's permissions."
+            >
+              把可复用的说明和资源交给客户端来指导任务；实际执行仍按各个工具的授权。
+            </p>
+            <a
+              href="https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Reference/PluginPackages.md"
+              data-en="Plugin packages"
+              >插件包</a
+            >
+          </article>
+          <article class="capability">
+            <p class="capability-kind">Computer Use</p>
+            <h3 data-en="Your desktop apps">你的桌面应用</h3>
+            <p class="ask" data-en="Check which window is in front right now.">
+              看看现在哪个窗口在最前面。
+            </p>
+            <ul class="packets" aria-label="Tools">
+              <li>computer.windows</li>
+            </ul>
+            <p
+              data-en="The Computer Use plugin connects native CUA, with Accessibility tools as a fallback. Availability depends on the operation and on macOS privacy grants."
+            >
+              Computer Use 插件接入原生 CUA，并以辅助功能工具兜底；能否使用取决于具体操作和 macOS
+              隐私授权。
+            </p>
+            <a
+              href="https://github.com/computer-mcp/plugin-computer-use"
+              data-en="Computer Use plugin"
+              >Computer Use 插件</a
+            >
+          </article>
+          <article class="capability">
+            <p class="capability-kind">Codex · Claude Code · Cursor</p>
+            <h3 data-en="Hand off to a coding agent">交给编码助手</h3>
+            <p class="ask" data-en="Ask Codex to fix this issue, then run the tests.">
+              让 Codex 修好这个问题，再跑测试。
+            </p>
+            <p
+              data-en="Install the Codex, Claude Code or Cursor plugin to start coding tasks, follow their progress and review the results from the chat. Advanced Codex orchestration is experimental."
+            >
+              安装 Codex、Claude Code 或 Cursor
+              插件，在对话里启动编码任务、跟进进度、查看结果。Codex 高级编排仍是实验能力。
+            </p>
+            <p class="capability-links">
+              <a href="https://github.com/computer-mcp/plugin-codex">Codex</a>
+              <a href="https://github.com/computer-mcp/plugin-claude">Claude Code</a>
+              <a href="https://github.com/computer-mcp/plugin-cursor">Cursor</a>
             </p>
           </article>
         </div>
-        <div class="host-model">
-          <div>
-            <h3 data-en="Choose a computer. Then a workspace.">选择电脑，再选择它的工作区。</h3>
-            <p
-              data-en="Connect each host to ChatGPT or another compatible MCP client. Tools execute on the selected computer; Codex is optional."
-            >
-              将各台宿主连接到 ChatGPT 或其他兼容 MCP 的客户端。工具在选定的电脑上执行，Codex
-              是可选集成。
-            </p>
-          </div>
-          <ul class="host-connections" aria-label="Independent host connections">
+        <p
+          class="section-note"
+          data-en="Tools need installation and configuration. These are example requests, not recorded results."
+        >
+          工具需要安装和配置。以上是任务示例，不是录制的执行结果。
+        </p>
+      </section>
+
+      <section id="connect" class="section shell connect" aria-labelledby="connect-title">
+        <div class="section-heading">
+          <p class="eyebrow" data-en="How it connects">怎么连起来</p>
+          <h2 id="connect-title" data-en="Each computer, its own connection.">
+            每台电脑，一条自己的连接。
+          </h2>
+          <p
+            data-en="Run Computer MCP on each computer and connect it to ChatGPT or another compatible MCP client. In the chat, choose a computer, then a workspace on it."
+          >
+            在每台电脑上运行 Computer MCP，再把它接到 ChatGPT 或其他兼容 MCP
+            的客户端。对话里先选电脑，再选那台电脑上的工作区。
+          </p>
+        </div>
+        <div class="connect-layout">
+          <ul class="paths">
             <li>
-              <strong>Mac A</strong
-              ><span data-en="Its tools · Its workspaces">本机工具 · 本机工作区</span>
+              <p class="path-kind">Secure MCP Tunnel</p>
+              <h3>ChatGPT</h3>
+              <p
+                data-en="Connects through OpenAI Secure MCP Tunnel without exposing a local port to the internet."
+              >
+                通过 OpenAI Secure MCP Tunnel 连接，不需要把本机端口暴露到公网。
+              </p>
             </li>
             <li>
-              <strong>Mac B</strong
-              ><span data-en="Its tools · Its workspaces">本机工具 · 本机工作区</span>
+              <p class="path-kind">stdio</p>
+              <h3 data-en="Local MCP clients">本地 MCP 客户端</h3>
+              <p
+                data-en="Copy the command the App shows into a local client. Codex users can review and register it with Codex."
+              >
+                把 App 显示的命令复制到本地客户端；Codex 用户可以核对预览后直接注册。
+              </p>
+            </li>
+            <li>
+              <p class="path-kind">Named Tunnel</p>
+              <h3>Cloudflare</h3>
+              <p
+                data-en="Serves an access-token-protected MCP endpoint through a Cloudflare named tunnel for other remote clients."
+              >
+                通过 Cloudflare Named Tunnel 提供有访问令牌保护的 MCP 地址，供其他远程客户端使用。
+              </p>
             </li>
           </ul>
-          <p
-            class="host-boundary"
-            data-en="Each host keeps its own credentials, policy, approvals and audit. Workspace IDs are host-scoped; connections do not share files or migrate running work."
-          >
-            每台宿主独立保有凭据、策略、审批和审计。工作区 ID
-            仅属于对应宿主，连接不会共享文件或迁移运行中的工作。
-          </p>
+          <div class="hosts" aria-hidden="true">
+            <div class="hosts-chat">ChatGPT</div>
+            <div class="hosts-links"><span></span><span></span></div>
+            <div class="hosts-row">
+              <div class="host">
+                <div class="mini-stack"><i></i><i></i><i>MacBook Pro</i></div>
+                <p>~/Developer/shop</p>
+              </div>
+              <div class="host">
+                <div class="mini-stack"><i></i><i></i><i>Mac mini</i></div>
+                <p>~/Projects/site</p>
+              </div>
+            </div>
+          </div>
         </div>
+        <p
+          class="section-note"
+          data-en="Each computer keeps its own credentials, policy, approvals and audit. Workspace IDs belong to that computer; connecting several does not share their files or move running work."
+        >
+          每台电脑各自保管凭据、策略、审批和审计。工作区 ID
+          只属于那台电脑；连接多台电脑不会共享文件，也不会迁移运行中的工作。
+        </p>
       </section>
-      <section id="security" class="section-block trust-section">
-        <div class="section-shell trust-layout">
+
+      <section id="permissions" class="section permissions" aria-labelledby="permissions-title">
+        <div class="shell permissions-layout">
           <div class="section-heading">
-            <p class="eyebrow" data-en="Your Mac. Your decisions.">你的 Mac，你来决定。</p>
-            <h2 data-en="Permissions stay in your hands.">权限，始终由你掌握。</h2>
+            <p class="eyebrow" data-en="Permissions">权限</p>
+            <h2 id="permissions-title" data-en="Each computer decides what it allows.">
+              每台电脑自己决定允许什么。
+            </h2>
             <p
               data-en="Review connected clients in the App. Choose their access, downgrade it or end it. Changes apply to new requests immediately."
             >
-              在 App 中查看已连接的客户端，选择、降低或结束访问权限。变更立即作用于新的请求。
+              在 App 里查看已连接的客户端，选择、降低或结束访问权限。变更立即作用于新的请求。
             </p>
             <a
               class="text-link"
@@ -340,197 +394,275 @@
               >了解安全模型</a
             >
           </div>
-          <div class="trust-details">
-            <article>
-              <h3 data-en="Observe or Control">观察，或控制</h3>
-              <p
-                data-en="Observe permits inspection without system changes. Control with Restricted Access uses only the tools, projects and integrations you select, and never permits arbitrary execution. Full Access requires your explicit approval for the connected client."
-              >
-                观察模式只允许查看，不修改系统。控制模式下，受限访问只使用你选择的工具、项目和集成，不能任意执行命令。完全访问需要你为已连接的客户端明确批准。
+          <div class="permission-detail">
+            <ol class="levels">
+              <li>
+                <h3 data-en="Observe">观察</h3>
+                <p data-en="Observe permits inspection without system changes.">
+                  只允许查看，不修改系统。
+                </p>
+              </li>
+              <li>
+                <h3 data-en="Control · Restricted Access">控制 · 受限访问</h3>
+                <p
+                  data-en="Uses only the tools, projects and integrations you select, and never permits arbitrary execution."
+                >
+                  只使用你选择的工具、项目和集成，不能任意执行命令。
+                </p>
+              </li>
+              <li>
+                <h3 data-en="Control · Full Access">控制 · 完全访问</h3>
+                <p
+                  data-en="Can run commands and access resources available to your macOS user, and requires your explicit approval for the connected client."
+                >
+                  可以执行命令、访问当前 macOS 用户可用的资源，需要你为这个客户端明确批准。
+                </p>
+              </li>
+            </ol>
+            <div class="approval" aria-hidden="true">
+              <p class="approval-head">
+                <span data-en="ChatGPT asks for Full Access">ChatGPT 请求完全访问</span>
+                <span class="badge-caution" data-en="Awaiting approval">等待确认</span>
               </p>
-            </article>
-            <article>
-              <h3 data-en="Full Access, for this session">完全访问，默认仅本次会话</h3>
-              <p
-                data-en="Full Access can run commands and access resources available to your macOS user; a workspace is not a sandbox. Approval defaults to This Session. Always Allow this Client is a separate choice. Routine local work and verified official plugin updates need no repeated approval within that session. New accounts, unverified persistent plugins and macOS privacy permissions require their own authorization."
-              >
-                完全访问可以执行命令，访问当前 macOS
-                用户可用的资源；工作区不是沙箱。授权默认仅本次会话，“始终允许此客户端”需单独选择。会话内的普通本机操作和已验证官方插件更新无需重复批准。新账号、未验证的持久插件与
-                macOS 隐私权限仍需各自授权。
+              <p class="approval-choices">
+                <span class="choice choice-selected" data-en="This Session">仅本次会话</span>
+                <span class="choice" data-en="Always Allow this Client">始终允许此客户端</span>
               </p>
-            </article>
-            <article class="codex-contract">
-              <h3 data-en="Codex keeps its native settings">Codex 保留原生执行设置</h3>
-              <p
-                data-en="The plugin supplies App Server and Exec lifecycles through swift-codex. Codex owns its configuration, provider, MCP, Skills, hooks and authentication. Omitted execution settings inherit Codex configuration, including native Full Access; explicit overrides follow native semantics. Native approvals retain their decisions and scopes and cannot approve host tickets."
+            </div>
+            <ul class="boundaries">
+              <li
+                data-en="Approval defaults to This Session. Always Allow this Client is a separate choice."
               >
-                插件通过 swift-codex 提供 App Server 与 Exec 生命周期。Codex
-                管理自己的配置、provider、MCP、Skills、hooks 和认证。未覆盖的执行参数遵循本机 Codex
-                配置，包括原生 Full
-                Access；显式覆盖遵循原生语义。原生审批保留自己的决定和作用域，不能批准宿主票据。
-              </p>
-            </article>
+                授权默认仅本次会话，“始终允许此客户端”需要单独选择。
+              </li>
+              <li
+                data-en="Full Access carries your macOS user's permissions; a workspace is not a sandbox."
+              >
+                完全访问使用当前 macOS 用户的权限；工作区不是沙箱。
+              </li>
+              <li
+                data-en="Routine local work and verified official plugin updates need no repeated approval within the session. New accounts, unverified persistent plugins and macOS privacy permissions require their own authorization."
+              >
+                会话内的普通本机操作和已验证的官方插件更新无需重复批准；新账号、未验证的持久插件和
+                macOS 隐私权限需要各自授权。
+              </li>
+            </ul>
           </div>
         </div>
       </section>
-      <section id="comparison" class="section-block section-shell comparison-section">
+
+      <section id="comparison" class="section shell" aria-labelledby="comparison-title">
         <div class="section-heading">
-          <p class="eyebrow" data-en="Different jobs. Different execution models.">
-            不同工作，不同执行模型。
-          </p>
-          <h2 data-en="Choose what fits the task.">选择适合任务的方式。</h2>
-          <p data-en="Computer MCP, OpenAI Dots and Codex Remote can complement one another.">
-            Computer MCP、OpenAI Dots 与 Codex Remote 可以互相配合。
+          <p class="eyebrow" data-en="Comparison">对比</p>
+          <h2 id="comparison-title" data-en="Choose what fits the job.">选适合这件事的工具。</h2>
+          <p
+            data-en="Computer MCP, OpenAI Dots and Codex Remote can complement one another; their capabilities and account requirements differ."
+          >
+            Computer MCP、OpenAI Dots 和 Codex Remote 可以互相配合；它们的能力和账号要求不同。
           </p>
         </div>
-        <div class="comparison-grid">
-          <article>
-            <h3>Computer MCP</h3>
-            <p
-              data-en="Direct, composable, governed access to general local capabilities from ChatGPT or compatible MCP clients."
+        <section class="table-scroll" aria-labelledby="comparison-caption" tabindex="0">
+          <table>
+            <caption
+              id="comparison-caption"
+              class="visually-hidden"
+              data-en="Computer MCP, OpenAI Dots and Codex Remote compared"
             >
-              从 ChatGPT 或兼容 MCP 的客户端直接组合使用受治理的通用本机能力。
-            </p>
-            <p
-              data-en="Connect independent hosts and choose their workspaces. Ordinary tools do not require a Codex task."
-            >
-              连接独立宿主，选择对应工作区。调用普通工具不要求启动 Codex 任务。
-            </p>
-          </article>
-          <article>
-            <h3>OpenAI Dots</h3>
-            <p
-              data-en="Always-on cloud agents with memory, apps and proactive work, plus their own cloud computer."
-            >
-              带记忆、应用和主动工作的常驻云端 Agent，拥有自己的云端电脑。
-            </p>
-            <p
-              data-en="A dot connects to one personal computer at a time. It can delegate local ChatGPT Work or Codex tasks."
-            >
-              一个 Dot 同时连接一台个人电脑，可以委派本地 ChatGPT Work 或 Codex 任务。
-            </p>
-          </article>
-          <article>
-            <h3>Codex Remote</h3>
-            <p
-              data-en="First-party remote coding: start or continue Codex tasks, steer, approve actions and review diffs and tests."
-            >
-              第一方远程编程：启动或继续 Codex 任务、跟进、审批操作并审查 Diff 和测试结果。
-            </p>
-            <p data-en="Switch among connected computers. The selected host runs the Codex task.">
-              在已连接的多台电脑间切换，由选定的宿主执行 Codex 任务。
-            </p>
-          </article>
-        </div>
+              Computer MCP、OpenAI Dots 与 Codex Remote 对比
+            </caption>
+            <thead>
+              <tr>
+                <td></td>
+                <th scope="col" class="own">Computer MCP</th>
+                <th scope="col">OpenAI Dots</th>
+                <th scope="col">Codex Remote</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row" data-en="Primary job">主要用途</th>
+                <td class="own" data-en="Direct, composable access to local tools">
+                  直接、可组合地使用本机工具
+                </td>
+                <td data-en="Always-on work with memory and proactive follow-through">
+                  常驻工作，带记忆并主动跟进
+                </td>
+                <td data-en="Start, steer, approve and review coding tasks remotely">
+                  远程启动、引导、审批和审查编码任务
+                </td>
+              </tr>
+              <tr>
+                <th scope="row" data-en="Execution">在哪执行</th>
+                <td
+                  class="own"
+                  data-en="The chosen computer runs registered capabilities; Codex is optional"
+                >
+                  选定的电脑运行已注册的能力；Codex 可选
+                </td>
+                <td
+                  data-en="A cloud agent with its own computer; it can delegate local Work or Codex tasks"
+                >
+                  有自己电脑的云端 Agent，可以委派本地 Work 或 Codex 任务
+                </td>
+                <td data-en="Codex runs the task on the selected connected computer">
+                  Codex 在选定的已连接电脑上运行任务
+                </td>
+              </tr>
+              <tr>
+                <th scope="row" data-en="Computers">电脑</th>
+                <td
+                  class="own"
+                  data-en="Independent Computer MCP hosts, each connected to a compatible client"
+                >
+                  每台电脑独立运行 Computer MCP，各自接到兼容的客户端
+                </td>
+                <td data-en="One personal computer at a time, alongside a separate cloud computer">
+                  同一时间一台个人电脑，另有独立的云端电脑
+                </td>
+                <td data-en="Multiple connected computers; choose where work runs">
+                  多台已连接的电脑，选择在哪台运行
+                </td>
+              </tr>
+              <tr>
+                <th scope="row" data-en="Interface">交互方式</th>
+                <td
+                  class="own"
+                  data-en="Typed MCP tools, registered CLI, Skills, builtins and Computer Use"
+                >
+                  类型明确的 MCP 工具、注册的 CLI、Skills、内置工具和 Computer Use
+                </td>
+                <td data-en="Agent conversation, apps and plugins, and delegated tasks">
+                  Agent 对话、应用和插件、委派任务
+                </td>
+                <td data-en="Coding conversations, commands, diffs and test output">
+                  编码对话、命令、Diff 和测试输出
+                </td>
+              </tr>
+              <tr>
+                <th scope="row" data-en="Client and authority">客户端与授权</th>
+                <td
+                  class="own"
+                  data-en="ChatGPT or compatible MCP clients; each computer's own policy, approvals and audit"
+                >
+                  ChatGPT 或兼容 MCP 的客户端；每台电脑自己的策略、审批和审计
+                </td>
+                <td data-en="ChatGPT's agent, app and computer-access controls">
+                  ChatGPT 的 Agent、应用和电脑访问控制
+                </td>
+                <td data-en="Codex account or workspace, and connected-computer permissions">
+                  Codex 账号或工作区，以及已连接电脑的权限
+                </td>
+              </tr>
+              <tr>
+                <th scope="row" data-en="Strongest fit">最适合</th>
+                <td class="own" data-en="General local capabilities across computers and clients">
+                  跨电脑、跨客户端的通用本机能力
+                </td>
+                <td data-en="Cloud continuity, memory and proactive work">
+                  云端连续性、记忆和主动工作
+                </td>
+                <td data-en="First-party remote Codex workflows">第一方远程 Codex 工作流</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
         <p
-          class="comparison-note"
-          data-en="Client and service usage terms still apply. OpenAI states that Dot conversations do not count toward ChatGPT usage limits; delegated Codex and ChatGPT Work tasks use their normal limits."
+          class="section-note"
+          data-en="Computer MCP does not require a Codex task to run ordinary registered tools. That is an architectural distinction, not a claim of free or unmetered usage: client, model and vendor service terms still apply. OpenAI says Dot conversations do not count toward ChatGPT usage limits; delegated Codex and ChatGPT Work tasks count toward their applicable limits."
         >
-          客户端与服务用量条款仍然适用。OpenAI 表示 Dot 对话不计入 ChatGPT 用量限制，委派的 Codex 与
-          ChatGPT Work 任务按各自的正常限制计量。
+          调用普通的已注册工具不需要 Codex
+          任务。这是架构上的区别，不代表免费或不限量：客户端、模型和服务商条款仍然适用。OpenAI 表示
+          Dot 对话不计入 ChatGPT 用量限制，委派的 Codex 和 ChatGPT Work 任务按各自的限制计量。
         </p>
-        <p class="comparison-sources">
-          <span data-en="Official sources checked 2026-10-01:">官方来源核实于 2026-10-01：</span>
-          <a href="https://learn.chatgpt.com/docs/dots/computers-and-apps" data-en="Dots computers"
-            >Dots 电脑</a
+        <p class="sources">
+          <span data-en="OpenAI facts checked">OpenAI 相关事实核实于</span>
+          <time datetime="2026-10-01">2026-10-01</time><span data-en=":">：</span>
+          <a
+            href="https://learn.chatgpt.com/docs/dots/computers-and-apps"
+            data-en="Dots computers and apps"
+            >Dots 电脑与应用</a
           >
           ·
-          <a href="https://openai.com/index/introducing-dots/" data-en="Introducing Dots"
+          <a href="https://openai.com/index/introducing-dots/" data-en="Introducing dots"
             >Dots 介绍</a
           >
           · <a href="https://learn.chatgpt.com/docs/remote">Codex Remote</a> ·
           <a href="https://learn.chatgpt.com/docs/remote-connections" data-en="Remote connections"
             >远程连接</a
           >
-          ·
-          <a
-            href="https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Reference/ProductComparison.md"
-            data-en="Full comparison"
-            >完整对比</a
-          >
         </p>
       </section>
-      <section id="get-started" class="section-block section-shell start-section">
+
+      <section id="get-started" class="section shell" aria-labelledby="start-title">
         <div class="section-heading">
-          <p class="eyebrow" data-en="Get connected">开始连接</p>
-          <h2 data-en="Give your next conversation more to work with.">让下一次对话，动手做事。</h2>
-          <p data-en="Start with one folder and a read-only request. Add tools when you need them.">
-            从一个文件夹、一次只读请求开始。需要更多能力时，再接入你的工具。
+          <p class="eyebrow" data-en="Get started">开始</p>
+          <h2 id="start-title" data-en="Connect your computer in three steps.">
+            三步接上你的电脑。
+          </h2>
+          <p data-en="Start with one folder and a read-only call. Open more when you need it.">
+            从一个文件夹、一次只读调用开始，需要时再开放更多。
           </p>
         </div>
-        <ol class="setup-steps">
+        <ol class="steps">
           <li>
-            <h3 data-en="Install Computer MCP">安装 Computer MCP</h3>
+            <h3 data-en="Download and open">下载并打开</h3>
             <p
-              data-en="Download the macOS app from Releases, verify SHA256SUMS and open it from Finder. macOS 14 or later is required."
+              data-en="Download the notarized DMG and SHA256SUMS from the latest release, verify the checksum, drag the App to Applications and open it from Finder. macOS 14 or later is required."
             >
-              从 Releases 下载 macOS App，核对 SHA256SUMS 后从 Finder 打开。需要 macOS 14
-              或更新系统。
+              从最新版本下载已公证的 DMG 和 SHA256SUMS，校验后拖入“应用程序”，从 Finder 打开。需要
+              macOS 14 或更新。
             </p>
             <a
               href="https://github.com/computer-mcp/computer-mcp/releases/latest"
-              data-en="Download for Mac"
-              >下载 Mac 版</a
+              data-en="Latest release"
+              >最新版本</a
             >
           </li>
           <li>
-            <h3 data-en="Choose folders and tools">选择文件夹与工具</h3>
+            <h3 data-en="Choose a connection">选择连接</h3>
             <p
-              data-en="Register a workspace, select permissions and start the Gateway. Install and enable the plugins you need; external tools are installed separately."
+              data-en="On Welcome, choose Local MCP, ChatGPT or Cloudflare, then start the Gateway on Home. Normal use needs no configuration file."
             >
-              注册工作区、选择权限并启动 Gateway。按需安装和启用插件；外部工具单独安装。
+              在欢迎页选择本地 MCP、ChatGPT 或 Cloudflare，然后在 Home 启动
+              Gateway。普通使用不需要编辑配置文件。
             </p>
-            <a
-              href="https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Reference/PluginPackages.md"
-              data-en="Set up plugins"
-              >设置插件</a
-            >
+            <a href="/guide/#connect" data-en="Connection steps">连接步骤</a>
           </li>
           <li>
-            <h3 data-en="Connect your conversation">接入你的对话</h3>
+            <h3 data-en="Open one folder">开放一个文件夹</h3>
             <p
-              data-en="Follow the ChatGPT guide to connect through Secure MCP Tunnel, or copy the Local MCP command into a compatible client. Client access and account support are required."
+              data-en="Add a folder under Workspaces and give the connection read-only access first. Open more when you need it."
             >
-              按 ChatGPT 指南通过 Secure MCP Tunnel 连接，或将 Local MCP
-              命令复制到兼容客户端。需要客户端及账号支持相应接入方式。
+              在 Workspaces 添加一个文件夹，先给连接只读权限，需要时再开放更多。
             </p>
-            <a
-              href="https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Reference/ChatGPTWebRunbook.md"
-              data-en="Connect ChatGPT"
-              >连接 ChatGPT</a
-            >
+            <a href="/guide/#permissions" data-en="Workspaces and permissions">工作区与权限</a>
           </li>
         </ol>
         <div class="first-call">
           <div>
             <h3 data-en="Try a read-only first call">先试一次只读调用</h3>
             <p data-en="List the workspaces available to this connection.">
-              查看当前接入可以使用的工作区。
+              列出这个连接能用的工作区。
             </p>
           </div>
           <pre><code>workspace.list</code><button type="button" data-copy="workspace.list" data-en="Copy">复制</button></pre>
         </div>
-        <a
-          class="text-link"
-          href="https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Reference/QuickStart.md"
-          data-en="Read the complete quick start"
-          >查看完整快速开始</a
-        >
       </section>
-      <section id="questions" class="section-block section-shell questions-section">
+
+      <section id="questions" class="section shell" aria-labelledby="questions-title">
         <div class="section-heading">
-          <p class="eyebrow" data-en="A little more context">再了解一点</p>
-          <h2 data-en="Before you connect.">连接前，你可能想知道。</h2>
+          <p class="eyebrow" data-en="Questions">问题</p>
+          <h2 id="questions-title" data-en="Before you connect.">连接之前。</h2>
         </div>
         <div class="questions">
           <details>
             <summary data-en="Does every CLI work automatically?">所有 CLI 都能直接用吗？</summary>
             <p
-              data-en="Install the external tool first, then register its commands or install a compatible plugin. CLI Trees describe commands, arguments and structured coverage. Computer MCP does not install vendor runtimes or infer a complete integration from any executable."
+              data-en="Install the external tool first, then register its commands or install a compatible plugin. CLI Trees describe commands, arguments and structured coverage. Computer MCP does not install vendor runtimes or turn an arbitrary executable into a complete integration."
             >
               先安装外部工具，再注册命令或安装兼容插件。CLI Tree
-              描述命令、参数与结构化覆盖范围。Computer MCP
-              不负责安装厂商运行时，也不会自动把任意可执行文件变成完整集成。
+              描述命令、参数和结构化覆盖范围。Computer MCP
+              不负责安装厂商运行时，也不会把任意可执行文件自动变成完整集成。
             </p>
             <a
               href="https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Reference/CLITrees.md"
@@ -541,16 +673,15 @@
           <details>
             <summary data-en="Is everything built in?">这些能力都是内置的吗？</summary>
             <p
-              data-en="The gateway provides the common connection and permission layer. Plugins package MCP, CLI and Skills contributions. New installations start disabled and grant no permissions. Codex requires its plugin and local Codex setup; advanced orchestration is experimental."
+              data-en="The gateway provides the shared connection and permission layer. Plugins package MCP, CLI and Skills; new installations start disabled and grant no permissions. Codex requires its plugin and a local Codex setup."
             >
-              Gateway 提供共同的接入与权限层。插件打包 MCP、CLI 和
-              Skills，新安装默认停用，也不自动授予权限。Codex
-              需要对应插件和本机配置，高级编排仍是实验能力。
+              Gateway 提供共同的连接和权限层。插件打包 MCP、CLI 和
+              Skills，新安装默认停用，也不授予任何权限。Codex 需要对应插件和本机 Codex。
             </p>
             <a
               href="https://github.com/computer-mcp/computer-mcp#capability-status"
-              data-en="Check capability status"
-              >查看能力状态</a
+              data-en="Capability status"
+              >能力状态</a
             >
           </details>
           <details>
@@ -558,9 +689,8 @@
             <p
               data-en="The Computer Use plugin connects native CUA, with native Accessibility tools as a fallback. Availability depends on the operation, macOS privacy grants and vendor caller authentication. A discovered tool list alone does not prove desktop control is available."
             >
-              Computer Use 插件接入原生 CUA，原生 Accessibility
-              工具提供兜底。实际可用性取决于具体操作、macOS
-              隐私授权与厂商调用者认证；能列出工具不代表已获得桌面控制能力。
+              Computer Use 插件接入原生 CUA，原生辅助功能工具兜底。实际可用性取决于具体操作、macOS
+              隐私授权和厂商调用者认证；能列出工具不代表已经获得桌面控制能力。
             </p>
             <a
               href="https://github.com/computer-mcp/plugin-computer-use"
@@ -570,63 +700,152 @@
           </details>
           <details>
             <summary data-en="How does it relate to Codex Remote?">
-              和 Codex Remote 有什么关系？
+              和 Codex Remote 是什么关系？
             </summary>
             <p
-              data-en="For ordinary remote Codex control, prefer the official first-party experience. Computer MCP is for workflows that also need local CLI tools, MCP services, files and Skills across compatible clients."
+              data-en="For ordinary remote Codex control, prefer the official first-party experience. Computer MCP is for work that also needs local CLI tools, MCP services, files and Skills across compatible clients."
             >
-              普通的远程 Codex 控制，优先使用官方原生体验。Computer MCP 适合还需要本机 CLI、MCP
-              服务、文件和 Skills，并希望跨兼容客户端组合这些能力的工作流。
+              普通的远程 Codex 控制，优先使用官方体验。Computer MCP 适合还需要本机 CLI、MCP
+              服务、文件和 Skills，并希望跨兼容客户端组合它们的工作。
+            </p>
+          </details>
+          <details class="codex-contract">
+            <summary data-en="Does it change my Codex settings?">会改动我的 Codex 设置吗？</summary>
+            <p
+              data-en="No. The plugin supplies App Server and Exec lifecycles through swift-codex. Codex owns its configuration, provider, MCP, Skills, hooks and authentication. Omitted execution settings inherit Codex configuration, including native Full Access. Native approvals keep their own decisions and scopes and cannot approve host tickets."
+            >
+              不会。插件通过 swift-codex 提供 App Server 和 Exec 生命周期。Codex
+              管理自己的配置、provider、MCP、Skills、hooks 和认证。未覆盖的执行参数沿用本机 Codex
+              配置，包括原生完全访问。原生审批保留自己的决定和作用域，不能批准宿主的票据。
             </p>
           </details>
           <details class="limitations">
-            <summary data-en="What are the execution boundaries?">实际执行有哪些边界？</summary>
+            <summary data-en="What are the execution boundaries?">执行有哪些边界？</summary>
             <p
               data-en="A working directory or worktree is not an OS sandbox. Host Full Access and native Codex Full Access carry the executing user's permissions. A cancellation request is not proof of completion or cleanup. Unknown write results are not automatically replayed. The gateway cannot stop an external Codex client it does not own."
             >
-              工作目录和 worktree 不是操作系统沙箱。宿主完全访问与 Codex 原生 Full Access
-              使用执行用户的权限。取消请求不代表完成或清理已确认；结果不明的写入不会自动重放。Gateway
-              不能停止不归自己所有的外部 Codex 客户端。
+              工作目录和 worktree 不是操作系统沙箱。宿主完全访问和 Codex
+              原生完全访问使用执行用户的权限。取消请求不代表已经完成或清理；结果不明的写入不会自动重放。Gateway
+              不能停止不归它管理的外部 Codex 客户端。
             </p>
           </details>
         </div>
       </section>
-      <section class="closing-section section-shell">
-        <p class="eyebrow">Computer MCP</p>
-        <h2 data-en="Let ChatGPT use your local tools.">让 ChatGPT，用上你的本机工具。</h2>
-        <a class="button button-primary" href="#get-started" data-en="Get started">开始使用</a>
+
+      <section class="closing shell" aria-labelledby="closing-title">
+        <h2 id="closing-title" data-en="Wherever you chat, your computer is there.">
+          聊天在哪，你的电脑就在哪。
+        </h2>
+        <div class="hero-actions">
+          <a
+            class="button button-primary"
+            href="https://github.com/computer-mcp/computer-mcp/releases/latest"
+            data-en="Download for Mac"
+            >下载 Mac 版</a
+          >
+          <a class="button button-secondary" href="/guide/" data-en="Setup guide">配置指南</a>
+        </div>
       </section>
     </main>
-    <footer class="site-footer section-shell">
-      <div class="footer-top">
-        <a class="brand" href="#top" aria-label="Computer MCP home"
-          ><img src="/brand/mark.svg" width="36" height="36" alt="" /><span>Computer MCP</span></a
-        >
-        <p data-en="Let ChatGPT use your local tools.">让 ChatGPT，用上你的本机工具。</p>
+    <footer class="site-footer">
+      <div class="shell footer-layout">
+        <div class="footer-brand">
+          <a class="brand" href="/">
+            <img src="/brand/icon.svg" width="32" height="32" alt="" />
+            <span>Computer MCP</span>
+          </a>
+          <p data-en="Wherever you chat, your computer is there.">聊天在哪，你的电脑就在哪。</p>
+        </div>
+        <nav class="family" aria-labelledby="family-title">
+          <h2 id="family-title" data-en="Plugins and tools">插件与工具</h2>
+          <ul>
+            <li>
+              <a href="https://github.com/computer-mcp/plugin-codex"
+                ><img src="/brand/icons/plugin-codex.svg" width="24" height="24" alt="" />Codex</a
+              >
+            </li>
+            <li>
+              <a href="https://github.com/computer-mcp/plugin-claude"
+                ><img src="/brand/icons/plugin-claude.svg" width="24" height="24" alt="" />Claude
+                Code</a
+              >
+            </li>
+            <li>
+              <a href="https://github.com/computer-mcp/plugin-cursor"
+                ><img src="/brand/icons/plugin-cursor.svg" width="24" height="24" alt="" />Cursor</a
+              >
+            </li>
+            <li>
+              <a href="https://github.com/computer-mcp/plugin-computer-use"
+                ><img
+                  src="/brand/icons/plugin-computer-use.svg"
+                  width="24"
+                  height="24"
+                  alt=""
+                />Computer Use</a
+              >
+            </li>
+            <li>
+              <a href="https://github.com/computer-mcp/plugin-swift-format"
+                ><img
+                  src="/brand/icons/plugin-swift-format.svg"
+                  width="24"
+                  height="24"
+                  alt=""
+                />Swift Format</a
+              >
+            </li>
+            <li>
+              <a href="https://github.com/computer-mcp/apple-cli"
+                ><img src="/brand/icons/apple-cli.svg" width="24" height="24" alt="" />Apple CLI</a
+              >
+            </li>
+          </ul>
+        </nav>
+        <nav class="footer-links" aria-labelledby="links-title">
+          <h2 id="links-title" data-en="Project">项目</h2>
+          <ul>
+            <li><a href="https://github.com/computer-mcp">GitHub</a></li>
+            <li>
+              <a
+                href="https://github.com/computer-mcp/computer-mcp/tree/master/Documentation"
+                data-en="Documentation"
+                >文档</a
+              >
+            </li>
+            <li>
+              <a href="https://github.com/computer-mcp/computer-mcp/releases" data-en="Releases"
+                >版本</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://github.com/computer-mcp/computer-mcp/blob/master/PRIVACY.md"
+                data-en="Privacy"
+                >隐私</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://github.com/computer-mcp/computer-mcp/security/policy"
+                data-en="Security"
+                >安全</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://github.com/computer-mcp/computer-mcp/blob/master/LICENSE"
+                data-en="License"
+                >许可</a
+              >
+            </li>
+          </ul>
+        </nav>
       </div>
-      <nav aria-label="Project links">
-        <a href="https://github.com/computer-mcp/computer-mcp">GitHub</a
-        ><a
-          href="https://github.com/computer-mcp/computer-mcp/tree/master/Documentation"
-          data-en="Documentation"
-          >文档</a
-        ><a href="https://github.com/computer-mcp/computer-mcp/releases" data-en="Releases">版本</a
-        ><a
-          href="https://github.com/computer-mcp/computer-mcp/blob/master/PRIVACY.md"
-          data-en="Privacy"
-          >隐私</a
-        ><a href="https://github.com/computer-mcp/computer-mcp/security/policy" data-en="Security"
-          >安全</a
-        ><a
-          href="https://github.com/computer-mcp/computer-mcp/blob/master/LICENSE"
-          data-en="License"
-          >许可</a
-        >
-      </nav>
-      <div class="footer-base">
-        <span>© 2026 Computer MCP</span
-        ><span data-en="macOS 14+ · CLI · Codex · MCP · Skills"
-          >macOS 14+ · CLI · Codex · MCP · Skills</span
+      <div class="shell footer-base">
+        <span>© 2026 Xudong Xu</span>
+        <a href="https://github.com/computer-mcp/computer-mcp.github.io" data-en="Website source"
+          >网站源码</a
         >
       </div>
     </footer>

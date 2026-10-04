@@ -6,5 +6,11 @@ export default defineConfig({
     outDir: "dist",
     emptyOutDir: true,
     sourcemap: true,
+    rollupOptions: {
+      input: {
+        main: "index.html",
+        guide: "guide/index.html",
+      },
+    },
   },
 });
