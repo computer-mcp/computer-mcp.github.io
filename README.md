@@ -101,14 +101,10 @@ directly.
 Update them from an organization checkout with `python3 Brand/brand.py sync <website-checkout>` and
 commit the result. CI verifies the lock with the organization's shared brand check.
 
-`src/fonts/` holds WOFF2 subsets of Bricolage Grotesque, JetBrains Mono and Noto Sans SC. After a
-copy change, regenerate them from their pinned sources with
-`uv run --no-project --with fonttools --with brotli python3 scripts/fonts.py update`;
-`npm run fonts:check` fails when a page uses a character the subset lacks.
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) carries the font licenses.
+Text uses the visitor's system fonts: SF Pro, SF Mono and PingFang SC on Apple devices. The site
+bundles no font files.
 
 ## License
 
 Computer MCP-owned website code and content use the
-[Functional Source License 1.1, Apache 2.0 Future License](LICENSE) (FSL-1.1-ALv2). The bundled
-fonts keep their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+[Functional Source License 1.1, Apache 2.0 Future License](LICENSE) (FSL-1.1-ALv2).

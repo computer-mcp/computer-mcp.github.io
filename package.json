@@ -11,7 +11,6 @@
     "format:check": "prettier --check .",
     "check:html": "html-validate index.html guide/index.html",
     "check:links": "node scripts/check-links.mjs",
-    "fonts:check": "python3 scripts/fonts.py check",
     "test": "npm run catalog:test && node --test scripts/release.test.mjs scripts/check-links.test.mjs && playwright test",
     "catalog:test": "python3 -m unittest discover -s scripts -p 'test_plugin_catalog*.py'",
     "catalog:check": "python3 scripts/plugin_catalog.py check",
@@ -21,7 +20,7 @@
     "release:update": "node scripts/release.mjs update",
     "release:verify-public": "node scripts/release.mjs verify-public",
     "test:install": "playwright install chromium",
-    "check": "npm run fonts:check && npm run release:check && npm run catalog:check-policy && npm run format:check && npm run check:html && npm run build && npm run check:links && npm run test"
+    "check": "npm run release:check && npm run catalog:check-policy && npm run format:check && npm run check:html && npm run build && npm run check:links && npm run test"
   },
   "engines": {
     "node": ">=22"

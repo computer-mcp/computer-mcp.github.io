@@ -1,15 +1,15 @@
 {
   "schema_version": 2,
   "authority": "https://github.com/computer-mcp/.github",
-  "revision": "9042c987ef8b3482f63e3a037ae0d0d2fdeffb9a7768c03295c9a6a6c5a43ae2",
+  "revision": "2d9913a442afcb22faca90f5272d3988eb961be6e858b71c5067303cf7c627d6",
   "consumer": "computer-mcp.github.io",
   "files": {
     "public/brand/icon.svg": "28250027a8aeafb3ec79defabd89d2279c4329fd2fd64cfc923b8803a78416f9",
     "public/brand/favicon.svg": "a60dff8e1adb06eb431d09b113b12f5e47b75a5f759fcbcc91083ddf1305d292",
     "public/brand/favicon-32.png": "50ca36c37a8b480d4081fd4bcb7b9fdc1be10272ca8e51f554adcf343999900f",
     "public/brand/apple-touch-icon.png": "198e9dfabecc73bfcc2608cb0ff963694e0811bbfa23337cadcfd7a4da38e0af",
-    "public/brand/social-en.png": "2dcb1c201e9ae2d6358b2d893c315d4291f28597eea5753bda7d26a101cbb93d",
-    "public/brand/social-zh-CN.png": "ec008afcda87f8bc5957eb45060072a317d5f09b380ba896186f8a965bca7f00",
+    "public/brand/social-en.png": "574a4ddb9e0787880af0db87a611e81f101280cf0588176ffcdbf15d303e4c69",
+    "public/brand/social-zh-CN.png": "7f5b90e73ec27078796db3e20b339d850cb0afb24bdb17d738d26ce185ccc744",
     "public/brand/icons/plugin-codex.svg": "c482350f0ebd76536cd54da6ebb3e4a86cb2529319bb6492dbe0352ac5b63569",
     "public/brand/icons/plugin-computer-use.svg": "1d848bfa746345d91cf4b5eb9c72b8867b9b8b7c6ce87b3289b85aac7bf42448",
     "public/brand/icons/plugin-claude.svg": "a3b8c20af24a0043ff6e4739e3915b523684347a693121e435a1c7501767e7e1",
