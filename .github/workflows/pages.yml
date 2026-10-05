@@ -19,10 +19,12 @@ jobs:
   build:
     if: github.repository_id == '1353589608' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45
     permissions:
+      actions: write
       contents: write
       pages: read
+      pull-requests: write
 
     steps:
       - name: Check out repository
@@ -82,10 +84,50 @@ jobs:
       - name: Run accessibility and smoke tests
         run: npm test
 
-      - name: Persist verified catalog generation
+      - name: Prepare verified catalog generation
+        id: catalog
         env:
           CATALOG_SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
         run: python3 scripts/plugin_catalog_publication.py --expected-head "$CATALOG_SOURCE_COMMIT"
+
+      - name: Merge catalog proposal
+        if: steps.catalog.outputs.proposal != ''
+        env:
+          BRANCH: automation/plugin-catalog
+          GH_TOKEN: ${{ github.token }}
+          PROPOSAL: ${{ steps.catalog.outputs.proposal }}
+          RUN_URL:
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title=$(git log -1 --format=%s "$PROPOSAL")
+          body="Generated from current official plugin releases by [the Pages workflow]($RUN_URL). The catalog successor, publisher policy and built site were verified before this proposal. Website CI runs on this branch, the pull request merges automatically once it passes, and the same run then deploys the merged generation."
+          number=$(gh pr list --head "$BRANCH" --base master --state open --json number --jq '.[0].number // empty')
+          if [[ -n "$number" ]]; then
+            gh pr edit "$number" --title "$title" --body "$body"
+          else
+            number=$(gh pr create --head "$BRANCH" --base master --title "$title" --body "$body" | sed 's#.*/##')
+          fi
+          if [[ "$(gh pr view "$number" --json autoMergeRequest --jq '.autoMergeRequest == null')" == true ]]; then
+            gh pr merge "$number" --auto --squash
+          fi
+          gh workflow run ci.yml --ref "$BRANCH"
+          for _ in $(seq 80); do
+            state=$(gh pr view "$number" --json state,headRefOid --jq '"\(.state) \(.headRefOid)"')
+            [[ "$state" == "MERGED $PROPOSAL" ]] && exit 0
+            [[ "$state" == "OPEN $PROPOSAL" ]] || break
+            sleep 15
+          done
+          echo "Catalog proposal #$number is not merged ($state); the deployed site is retained." >&2
+          exit 1
+
+      - name: Verify merged catalog generation
+        if: steps.catalog.outputs.proposal != ''
+        env:
+          CATALOG_SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
+          PROPOSAL: ${{ steps.catalog.outputs.proposal }}
+        run:
+          python3 scripts/plugin_catalog_publication.py --expected-head "$CATALOG_SOURCE_COMMIT"
+          --merged "$PROPOSAL"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5

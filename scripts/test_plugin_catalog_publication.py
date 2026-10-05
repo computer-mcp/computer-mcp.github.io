@@ -4,7 +4,6 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
-from unittest.mock import patch
 
 import plugin_catalog as catalog
 import plugin_catalog_publication as publication
@@ -42,9 +41,12 @@ class PublicationTests(unittest.TestCase):
         return subprocess.check_output(["git", "-C", str(root), *arguments], stderr=subprocess.PIPE,
                                        timeout=10).decode()
 
+    def fixture_command(self, root, *arguments):
+        return self.command(root, "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                            "-c", "commit.gpgsign=false", *arguments)
+
     def commit(self, root):
-        self.command(root, "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
-                     "-c", "commit.gpgsign=false", "commit", "-m", "Fixture")
+        self.fixture_command(root, "commit", "-m", "Fixture")
 
     def write_candidate(self):
         data = catalog.canonical(self.current)
@@ -54,30 +56,78 @@ class PublicationTests(unittest.TestCase):
         artifact.parent.mkdir(parents=True, exist_ok=True)
         artifact.write_bytes(data)
 
+    def clone(self):
+        directory = Path(tempfile.mkdtemp(dir=self.temporary.name)) / "clone"
+        self.command(directory.parent, "clone", "--branch", "master", str(self.remote), str(directory))
+        return directory
+
     def advance_remote(self):
-        other = Path(self.temporary.name) / "other"
-        self.command(other.parent, "clone", "--branch", "master", str(self.remote), str(other))
+        other = self.clone()
         (other / "concurrent.txt").write_text("Concurrent source change\n")
         self.command(other, "add", "concurrent.txt")
         self.commit(other)
         self.command(other, "push", "origin", "master")
         return self.command(other, "rev-parse", "HEAD").strip()
 
-    def test_commits_exact_snapshot_without_changing_worktree_head_or_index(self):
+    def squash_merge(self):
+        other = self.clone()
+        self.command(other, "fetch", "origin", publication.PROPOSAL)
+        self.fixture_command(other, "merge", "--squash", "FETCH_HEAD")
+        self.commit(other)
+        self.command(other, "push", "origin", "master")
+        return self.command(other, "rev-parse", "HEAD").strip()
+
+    def proposals(self):
+        return self.command(self.remote, "for-each-ref", "--format=%(objectname)", publication.PROPOSAL).split()
+
+    def test_proposes_exact_snapshot_without_changing_master_worktree_head_or_index(self):
         index = (self.root / ".git/index").read_bytes()
-        commit = publication.publish_commit(self.root, self.head)
+        commit = publication.propose_commit(self.root, self.head)
         self.assertNotEqual(commit, self.head)
-        self.assertEqual(publication.remote_head(self.root), commit)
+        self.assertEqual(publication.remote_head(self.root, publication.PROPOSAL), commit)
+        self.assertEqual(publication.remote_head(self.root), self.head)
         self.assertEqual(self.command(self.root, "rev-parse", "HEAD").strip(), self.head)
         self.assertEqual((self.root / ".git/index").read_bytes(), index)
+        self.assertEqual(self.command(self.root, "rev-parse", commit + "^"), self.head + "\n")
         self.assertEqual(self.command(self.root, "diff", "--name-only", self.head, commit).strip(), publication.INDEX)
         self.assertEqual(json.loads(self.command(self.root, "show", commit + ":" + publication.INDEX)), self.current)
 
     def test_duplicate_reconciliation_keeps_commit_and_generation(self):
         self.current = self.previous
         self.write_candidate()
-        self.assertEqual(publication.publish_commit(self.root, self.head), self.head)
+        self.assertEqual(publication.propose_commit(self.root, self.head), self.head)
         self.assertEqual(publication.remote_head(self.root), self.head)
+        self.assertEqual(self.proposals(), [])
+
+    def test_new_proposal_replaces_unmerged_proposal(self):
+        stale = self.advance_remote()
+        self.command(self.remote, "update-ref", publication.PROPOSAL, stale)
+        self.command(self.remote, "update-ref", publication.BRANCH, self.head)
+        commit = publication.propose_commit(self.root, self.head)
+        self.assertEqual(self.proposals(), [commit])
+
+    def test_squash_merged_proposal_is_the_deployable_source(self):
+        commit = publication.propose_commit(self.root, self.head)
+        merged = self.squash_merge()
+        self.assertEqual(publication.verify_merged(self.root, self.head, commit), merged)
+
+    def test_unmerged_proposal_is_not_deployable(self):
+        commit = publication.propose_commit(self.root, self.head)
+        with self.assertRaisesRegex(catalog.CatalogError, "not merged"):
+            publication.verify_merged(self.root, self.head, commit)
+
+    def test_master_update_before_merge_prevents_deployment(self):
+        commit = publication.propose_commit(self.root, self.head)
+        self.advance_remote()
+        self.squash_merge()
+        with self.assertRaisesRegex(catalog.CatalogError, "Master changed"):
+            publication.verify_merged(self.root, self.head, commit)
+
+    def test_merged_source_must_match_proposal(self):
+        commit = publication.propose_commit(self.root, self.head)
+        self.advance_remote()
+        with self.assertRaisesRegex(catalog.CatalogError, "differs"):
+            publication.verify_merged(self.root, self.head, commit)
 
     def test_missing_committed_seed_cannot_reset_generation(self):
         (self.root / publication.INDEX).write_bytes(catalog.canonical(self.previous))
@@ -89,7 +139,7 @@ class PublicationTests(unittest.TestCase):
         with self.assertRaises(catalog.CatalogError):
             publication.committed_snapshot(self.root, head)
         with self.assertRaises(catalog.CatalogError):
-            publication.publish_commit(self.root, head)
+            publication.propose_commit(self.root, head)
         self.assertEqual(publication.remote_head(self.root), head)
 
     def test_missing_seed_stops_generation_before_network_requests(self):
@@ -121,20 +171,21 @@ class PublicationTests(unittest.TestCase):
         self.assertTrue(changed)
         self.assertTrue(current["releases"][0]["withdrawn"])
         (self.root / "dist/plugins/index.json").write_bytes(catalog.canonical(current))
-        commit = publication.publish_commit(self.root, head)
+        commit = publication.propose_commit(self.root, head)
         self.assertEqual(json.loads(self.command(self.remote, "show", commit + ":" + publication.INDEX)), current)
 
     def test_artifact_mismatch_prevents_remote_commit(self):
         (self.root / "dist/plugins/index.json").write_bytes(catalog.canonical(self.previous))
         with self.assertRaisesRegex(catalog.CatalogError, "artifact"):
-            publication.publish_commit(self.root, self.head)
+            publication.propose_commit(self.root, self.head)
         self.assertEqual(publication.remote_head(self.root), self.head)
+        self.assertEqual(self.proposals(), [])
 
     def test_unrelated_work_is_preserved_and_not_committed(self):
         unrelated = self.root / "notes.txt"
         unrelated.write_text("Unrelated local work")
         with self.assertRaisesRegex(catalog.CatalogError, "Only the generated"):
-            publication.publish_commit(self.root, self.head)
+            publication.propose_commit(self.root, self.head)
         self.assertEqual(unrelated.read_text(), "Unrelated local work")
         self.assertEqual(publication.remote_head(self.root), self.head)
 
@@ -143,7 +194,7 @@ class PublicationTests(unittest.TestCase):
         self.command(self.root, "add", "index.html")
         index = (self.root / ".git/index").read_bytes()
         with self.assertRaises(catalog.CatalogError):
-            publication.publish_commit(self.root, self.head)
+            publication.propose_commit(self.root, self.head)
         self.assertEqual((self.root / ".git/index").read_bytes(), index)
         self.assertEqual(publication.remote_head(self.root), self.head)
 
@@ -153,7 +204,7 @@ class PublicationTests(unittest.TestCase):
         self.current["revision"] = hashlib.sha256(catalog.canonical(content)).hexdigest()
         self.write_candidate()
         with self.assertRaisesRegex(catalog.CatalogError, "identity"):
-            publication.publish_commit(self.root, self.head)
+            publication.propose_commit(self.root, self.head)
         self.assertEqual(publication.remote_head(self.root), self.head)
 
     def test_generation_cannot_reset_or_skip(self):
@@ -162,39 +213,25 @@ class PublicationTests(unittest.TestCase):
                 self.current["generation"] = generation
                 self.write_candidate()
                 with self.assertRaisesRegex(catalog.CatalogError, "generation"):
-                    publication.publish_commit(self.root, self.head)
+                    publication.propose_commit(self.root, self.head)
                 self.assertEqual(publication.remote_head(self.root), self.head)
 
     def test_remote_update_before_publication_is_not_overwritten(self):
         other = self.advance_remote()
         with self.assertRaisesRegex(catalog.CatalogError, "Remote master changed"):
-            publication.publish_commit(self.root, self.head)
+            publication.propose_commit(self.root, self.head)
         self.assertEqual(publication.remote_head(self.root), other)
+        self.assertEqual(self.proposals(), [])
 
-    def test_remote_update_after_comparison_rejects_non_fast_forward_push(self):
-        real_git = publication.git
-        other = []
-
-        def racing_git(root, *arguments, **kwargs):
-            if arguments[0] == "push":
-                other.append(self.advance_remote())
-            return real_git(root, *arguments, **kwargs)
-
-        with patch.object(publication, "git", racing_git):
-            with self.assertRaisesRegex(catalog.CatalogError, "push failed"):
-                publication.publish_commit(self.root, self.head)
-        self.assertEqual(publication.remote_head(self.root), other[0])
-        self.assertEqual(json.loads(self.command(self.remote, "show", "master:" + publication.INDEX)), self.previous)
-
-    def test_deployment_failure_can_retry_same_committed_snapshot(self):
-        commit = publication.publish_commit(self.root, self.head)
-        retry = Path(self.temporary.name) / "retry"
-        self.command(retry.parent, "clone", "--branch", "master", str(self.remote), str(retry))
+    def test_deployment_failure_can_retry_same_merged_snapshot(self):
+        publication.propose_commit(self.root, self.head)
+        merged = self.squash_merge()
+        retry = self.clone()
         artifact = retry / "dist/plugins/index.json"
         artifact.parent.mkdir(parents=True)
         artifact.write_bytes((retry / publication.INDEX).read_bytes())
-        self.assertEqual(publication.publish_commit(retry, commit), commit)
-        self.assertEqual(publication.remote_head(retry), commit)
+        self.assertEqual(publication.propose_commit(retry, merged), merged)
+        self.assertEqual(publication.remote_head(retry), merged)
 
 
 if __name__ == "__main__":
