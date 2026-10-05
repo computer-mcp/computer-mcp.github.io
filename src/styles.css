@@ -1,26 +1,3 @@
-@font-face {
-  font-family: "Bricolage Grotesque";
-  src: url("./fonts/bricolage-grotesque.woff2") format("woff2");
-  font-weight: 200 800;
-  font-stretch: 75% 100%;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "JetBrains Mono";
-  src: url("./fonts/jetbrains-mono.woff2") format("woff2");
-  font-weight: 100 800;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Noto Sans SC";
-  src: url("./fonts/noto-sans-sc.woff2") format("woff2");
-  font-weight: 400 800;
-  font-display: swap;
-  unicode-range: U+2E80-FFFF;
-}
-
 :root {
   color-scheme: light dark;
   --ink: #16181d;
@@ -49,8 +26,9 @@
   --shadow: 0 1px 0 rgba(0, 0, 0, 0.05), 0 22px 40px -14px rgba(10, 16, 30, 0.3);
   --packet-shadow: 0 6px 14px -6px rgba(10, 16, 30, 0.25);
   --font-sans:
-    "Bricolage Grotesque", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "Noto Sans SC", ui-monospace, "SF Mono", Menlo, monospace;
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC",
+    "Hiragino Sans GB", "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
   --offset: 48px;
   --header: 64px;
 }
@@ -92,9 +70,8 @@ body {
   background: var(--page);
   color: var(--text);
   font-family: var(--font-sans);
-  font-size: 16px;
-  line-height: 1.6;
-  font-variation-settings: "opsz" 14;
+  font-size: 17px;
+  line-height: 1.53;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -132,6 +109,10 @@ a:hover {
   border-radius: 4px;
 }
 
+html:lang(en) body {
+  letter-spacing: -0.022em;
+}
+
 h1:lang(zh-CN),
 h2:lang(zh-CN) {
   word-break: keep-all;
@@ -165,7 +146,7 @@ h2:lang(zh-CN) {
   border-radius: 12px;
   background: var(--ink);
   color: var(--paper);
-  font: 600 14px/1.2 var(--font-mono);
+  font: 600 14px/1.2 var(--font-sans);
   transform: translateY(-160%);
 }
 
@@ -177,9 +158,7 @@ h2:lang(zh-CN) {
 .capability-kind,
 .path-kind {
   color: var(--accent-text);
-  font: 600 12px/1.2 var(--font-mono);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font: 600 15px/1.3 var(--font-sans);
 }
 
 /* Header */
@@ -211,8 +190,8 @@ h2:lang(zh-CN) {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: 650;
-  letter-spacing: -0.01em;
+  font-weight: 600;
+  letter-spacing: -0.015em;
   text-decoration: none;
   white-space: nowrap;
 }
@@ -231,8 +210,9 @@ h2:lang(zh-CN) {
   padding: 8px 12px;
   border-radius: 10px;
   color: var(--muted);
-  font-size: 15px;
+  font-size: 14px;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .primary-nav a:hover,
@@ -256,8 +236,9 @@ h2:lang(zh-CN) {
   border-radius: 12px;
   background: var(--raised);
   color: var(--text);
-  font: 600 13px/1 var(--font-mono);
+  font: 500 14px/1 var(--font-sans);
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .menu-toggle {
@@ -273,8 +254,7 @@ h2:lang(zh-CN) {
   min-height: 48px;
   padding: 0 20px;
   border-radius: 12px;
-  font: 600 14px/1.2 var(--font-mono);
-  letter-spacing: 0.02em;
+  font: 500 15px/1.2 var(--font-sans);
   text-decoration: none;
   transition:
     background-color 140ms ease,
@@ -313,7 +293,7 @@ h2:lang(zh-CN) {
 .text-link {
   display: inline-block;
   margin-top: 20px;
-  font: 600 14px/1.4 var(--font-mono);
+  font: 500 15px/1.4 var(--font-sans);
   text-decoration-color: var(--vermilion);
 }
 
@@ -333,33 +313,28 @@ h2:lang(zh-CN) {
 }
 
 .hero-meta {
-  letter-spacing: 0.02em;
   text-transform: none;
 }
 
 .hero h1 {
   margin-top: 20px;
-  font-size: 88px;
-  font-weight: 700;
-  line-height: 0.98;
-  letter-spacing: -0.035em;
-  font-variation-settings:
-    "opsz" 96,
-    "wdth" 88;
+  font-size: 80px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
 }
 
 .hero h1:lang(zh-CN) {
-  font-size: 68px;
-  font-weight: 800;
-  line-height: 1.12;
-  letter-spacing: -0.01em;
+  font-size: clamp(52px, 5vw, 64px);
+  font-weight: 600;
+  line-height: 1.14;
+  letter-spacing: 0;
 }
 
 .hero-lede {
   max-width: 34em;
   margin-top: 28px;
   font-size: 18px;
-  font-variation-settings: "opsz" 18;
 }
 
 .hero-support {
@@ -389,8 +364,7 @@ h2:lang(zh-CN) {
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--chip);
-  font: 600 12px/1.2 var(--font-mono);
-  letter-spacing: 0.04em;
+  font: 500 13px/1.2 var(--font-sans);
 }
 
 /* Hero scene: chat card high, stack low, one link bending into the stack. */
@@ -417,8 +391,7 @@ h2:lang(zh-CN) {
 .chat-title {
   margin-bottom: 10px;
   color: var(--muted);
-  font: 600 12px/1.2 var(--font-mono);
-  letter-spacing: 0.06em;
+  font: 600 13px/1.2 var(--font-sans);
 }
 
 .chat-request {
@@ -479,7 +452,6 @@ h2:lang(zh-CN) {
   background: var(--raised);
   box-shadow: var(--packet-shadow);
   font: 600 12px/1.2 var(--font-mono);
-  letter-spacing: 0.02em;
   white-space: nowrap;
   transform: translateX(50%);
 }
@@ -527,7 +499,6 @@ h2:lang(zh-CN) {
   align-items: flex-end;
   padding: 0 18px 14px;
   font: 600 12px/1.2 var(--font-mono);
-  letter-spacing: 0.03em;
   white-space: nowrap;
 }
 
@@ -546,6 +517,10 @@ h2:lang(zh-CN) {
   box-shadow: var(--shadow);
 }
 
+.plane-capabilities {
+  font-family: var(--font-sans);
+}
+
 .plane-result {
   bottom: calc(2 * var(--offset));
   left: calc(2 * var(--offset));
@@ -554,7 +529,7 @@ h2:lang(zh-CN) {
   border: 1px solid var(--line);
   background: var(--raised);
   box-shadow: var(--shadow);
-  font: 450 13px/1.6 var(--font-mono);
+  font: 400 13px/1.6 var(--font-mono);
 }
 
 .result-head {
@@ -563,8 +538,7 @@ h2:lang(zh-CN) {
   gap: 12px;
   margin-bottom: 8px;
   color: var(--muted);
-  font: 600 12px/1.2 var(--font-mono);
-  letter-spacing: 0.02em;
+  font: 600 13px/1.2 var(--font-sans);
 }
 
 .result-host {
@@ -701,26 +675,22 @@ h2:lang(zh-CN) {
 .closing h2 {
   margin-top: 14px;
   font-size: 56px;
-  font-weight: 700;
-  line-height: 1.02;
-  letter-spacing: -0.03em;
-  font-variation-settings:
-    "opsz" 72,
-    "wdth" 90;
+  font-weight: 600;
+  line-height: 1.07;
+  letter-spacing: -0.005em;
 }
 
 .section-heading h2:lang(zh-CN) {
   font-size: 44px;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1.18;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
 .section-heading > p:not(.eyebrow) {
   margin-top: 18px;
   color: var(--muted);
   font-size: 18px;
-  font-variation-settings: "opsz" 18;
 }
 
 .section-note {
@@ -733,9 +703,9 @@ h2:lang(zh-CN) {
 
 h3 {
   font-size: 22px;
-  font-weight: 650;
+  font-weight: 600;
   line-height: 1.2;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.004em;
 }
 
 /* Capabilities */
@@ -804,7 +774,7 @@ h3 {
 .capability > a,
 .capability-links {
   margin-top: auto;
-  font: 600 14px/1.4 var(--font-mono);
+  font: 500 15px/1.4 var(--font-sans);
 }
 
 .capability-links {
@@ -858,7 +828,7 @@ h3 {
   border-radius: 20px;
   background: var(--raised);
   box-shadow: var(--shadow);
-  font: 600 13px/1.2 var(--font-mono);
+  font: 600 13px/1.2 var(--font-sans);
   text-align: center;
 }
 
@@ -903,7 +873,7 @@ h3 {
 
 .host p {
   color: var(--muted);
-  font: 600 12px/1.2 var(--font-mono);
+  font: 600 13px/1.2 var(--font-sans);
 }
 
 .mini-stack {
@@ -1001,7 +971,7 @@ h3 {
   content: "0" counter(level);
   grid-row: span 2;
   color: var(--accent-text);
-  font: 600 13px/1.7 var(--font-mono);
+  font: 600 13px/1.7 var(--font-sans);
 }
 
 .levels p {
@@ -1023,7 +993,7 @@ h3 {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  font: 600 13px/1.3 var(--font-mono);
+  font: 600 14px/1.3 var(--font-sans);
 }
 
 .badge-caution {
@@ -1031,8 +1001,7 @@ h3 {
   border-radius: 6px;
   background: var(--caution);
   color: var(--ink);
-  font: 600 12px/1.2 var(--font-mono);
-  letter-spacing: 0.04em;
+  font: 600 12px/1.2 var(--font-sans);
 }
 
 .approval-choices {
@@ -1047,7 +1016,7 @@ h3 {
   border: 1px solid var(--line);
   border-radius: 12px;
   color: var(--muted);
-  font: 600 13px/1.2 var(--font-mono);
+  font: 500 13px/1.2 var(--font-sans);
 }
 
 .choice-selected {
@@ -1111,7 +1080,7 @@ thead th,
 thead td {
   border-top: 0;
   font-size: 18px;
-  font-weight: 650;
+  font-weight: 600;
 }
 
 thead th.own {
@@ -1129,9 +1098,7 @@ tbody th {
   width: 150px;
   background: var(--raised);
   color: var(--muted);
-  font: 600 12px/1.5 var(--font-mono);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font: 600 13px/1.5 var(--font-sans);
 }
 
 .sources {
@@ -1166,12 +1133,9 @@ tbody th {
 .steps li::before {
   content: "0" counter(step);
   font-size: 44px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
-  letter-spacing: -0.03em;
-  font-variation-settings:
-    "opsz" 72,
-    "wdth" 90;
+  letter-spacing: -0.005em;
 }
 
 .steps p {
@@ -1181,7 +1145,7 @@ tbody th {
 
 .steps a {
   margin-top: auto;
-  font: 600 14px/1.4 var(--font-mono);
+  font: 500 15px/1.4 var(--font-sans);
 }
 
 .first-call {
@@ -1217,7 +1181,7 @@ pre {
   border-radius: 12px;
   background: var(--code-bg);
   color: var(--code-text);
-  font: 450 13px/1.6 var(--font-mono);
+  font: 400 13px/1.6 var(--font-mono);
 }
 
 pre code {
@@ -1239,7 +1203,7 @@ pre button {
   border-radius: 10px;
   background: transparent;
   color: var(--code-text);
-  font: 600 12px/1 var(--font-mono);
+  font: 500 12px/1 var(--font-sans);
   cursor: pointer;
 }
 
@@ -1266,7 +1230,7 @@ summary {
   min-height: 64px;
   padding: 12px 0;
   font-size: 19px;
-  font-weight: 650;
+  font-weight: 600;
   line-height: 1.3;
   list-style: none;
   cursor: pointer;
@@ -1280,7 +1244,7 @@ summary::after {
   content: "+";
   flex: none;
   color: var(--accent-text);
-  font: 500 22px/1 var(--font-mono);
+  font: 300 24px/1 var(--font-sans);
   transition: rotate 160ms ease;
 }
 
@@ -1300,7 +1264,7 @@ details > :last-child {
 
 details a {
   margin-top: 12px;
-  font: 600 14px/1.4 var(--font-mono);
+  font: 500 15px/1.4 var(--font-sans);
 }
 
 /* Closing and footer */
@@ -1317,9 +1281,9 @@ details a {
 .closing h2:lang(zh-CN) {
   max-width: none;
   font-size: 56px;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1.15;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
 .site-footer {
@@ -1342,9 +1306,7 @@ details a {
 .site-footer h2 {
   margin-bottom: 14px;
   color: var(--muted);
-  font: 600 12px/1.2 var(--font-mono);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font: 600 12px/1.3 var(--font-sans);
 }
 
 .site-footer ul {
@@ -1400,7 +1362,7 @@ details a {
   border-radius: 12px;
   background: var(--ink);
   color: var(--paper);
-  font: 600 13px/1.3 var(--font-mono);
+  font: 500 13px/1.3 var(--font-sans);
   opacity: 0;
   pointer-events: none;
   transform: translate(-50%, 8px);
@@ -1425,19 +1387,16 @@ details a {
 .doc h1 {
   margin-top: 16px;
   font-size: 56px;
-  font-weight: 700;
-  line-height: 1.02;
-  letter-spacing: -0.03em;
-  font-variation-settings:
-    "opsz" 72,
-    "wdth" 90;
+  font-weight: 600;
+  line-height: 1.07;
+  letter-spacing: -0.005em;
 }
 
 .doc h1:lang(zh-CN) {
   font-size: 44px;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1.18;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
 .doc-lede {
@@ -1456,9 +1415,7 @@ details a {
 
 .toc h2 {
   color: var(--muted);
-  font: 600 12px/1.2 var(--font-mono);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font: 600 13px/1.3 var(--font-sans);
 }
 
 .toc ol {
@@ -1470,7 +1427,7 @@ details a {
 
 .toc li {
   padding: 4px 0;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 14px;
 }
 
@@ -1480,14 +1437,14 @@ details a {
 
 .doc section h2 {
   font-size: 32px;
-  font-weight: 650;
+  font-weight: 600;
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.004em;
 }
 
 .doc section h2:lang(zh-CN) {
   font-size: 30px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0;
 }
 
@@ -1526,7 +1483,7 @@ details a {
   border: 1px solid var(--line);
   border-radius: 50%;
   background: var(--chip);
-  font: 600 12px/1 var(--font-mono);
+  font: 600 12px/1 var(--font-sans);
 }
 
 .doc-terms {
@@ -1585,7 +1542,7 @@ details a {
   }
 
   .hero h1:lang(zh-CN) {
-    font-size: 56px;
+    font-size: 50px;
   }
 }
 
