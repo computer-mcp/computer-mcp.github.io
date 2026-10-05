@@ -41,9 +41,12 @@ class PublicationTests(unittest.TestCase):
         return subprocess.check_output(["git", "-C", str(root), *arguments], stderr=subprocess.PIPE,
                                        timeout=10).decode()
 
+    def fixture_command(self, root, *arguments):
+        return self.command(root, "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                            "-c", "commit.gpgsign=false", *arguments)
+
     def commit(self, root):
-        self.command(root, "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
-                     "-c", "commit.gpgsign=false", "commit", "-m", "Fixture")
+        self.fixture_command(root, "commit", "-m", "Fixture")
 
     def write_candidate(self):
         data = catalog.canonical(self.current)
@@ -69,7 +72,7 @@ class PublicationTests(unittest.TestCase):
     def squash_merge(self):
         other = self.clone()
         self.command(other, "fetch", "origin", publication.PROPOSAL)
-        self.command(other, "merge", "--squash", "FETCH_HEAD")
+        self.fixture_command(other, "merge", "--squash", "FETCH_HEAD")
         self.commit(other)
         self.command(other, "push", "origin", "master")
         return self.command(other, "rev-parse", "HEAD").strip()
