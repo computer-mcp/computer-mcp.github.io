@@ -2,10 +2,11 @@ name: Notify official plugin catalog
 description: Request a complete central catalog reconciliation and return its accepted run.
 inputs:
   client-id:
-    description: Client ID of the organization-owned catalog GitHub App.
+    description: Client ID of the organization's Computer MCP Release Notifier GitHub App.
     required: true
   private-key:
-    description: Catalog App private key supplied from the authorized sender's Actions secret.
+    description:
+      Release Notifier App private key supplied from the authorized sender's Actions secret.
     required: true
 outputs:
   run-url:
