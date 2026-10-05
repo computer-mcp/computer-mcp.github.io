@@ -161,7 +161,7 @@ class PublicationTests(unittest.TestCase):
         self.assertEqual(self.proposals(), [])
         self.assertEqual(publication.remote_head(self.root), self.head)
 
-    def test_proposal_requires_the_workflow_token(self):
+    def test_proposal_requires_the_automation_token(self):
         with patch.dict(os.environ, {"GH_TOKEN": ""}), self.assertRaisesRegex(catalog.CatalogError, "token"):
             REST("POST", "/git/blobs", {})
 
