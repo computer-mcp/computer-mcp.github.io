@@ -182,7 +182,7 @@ and can deploy it without incrementing generation. A local generated file alone 
 anything. Publisher tests also run in read-only website CI, without contacting release sources.
 
 The repository allows auto-merge. Only when the catalog changes, the central build job mints a
-short-lived installation token for the organization's Computer MCP Automation GitHub App, which has
+short-lived installation token for the organization's Computer MCP Updater GitHub App, which has
 Contents and Pull requests write access and is installed only on this repository and the Homebrew
 tap. Its client ID and private key are the `AUTOMATION_APP_CLIENT_ID` variable and
 `AUTOMATION_APP_PRIVATE_KEY` secret. That token creates the signed proposal and opens and
@@ -202,7 +202,7 @@ short-lived installation token from its `client-id` and `private-key` inputs, an
 `{"ref":"master"}` to the fixed official `pages.yml` workflow. It cannot supply releases, replace
 policy or select another ref. It neither checks out nor executes the plugin package.
 
-The organization-owned catalog GitHub App is installed only on
+The organization's Computer MCP Release Notifier GitHub App is installed only on
 `computer-mcp/computer-mcp.github.io`, with Actions write and mandatory Metadata read. Actions write
 also permits other Actions administration in that repository; GitHub does not offer a
 workflow-specific dispatch-only permission. The App has no website Contents write permission.
