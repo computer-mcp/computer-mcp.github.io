@@ -21,10 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
-      actions: write
-      contents: write
+      contents: read
       pages: read
-      pull-requests: write
 
     steps:
       - name: Check out repository
@@ -84,24 +82,43 @@ jobs:
       - name: Run accessibility and smoke tests
         run: npm test
 
+      - name: Detect catalog change
+        id: generation
+        run: |
+          if ! git diff --quiet HEAD -- public/plugins/index.json; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Pull requests opened with the job token wait for manual approval before their checks run,
+      # so a catalog proposal and its pull request use the automation App's installation token.
+      - name: Create automation token
+        id: automation
+        if: steps.generation.outputs.changed == 'true'
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.AUTOMATION_APP_CLIENT_ID }}
+          private-key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
       - name: Prepare verified catalog generation
         id: catalog
         env:
           CATALOG_SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.automation.outputs.token }}
         run: python3 scripts/plugin_catalog_publication.py --expected-head "$CATALOG_SOURCE_COMMIT"
 
       - name: Merge catalog proposal
         if: steps.catalog.outputs.proposal != ''
         env:
           BRANCH: automation/plugin-catalog
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.automation.outputs.token }}
           PROPOSAL: ${{ steps.catalog.outputs.proposal }}
           RUN_URL:
             ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           title=$(git log -1 --format=%s "$PROPOSAL")
-          body="Generated from current official plugin releases by [the Pages workflow]($RUN_URL). The catalog successor, publisher policy and built site were verified before this proposal. Website CI runs on this branch, the pull request merges automatically once it passes, and the same run then deploys the merged generation."
+          body="Generated from current official plugin releases by [the Pages workflow]($RUN_URL). The catalog successor, publisher policy and built site were verified before this proposal. The pull request merges automatically once Website CI passes, and the same run then deploys the merged generation."
           number=$(gh pr list --head "$BRANCH" --base master --state open --json number --jq '.[0].number // empty')
           if [[ -n "$number" ]]; then
             gh pr edit "$number" --title "$title" --body "$body"
@@ -111,7 +128,6 @@ jobs:
           if [[ "$(gh pr view "$number" --json autoMergeRequest --jq '.autoMergeRequest == null')" == true ]]; then
             gh pr merge "$number" --auto --squash
           fi
-          gh workflow run ci.yml --ref "$BRANCH"
           for _ in $(seq 80); do
             state=$(gh pr view "$number" --json state,headRefOid --jq '"\(.state) \(.headRefOid)"')
             [[ "$state" == "MERGED $PROPOSAL" ]] && exit 0

@@ -164,15 +164,16 @@ After generation, the workflow validates and tests the complete site. The public
 the catalog successor, exact built index bytes and unchanged source, then computes a commit tree
 that changes only the new index on top of the checked-out commit. Because `master` accepts only
 signed commits, the helper has GitHub create that blob, tree and commit through the REST API with
-the job token, which GitHub signs. It requires GitHub's objects to match the locally computed tree
-and parent and the commit to be verified. It then points `automation/plugin-catalog` at that commit,
-replacing any earlier unmerged proposal, and `master` changes only through the resulting pull
-request. The workflow opens or updates the pull request, enables squash auto-merge and dispatches
-Website CI on the branch, because pull requests opened with the job token do not trigger workflows.
-It then waits up to 20 minutes for the merge and requires `master` to be exactly the squash of the
-proposal onto the checked-out commit. A concurrent source update rejects publication; the next run
-starts from current `master`. Identical catalog content creates no proposal. Unrelated local or
-staged changes are rejected and preserved.
+the automation App's installation token, which GitHub signs. It requires GitHub's objects to match
+the locally computed tree and parent and the commit to be verified. It then points
+`automation/plugin-catalog` at that commit, replacing any earlier unmerged proposal, and `master`
+changes only through the resulting pull request. The workflow opens or updates the pull request with
+the same token and enables squash auto-merge, so Website CI runs on it like any other pull request;
+a pull request opened with the job token would wait for manual approval instead. It then waits up to
+20 minutes for the merge and requires `master` to be exactly the squash of the proposal onto the
+checked-out commit. A concurrent source update rejects publication; the next run starts from current
+`master`. Identical catalog content creates no proposal. Unrelated local or staged changes are
+rejected and preserved.
 
 Only then does Pages upload and deploy the complete artifact. Generation, validation, proposal or
 merge failure prevents upload and preserves the deployed artifact. If the proposal merges after the
@@ -180,15 +181,18 @@ run stops waiting, or deployment fails after the merge, the next run uses that c
 and can deploy it without incrementing generation. A local generated file alone does not deploy
 anything. Publisher tests also run in read-only website CI, without contacting release sources.
 
-The repository allows auto-merge and lets GitHub Actions create pull requests. The central build job
-uses its short-lived GitHub job token with contents, pull-request and Actions write access to create
-the signed proposal, open and auto-merge its pull request and dispatch Website CI; the deployment
-job has Pages and identity-token permissions. Plugin notification senders should invoke `pages.yml`
-on `master` using `workflow_dispatch`, with Actions write access scoped to this receiving
-repository. They do not need website Contents write access. Notification payloads provide no
-metadata or policy overrides. Existing GitHub authentication is an operator input; this repository
-does not create credentials. If notifications are unavailable, scheduled and manual reconciliation
-still use the same complete verification path.
+The repository allows auto-merge. Only when the catalog changes, the central build job mints a
+short-lived installation token for the organization's Computer MCP Automation GitHub App, which has
+Contents and Pull requests write access and is installed only on this repository and the Homebrew
+tap. Its client ID and private key are the `AUTOMATION_APP_CLIENT_ID` variable and
+`AUTOMATION_APP_PRIVATE_KEY` secret. That token creates the signed proposal and opens and
+auto-merges its pull request; the job token stays read-only, and the deployment job has Pages and
+identity-token permissions. Plugin notification senders should invoke `pages.yml` on `master` using
+`workflow_dispatch`, with Actions write access scoped to this receiving repository. They do not need
+website Contents write access. Notification payloads provide no metadata or policy overrides.
+Existing GitHub authentication is an operator input; this repository does not create credentials. If
+notifications are unavailable, scheduled and manual reconciliation still use the same complete
+verification path.
 
 ## Plugin release notifications
 

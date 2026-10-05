@@ -41,7 +41,7 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 def rest(method, path, body):
     token = os.environ.get("GH_TOKEN")
-    catalog.require(bool(token), "Catalog proposal requires the workflow token")
+    catalog.require(bool(token), "Catalog proposal requires the automation App token")
     request = urllib.request.Request(API + path, method=method, data=json.dumps(body).encode(), headers={
         "Accept": "application/vnd.github+json", "Authorization": "Bearer " + token,
         "Content-Type": "application/json", "User-Agent": "computer-mcp-plugin-catalog/1",
@@ -108,8 +108,8 @@ def propose_commit(root, expected_head):
         return expected_head
     # Compute the expected tree from the verified bytes and parent without touching the caller's
     # index. GitHub then creates the same objects, because master accepts only signed commits and
-    # GitHub signs commits that the job token creates through its API. Each run replaces any
-    # earlier unmerged proposal.
+    # GitHub signs commits that the automation App's token creates through its API. Each run
+    # replaces any earlier unmerged proposal.
     blob = git(root, "hash-object", "-w", "--stdin", data=data).decode().strip()
     with tempfile.TemporaryDirectory(prefix="computer-mcp-catalog-index-") as directory:
         environment = {**os.environ, "GIT_INDEX_FILE": str(Path(directory) / "index")}
