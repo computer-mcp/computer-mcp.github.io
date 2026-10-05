@@ -88,6 +88,7 @@ jobs:
         id: catalog
         env:
           CATALOG_SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
+          GH_TOKEN: ${{ github.token }}
         run: python3 scripts/plugin_catalog_publication.py --expected-head "$CATALOG_SOURCE_COMMIT"
 
       - name: Merge catalog proposal

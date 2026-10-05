@@ -2,12 +2,16 @@
 """Propose one verified catalog for merge and confirm the merged source before Pages upload."""
 
 import argparse
+import base64
+import json
 import os
 from pathlib import Path
 import re
 import subprocess
 import sys
 import tempfile
+import urllib.error
+import urllib.request
 
 import plugin_catalog as catalog
 
@@ -18,6 +22,8 @@ POLICY = "scripts/plugin-catalog-policy.json"
 BRANCH = "refs/heads/master"
 PROPOSAL = "refs/heads/automation/plugin-catalog"
 REMOTE = "https://github.com/computer-mcp/computer-mcp.github.io"
+API = "https://api.github.com/repos/computer-mcp/computer-mcp.github.io"
+MAX_RESPONSE = 1024 * 1024
 
 
 def git(root, *arguments, data=None, environment=None):
@@ -26,6 +32,30 @@ def git(root, *arguments, data=None, environment=None):
     catalog.require(result.returncode == 0, f"Git {arguments[0]} failed; Pages must not deploy")
     catalog.require(len(result.stdout) <= catalog.MAX_INDEX + 1024, "Git response exceeds catalog budget")
     return result.stdout
+
+
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *arguments):
+        return None
+
+
+def rest(method, path, body):
+    token = os.environ.get("GH_TOKEN")
+    catalog.require(bool(token), "Catalog proposal requires the workflow token")
+    request = urllib.request.Request(API + path, method=method, data=json.dumps(body).encode(), headers={
+        "Accept": "application/vnd.github+json", "Authorization": "Bearer " + token,
+        "Content-Type": "application/json", "User-Agent": "computer-mcp-plugin-catalog/1",
+        "X-GitHub-Api-Version": "2022-11-28"})
+    try:
+        with urllib.request.build_opener(NoRedirect()).open(request, timeout=60) as response:
+            data = response.read(MAX_RESPONSE + 1)
+    except urllib.error.HTTPError as error:
+        error.close()
+        raise catalog.CatalogError(f"GitHub HTTP {error.code}; Pages must not deploy") from None
+    catalog.require(len(data) <= MAX_RESPONSE, "GitHub response exceeds catalog budget")
+    value = catalog.decode_json(data, MAX_RESPONSE)
+    catalog.require(isinstance(value, dict), "Invalid GitHub response")
+    return value
 
 
 def remote_head(root, ref=BRANCH):
@@ -76,23 +106,40 @@ def propose_commit(root, expected_head):
                     "Remote master changed; reconcile from the current source before deployment")
     if current == previous:
         return expected_head
-    # Construct the tree from the verified bytes and parent, without touching the caller's index
-    # or committing unrelated working-tree files. Each run replaces any earlier unmerged proposal.
+    # Compute the expected tree from the verified bytes and parent without touching the caller's
+    # index. GitHub then creates the same objects, because master accepts only signed commits and
+    # GitHub signs commits that the job token creates through its API. Each run replaces any
+    # earlier unmerged proposal.
     blob = git(root, "hash-object", "-w", "--stdin", data=data).decode().strip()
     with tempfile.TemporaryDirectory(prefix="computer-mcp-catalog-index-") as directory:
         environment = {**os.environ, "GIT_INDEX_FILE": str(Path(directory) / "index")}
         git(root, "read-tree", expected_head, environment=environment)
         git(root, "update-index", "--add", "--cacheinfo", f"100644,{blob},{INDEX}", environment=environment)
         tree = git(root, "write-tree", environment=environment).decode().strip()
-    identity = {**os.environ, "GIT_AUTHOR_NAME": "github-actions[bot]",
-                "GIT_COMMITTER_NAME": "github-actions[bot]",
-                "GIT_AUTHOR_EMAIL": "41898282+github-actions[bot]@users.noreply.github.com",
-                "GIT_COMMITTER_EMAIL": "41898282+github-actions[bot]@users.noreply.github.com"}
-    commit = git(root, "-c", "commit.gpgsign=false", "commit-tree", tree, "-p", expected_head,
-                 "-m", f"Publish plugin catalog generation {current['generation']}",
-                 environment=identity).decode().strip()
-    git(root, "push", "--porcelain", "--force", "origin", commit + ":" + PROPOSAL)
-    catalog.require(remote_head(root, PROPOSAL) == commit, "Catalog proposal changed before merge")
+    base = git(root, "rev-parse", expected_head + "^{tree}").decode().strip()
+    created = rest("POST", "/git/blobs", {"content": base64.b64encode(data).decode(), "encoding": "base64"})
+    catalog.require(created.get("sha") == blob, "GitHub stored different catalog bytes")
+    created = rest("POST", "/git/trees", {"base_tree": base, "tree": [
+        {"path": INDEX, "mode": "100644", "type": "blob", "sha": blob}]})
+    catalog.require(created.get("sha") == tree, "GitHub built a different catalog tree")
+    created = rest("POST", "/git/commits", {"message": f"Publish plugin catalog generation {current['generation']}",
+                                            "tree": tree, "parents": [expected_head]})
+    commit = created.get("sha")
+    catalog.require(isinstance(commit, str) and re.fullmatch(r"[0-9a-f]{40}", commit) is not None,
+                    "Invalid catalog proposal identity")
+    verification = created.get("verification")
+    catalog.require(isinstance(verification, dict) and verification.get("verified") is True,
+                    "GitHub did not sign the catalog proposal")
+    if git(root, "ls-remote", "origin", PROPOSAL).strip():
+        rest("PATCH", "/git/" + PROPOSAL, {"sha": commit, "force": True})
+    else:
+        rest("POST", "/git/refs", {"ref": PROPOSAL, "sha": commit})
+    git(root, "fetch", "--no-tags", "origin", PROPOSAL)
+    catalog.require(git(root, "rev-parse", "FETCH_HEAD").decode().strip() == commit,
+                    "Catalog proposal changed before merge")
+    catalog.require(git(root, "rev-list", "--parents", "-n", "1", commit).decode().split() == [commit, expected_head]
+                    and git(root, "rev-parse", commit + "^{tree}").decode().strip() == tree,
+                    "GitHub created a different catalog proposal")
     return commit
 
 

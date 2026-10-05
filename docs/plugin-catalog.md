@@ -161,8 +161,11 @@ verifies its seed before requesting release metadata. It always scans every admi
 missed notifications and replaced pending runs are repaired by the next successful reconciliation.
 
 After generation, the workflow validates and tests the complete site. The publication helper checks
-the catalog successor, exact built index bytes and unchanged source, then commits only the new index
-as a child of the checked-out commit. It pushes that commit to `automation/plugin-catalog`,
+the catalog successor, exact built index bytes and unchanged source, then computes a commit tree
+that changes only the new index on top of the checked-out commit. Because `master` accepts only
+signed commits, the helper has GitHub create that blob, tree and commit through the REST API with
+the job token, which GitHub signs. It requires GitHub's objects to match the locally computed tree
+and parent and the commit to be verified. It then points `automation/plugin-catalog` at that commit,
 replacing any earlier unmerged proposal, and `master` changes only through the resulting pull
 request. The workflow opens or updates the pull request, enables squash auto-merge and dispatches
 Website CI on the branch, because pull requests opened with the job token do not trigger workflows.
@@ -178,8 +181,8 @@ and can deploy it without incrementing generation. A local generated file alone 
 anything. Publisher tests also run in read-only website CI, without contacting release sources.
 
 The repository allows auto-merge and lets GitHub Actions create pull requests. The central build job
-uses its short-lived GitHub job token with contents, pull-request and Actions write access to push
-the proposal branch, open and auto-merge its pull request and dispatch Website CI; the deployment
+uses its short-lived GitHub job token with contents, pull-request and Actions write access to create
+the signed proposal, open and auto-merge its pull request and dispatch Website CI; the deployment
 job has Pages and identity-token permissions. Plugin notification senders should invoke `pages.yml`
 on `master` using `workflow_dispatch`, with Actions write access scoped to this receiving
 repository. They do not need website Contents write access. Notification payloads provide no
@@ -249,6 +252,6 @@ are generation failure bounds, not permission to truncate the catalog or omit ol
 Tests cover provenance rejection, immutable identities, explicit withdrawal, failed writes,
 concurrent publishers, duplicate events, invalid/oversized/truncated input, bounded retries,
 manifest/archive agreement, safe manifest reads, credential-free redirects, committed generation
-continuity, proposal replacement, merge verification, concurrent source pushes and deployment retry.
-Network discovery in the host remains a separate consumer; installation must retain its exact GitHub
-revalidation.
+continuity, signed proposal creation, proposal replacement, merge verification, concurrent source
+pushes and deployment retry. Network discovery in the host remains a separate consumer; installation
+must retain its exact GitHub revalidation.
