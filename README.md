@@ -65,9 +65,9 @@ verifies release archives without running package code. `npm run catalog:check-p
 `npm run catalog:test` run offline; `npm run catalog:check` validates a generated snapshot.
 Automatic publication requires a complete verified snapshot committed to `master`; a missing seed
 fails Pages publication before upload and preserves the deployed site. Runs reconcile hourly, on
-source pushes and on manual workflow dispatch, persist changed generations and deploy one complete
-artifact. See [the plugin catalog contract](docs/plugin-catalog.md) for provenance, withdrawals,
-resource bounds, atomic updates and installation trust.
+source pushes and on manual workflow dispatch, merge changed generations through an auto-merged pull
+request and deploy one complete artifact. See [the plugin catalog contract](docs/plugin-catalog.md)
+for provenance, withdrawals, resource bounds, atomic updates and installation trust.
 
 ## Content boundaries
 

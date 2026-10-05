@@ -162,23 +162,30 @@ missed notifications and replaced pending runs are repaired by the next successf
 
 After generation, the workflow validates and tests the complete site. The publication helper checks
 the catalog successor, exact built index bytes and unchanged source, then commits only the new index
-as a child of the checked-out commit. It uses a normal fast-forward push, never a force push. A
-concurrent source update rejects publication; the next run starts from current `master`. Identical
-catalog content creates no commit. Unrelated local or staged changes are rejected and preserved.
+as a child of the checked-out commit. It pushes that commit to `automation/plugin-catalog`,
+replacing any earlier unmerged proposal, and `master` changes only through the resulting pull
+request. The workflow opens or updates the pull request, enables squash auto-merge and dispatches
+Website CI on the branch, because pull requests opened with the job token do not trigger workflows.
+It then waits up to 20 minutes for the merge and requires `master` to be exactly the squash of the
+proposal onto the checked-out commit. A concurrent source update rejects publication; the next run
+starts from current `master`. Identical catalog content creates no proposal. Unrelated local or
+staged changes are rejected and preserved.
 
-Only then does Pages upload and deploy the complete artifact. Generation, validation or commit
-failure prevents upload and preserves the deployed artifact. If deployment fails after the verified
-index commit, the next run uses that committed generation and can deploy it without incrementing
-generation. A local generated file alone does not deploy anything. Publisher tests also run in
-read-only website CI, without contacting release sources.
+Only then does Pages upload and deploy the complete artifact. Generation, validation, proposal or
+merge failure prevents upload and preserves the deployed artifact. If the proposal merges after the
+run stops waiting, or deployment fails after the merge, the next run uses that committed generation
+and can deploy it without incrementing generation. A local generated file alone does not deploy
+anything. Publisher tests also run in read-only website CI, without contacting release sources.
 
-The central build job uses its short-lived GitHub job token with `contents: write` to persist the
-index; the deployment job has Pages and identity-token permissions. Plugin notification senders
-should invoke `pages.yml` on `master` using `workflow_dispatch`, with Actions write access scoped to
-this receiving repository. They do not need website Contents write access. Notification payloads
-provide no metadata or policy overrides. Existing GitHub authentication is an operator input; this
-repository does not create credentials. If notifications are unavailable, scheduled and manual
-reconciliation still use the same complete verification path.
+The repository allows auto-merge and lets GitHub Actions create pull requests. The central build job
+uses its short-lived GitHub job token with contents, pull-request and Actions write access to push
+the proposal branch, open and auto-merge its pull request and dispatch Website CI; the deployment
+job has Pages and identity-token permissions. Plugin notification senders should invoke `pages.yml`
+on `master` using `workflow_dispatch`, with Actions write access scoped to this receiving
+repository. They do not need website Contents write access. Notification payloads provide no
+metadata or policy overrides. Existing GitHub authentication is an operator input; this repository
+does not create credentials. If notifications are unavailable, scheduled and manual reconciliation
+still use the same complete verification path.
 
 ## Plugin release notifications
 
@@ -242,5 +249,6 @@ are generation failure bounds, not permission to truncate the catalog or omit ol
 Tests cover provenance rejection, immutable identities, explicit withdrawal, failed writes,
 concurrent publishers, duplicate events, invalid/oversized/truncated input, bounded retries,
 manifest/archive agreement, safe manifest reads, credential-free redirects, committed generation
-continuity, concurrent source pushes and deployment retry. Network discovery in the host remains a
-separate consumer; installation must retain its exact GitHub revalidation.
+continuity, proposal replacement, merge verification, concurrent source pushes and deployment retry.
+Network discovery in the host remains a separate consumer; installation must retain its exact GitHub
+revalidation.
