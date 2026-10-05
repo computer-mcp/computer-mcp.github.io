@@ -18,7 +18,7 @@ concurrency:
 jobs:
   build:
     if: github.repository_id == '1353589608' && github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 45
     permissions:
       contents: read
@@ -157,7 +157,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: build
 
     steps:
