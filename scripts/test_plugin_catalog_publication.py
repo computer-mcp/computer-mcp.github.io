@@ -1,13 +1,55 @@
+import base64
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import plugin_catalog as catalog
 import plugin_catalog_publication as publication
 from test_plugin_catalog import NOW, Source
+
+REST = publication.rest
+
+
+class RemoteAPI:
+    """Serve the repository's Git data API from the bare fixture remote."""
+
+    def __init__(self, remote):
+        self.remote, self.calls, self.verified = remote, [], True
+
+    def git(self, *arguments, data=None, environment=None):
+        return subprocess.run(["git", "-C", str(self.remote), *arguments], input=data, check=True,
+                              capture_output=True, timeout=10, env=environment).stdout.decode().strip()
+
+    def __call__(self, method, path, body):
+        self.calls.append((method, path))
+        if (method, path) == ("POST", "/git/blobs"):
+            return {"sha": self.git("hash-object", "-w", "--stdin", data=base64.b64decode(body["content"]))}
+        if (method, path) == ("POST", "/git/trees"):
+            with tempfile.TemporaryDirectory() as directory:
+                environment = {**os.environ, "GIT_INDEX_FILE": str(Path(directory) / "index")}
+                self.git("read-tree", body["base_tree"], environment=environment)
+                for entry in body["tree"]:
+                    self.git("update-index", "--add", "--cacheinfo", f"{entry['mode']},{entry['sha']},{entry['path']}",
+                             environment=environment)
+                return {"sha": self.git("write-tree", environment=environment)}
+        if (method, path) == ("POST", "/git/commits"):
+            parents = [argument for parent in body["parents"] for argument in ("-p", parent)]
+            commit = self.git("-c", "user.name=GitHub", "-c", "user.email=github@example.invalid",
+                              "-c", "commit.gpgsign=false", "commit-tree", body["tree"], *parents,
+                              "-m", body["message"])
+            return {"sha": commit, "verification": {"verified": self.verified}}
+        if (method, path) == ("POST", "/git/refs"):
+            self.git("update-ref", body["ref"], body["sha"], "0" * 40)
+            return {}
+        if method == "PATCH" and path.startswith("/git/refs/heads/") and body["force"] is True:
+            self.git("update-ref", path.removeprefix("/git/"), body["sha"])
+            return {}
+        raise AssertionError(f"Unexpected API request {method} {path}")
 
 
 class PublicationTests(unittest.TestCase):
@@ -17,6 +59,10 @@ class PublicationTests(unittest.TestCase):
         base = Path(self.temporary.name)
         self.root, self.remote = base / "source", base / "remote.git"
         self.root.mkdir()
+        self.api = RemoteAPI(self.remote)
+        rest = patch.object(publication, "rest", self.api)
+        rest.start()
+        self.addCleanup(rest.stop)
         self.command(base, "init", "--bare", str(self.remote))
         self.command(self.root, "init", "-b", "master")
         self.command(self.root, "remote", "add", "origin", str(self.remote))
@@ -98,6 +144,7 @@ class PublicationTests(unittest.TestCase):
         self.assertEqual(publication.propose_commit(self.root, self.head), self.head)
         self.assertEqual(publication.remote_head(self.root), self.head)
         self.assertEqual(self.proposals(), [])
+        self.assertEqual(self.api.calls, [])
 
     def test_new_proposal_replaces_unmerged_proposal(self):
         stale = self.advance_remote()
@@ -105,6 +152,18 @@ class PublicationTests(unittest.TestCase):
         self.command(self.remote, "update-ref", publication.BRANCH, self.head)
         commit = publication.propose_commit(self.root, self.head)
         self.assertEqual(self.proposals(), [commit])
+        self.assertIn(("PATCH", "/git/" + publication.PROPOSAL), self.api.calls)
+
+    def test_unsigned_proposal_is_not_published(self):
+        self.api.verified = False
+        with self.assertRaisesRegex(catalog.CatalogError, "sign"):
+            publication.propose_commit(self.root, self.head)
+        self.assertEqual(self.proposals(), [])
+        self.assertEqual(publication.remote_head(self.root), self.head)
+
+    def test_proposal_requires_the_workflow_token(self):
+        with patch.dict(os.environ, {"GH_TOKEN": ""}), self.assertRaisesRegex(catalog.CatalogError, "token"):
+            REST("POST", "/git/blobs", {})
 
     def test_squash_merged_proposal_is_the_deployable_source(self):
         commit = publication.propose_commit(self.root, self.head)
