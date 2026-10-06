@@ -52,9 +52,9 @@ canonical master. Import, merge or deployment failure preserves the published si
 
 Manual import is available through `npm run release:update -- latest` or an explicit `vX.Y.Z` tag.
 `npm run release:check` checks the local record without changing it.
-`npm run release:verify-public -- latest` compares it with the official public asset.
-Historical releases without a delivery-record asset retain their existing record until the next
-product delivery. Tests read the record rather than maintain another product-version constant.
+`npm run release:verify-public -- latest` compares it with the official public asset. Historical
+releases without a delivery-record asset retain their existing record until the next product
+delivery. Tests read the record rather than maintain another product-version constant.
 
 The plugin catalog publisher generates a separate versioned snapshot of verified current official
 plugin releases: the latest stable and any newer prerelease for each repository. Host and plugin
