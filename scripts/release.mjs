@@ -93,9 +93,15 @@ function main(args) {
     return;
   }
   if (args.length !== 2 || !["update", "verify-public"].includes(args[0])) {
-    throw new Error("Usage: release.mjs check | update vX.Y.Z | verify-public vX.Y.Z");
+    throw new Error(
+      "Usage: release.mjs check | update latest|vX.Y.Z | verify-public latest|vX.Y.Z",
+    );
   }
-  const record = publishedRecord(args[1]);
+  const tag =
+    args[1] === "latest"
+      ? JSON.parse(gh("api", `repos/${repository}/releases/latest`)).tag_name
+      : args[1];
+  const record = publishedRecord(tag);
   checkForward(previous, record);
   if (args[0] === "update") {
     writeFileSync(destination, `${JSON.stringify(record, null, 2)}\n`);

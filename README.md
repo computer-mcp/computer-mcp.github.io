@@ -43,15 +43,16 @@ Content verification covers `main`, `master` and full commit hashes; other conte
 validation.
 
 `public/release.json` binds the deployed site to the product's delivered commit and release tag. The
-private website package version describes this build project, not the product version. After the
-main repository publishes an accepted release, run `npm run release:update -- vX.Y.Z` to import its
-`release.json` asset. The importer verifies the official repository, public stable release, tag
-commit and GitHub asset digest; it refuses version regressions and changed identities for an
-existing version. It never derives a release from an installed App or local source checkout. Commit
-the generated record with the website delivery.
+private website package version describes this build project, not the product version. Pages
+reconciles the latest public stable product release hourly, on master pushes and on manual dispatch.
+The importer verifies the official repository, public release, tag commit and GitHub asset digest;
+it refuses version regressions and changed identities for an existing version. The automation App
+creates a signed proposal, required CI authorizes its automatic merge, and Pages deploys current
+canonical master. Import, merge or deployment failure preserves the published site.
 
+Manual import is available through `npm run release:update -- latest` or an explicit `vX.Y.Z` tag.
 `npm run release:check` checks the local record without changing it.
-`npm run release:verify-public -- vX.Y.Z` also compares it with the official public asset.
+`npm run release:verify-public -- latest` compares it with the official public asset.
 Historical releases without a delivery-record asset retain their existing record until the next
 product delivery. Tests read the record rather than maintain another product-version constant.
 
