@@ -17,7 +17,7 @@ BRANCH = "automation/product-release"
 
 
 def git(*args, data=None, environment=None):
-    return subprocess.check_output(["git", "-C", str(ROOT), *args], input=data,
+    return subprocess.check_output(["git", "--no-optional-locks", "-C", str(ROOT), *args], input=data,
                                    timeout=60, env=environment)
 
 
