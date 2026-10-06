@@ -126,7 +126,11 @@ def synchronize():
         gh("pr", "edit", number, "--title", title, "--body", body)
     else:
         number = gh("pr", "create", "--head", BRANCH, "--base", "master", "--title", title, "--body", body).rsplit("/", 1)[-1]
-    gh("pr", "merge", number, "--auto", "--squash", "--match-head-commit", commit)
+    proposal = json.loads(gh("pr", "view", number, "--json", "state,headRefOid,autoMergeRequest"))
+    if proposal["headRefOid"] != commit:
+        raise ValueError("Release proposal identity changed")
+    if proposal["state"] == "OPEN" and proposal["autoMergeRequest"] is None:
+        gh("pr", "merge", number, "--auto", "--squash", "--match-head-commit", commit)
     deadline = time.monotonic() + 1200
     while time.monotonic() < deadline:
         proposal = json.loads(gh("pr", "view", number, "--json", "state,headRefOid"))
