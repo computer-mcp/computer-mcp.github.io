@@ -57,4 +57,4 @@ jobs:
         run: npm test
 
   brand:
-    uses: computer-mcp/.github/.github/workflows/brand-check.yml@43abe15c93db0a0731f81bf806edd89a7a5b2136 # master
+    uses: computer-mcp/.github/.github/workflows/brand-check.yml@f402911abcdfb87ef0c41a2759e8c51387b18935 # master
