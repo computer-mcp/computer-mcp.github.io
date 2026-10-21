@@ -42,11 +42,11 @@ object keys and a trailing newline. It is excluded from Prettier because the pub
 serialization. `--require-existing` refuses to initialize a missing catalog before making source
 requests; automation always uses this option.
 
-## Schema 2
+## Schema 3
 
 | Field            | Meaning                                                                                  |
 | ---------------- | ---------------------------------------------------------------------------------------- |
-| `schema_version` | Integer `2`; schema 1 remains readable with inherited macOS archive targets.             |
+| `schema_version` | Integer `3`; the generator and publication checks accept only this schema.               |
 | `publisher`      | Official organization login and numeric identity.                                        |
 | `generation`     | Positive integer incremented only when catalog content changes.                          |
 | `revision`       | SHA-256 of the canonical object containing `schema_version`, `publisher` and `releases`. |
@@ -59,12 +59,14 @@ Each release record contains:
   `manifest_blob_sha` and `manifest_sha256`.
 - Manifest `plugin_id`, `name`, semantic `version`, nullable `summary` and `contributions` with
   `mcp`, `cli` and `skills` identifier arrays.
-- `compatibility` with `platforms`, `architectures`, nullable `minimum_host` and nullable
-  `maximum_host`. Platforms are the manifest's explicit unique subset of `macos` and `windows`,
-  defaulting to `['macos']` for legacy declarations. Architectures are a unique subset of `arm64`
-  and `x86_64`; an empty array permits both. The minimum is inclusive and the maximum exclusive,
-  following the host's semantic version precedence. Metadata support does not imply a shipped
-  Windows App, gateway or provider.
+- `compatibility` with required positive integer `plugin_api`, `platforms`, `architectures`,
+  nullable `minimum_host` and nullable `maximum_host`. The API version comes from the tagged
+  manifest's required top-level `plugin_api`; the generator accepts only versions it knows,
+  currently `1`. Missing, non-integer, non-positive and unknown versions fail generation. Platforms
+  are the manifest's explicit unique subset of `macos` and `windows`, defaulting to `['macos']` when
+  omitted. Architectures are a unique subset of `arm64` and `x86_64`; an empty array permits both.
+  The minimum is inclusive and the maximum exclusive, following the host's semantic version
+  precedence. Metadata support does not imply a shipped Windows App, gateway or provider.
 - `dependencies`, containing manifest dependency IDs, command names, application locators, human
   setup instructions and nullable documentation URLs. These are prerequisites the user supplies, not
   instructions to install software automatically.
@@ -79,15 +81,9 @@ Per-archive targets come from `[[compatibility.artifacts]]` in the exact tagged 
 supplies `name`, `platforms` and `architectures`; names match published archive assets exactly and
 are unique ignoring case. A declared list must account for every published archive, and every
 declared archive must exist. Windows declarations require this list. Without one, archives inherit
-the legacy release target. Neither filenames nor native binary inspection can substitute for the
-declaration. Installation independently re-fetches the tag and proves the selected target before
-accepting the exact package bytes.
-
-Schema 1 contains no asset target field and requires macOS release targets. The publisher accepts
-such a seed, materializes each archive's already implied target, then advances generation to
-schema 2. This preserves the release's immutable identity and withdrawal state; narrowing or
-expanding an existing target is rejected. Schema downgrades are rejected. A client supporting only
-schema 1 must retain its last known-good snapshot when presented with schema 2.
+the release target. Each catalog asset always records its target explicitly. Neither filenames nor
+native binary inspection can substitute for the declaration. Installation independently re-fetches
+the tag and proves the selected target before accepting the exact package bytes.
 
 IDs are positive integers at most 9,007,199,254,740,991. Plugin IDs cannot move between numeric
 repository identities. A repository cannot advertise duplicate versions or tags, and archive IDs are

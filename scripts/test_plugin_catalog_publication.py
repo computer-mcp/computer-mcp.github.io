@@ -160,6 +160,22 @@ class PublicationTests(unittest.TestCase):
         self.assertEqual(self.proposals(), [])
         self.assertEqual(self.api.calls, [])
 
+    def test_committed_seed_requires_schema_three(self):
+        for schema in (1, 2, 4):
+            with self.subTest(schema=schema):
+                unsupported = {**self.previous, "schema_version": schema}
+                content = {k: unsupported[k] for k in ("schema_version", "publisher", "releases")}
+                unsupported["revision"] = hashlib.sha256(catalog.canonical(content)).hexdigest()
+                (self.root / publication.INDEX).write_bytes(catalog.canonical(unsupported))
+                self.command(self.root, "add", publication.INDEX)
+                self.commit(self.root)
+                head = self.command(self.root, "rev-parse", "HEAD").strip()
+                with self.assertRaisesRegex(catalog.CatalogError, "^Unsupported catalog schema$"):
+                    publication.verify_seed(self.root, head)
+                with self.assertRaisesRegex(catalog.CatalogError, "^Unsupported catalog schema$"):
+                    publication.propose_commit(self.root, head)
+                self.assertEqual(self.api.calls, [])
+
     def test_new_proposal_replaces_unmerged_proposal(self):
         stale = self.advance_remote()
         self.command(self.remote, "update-ref", publication.PROPOSAL, stale)

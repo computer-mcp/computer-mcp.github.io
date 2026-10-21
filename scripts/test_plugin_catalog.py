@@ -38,7 +38,7 @@ class Source:
         self.repository = {"id": 10, "name": REPOSITORY}
         self.policy = {"schema_version": 1, "publisher": catalog.PUBLISHER,
                        "repositories": [self.repository], "withdrawals": []}
-        self.data = (f'id = "example"\nname = "Example"\nversion = "1.0.0"\n'
+        self.data = (f'id = "example"\nname = "Example"\nversion = "1.0.0"\nplugin_api = 1\n'
                      f'repository = "https://github.com/{REPOSITORY}"\n'
                      '[[mcp]]\nid = "server"\ntransport = "stdio"\n'
                      'executable = {path = "bin/server"}\n').encode()
@@ -148,7 +148,7 @@ class PublisherTests(unittest.TestCase):
     def test_native_targets_are_projected_from_tag_declarations(self):
         source = platform_source()
         snapshot = catalog.reconcile(source, source.policy, now=NOW)
-        self.assertEqual(snapshot["schema_version"], 2)
+        self.assertEqual(snapshot["schema_version"], 3)
         record = snapshot["releases"][0]
         self.assertEqual(record["compatibility"]["platforms"], ["macos", "windows"])
         self.assertEqual([a["compatibility"] for a in record["assets"]], [
@@ -184,33 +184,23 @@ class PublisherTests(unittest.TestCase):
         with self.assertRaises(catalog.CatalogError):
             catalog.validate_snapshot(widened)
 
-    def test_schema_one_upgrade_preserves_immutable_release_identity(self):
-        current = self.snapshot()
-        old = copy.deepcopy(current)
-        old["schema_version"] = 1
-        for asset in old["releases"][0]["assets"]:
-            asset.pop("compatibility")
-        old["revision"] = hashlib.sha256(catalog.canonical({k: old[k] for k in ("schema_version", "publisher", "releases")})).hexdigest()
-        catalog.validate_snapshot(old)
-        successor = self.snapshot(old)
-        self.assertEqual(successor["schema_version"], 2)
-        self.assertEqual(successor["generation"], old["generation"] + 1)
-        self.assertEqual(catalog.immutable_release(old["releases"][0]), catalog.immutable_release(successor["releases"][0]))
-        catalog.validate_successor(old, successor)
-        changed = copy.deepcopy(successor)
+    def test_asset_targets_are_immutable(self):
+        previous = self.snapshot()
+        changed = copy.deepcopy(previous)
+        changed["generation"] += 1
         changed["releases"][0]["assets"][0]["compatibility"]["architectures"] = ["arm64"]
         changed["revision"] = hashlib.sha256(catalog.canonical({k: changed[k] for k in ("schema_version", "publisher", "releases")})).hexdigest()
-        with self.assertRaises(catalog.CatalogError):
-            catalog.validate_successor(old, changed)
-        old["generation"] = successor["generation"] + 1
-        with self.assertRaises(catalog.CatalogError):
-            catalog.validate_successor(successor, old)
+        with self.assertRaisesRegex(catalog.CatalogError, "Published release identity changed"):
+            catalog.validate_successor(previous, changed)
 
     def test_verified_snapshot_and_duplicate_event_are_identical(self):
         first = self.snapshot()
         self.assertEqual(first["releases"][0]["commit"], COMMIT)
         self.assertEqual(first["releases"][0]["contributions"], {"mcp": ["server"], "cli": [], "skills": []})
-        self.assertEqual(first["releases"][0]["compatibility"]["platforms"], ["macos"])
+        self.assertEqual(first["schema_version"], 3)
+        self.assertEqual(first["releases"][0]["compatibility"], {
+            "plugin_api": 1, "platforms": ["macos"], "architectures": [],
+            "minimum_host": None, "maximum_host": None})
         self.assertEqual(first, self.snapshot(first))
         self.assertTrue(all("/orgs/" not in path for path in self.source.calls))
 
@@ -221,6 +211,7 @@ class PublisherTests(unittest.TestCase):
             empty, changed = catalog.publish(self.source, self.source.policy, destination, NOW)
             self.assertTrue(changed)
             self.assertEqual(empty["releases"], [])
+            self.assertEqual(empty["schema_version"], 3)
             self.assertEqual(empty["generation"], 1)
             catalog.validate_snapshot(empty)
             catalog.validate_policy_snapshot(self.source.policy, empty)
@@ -236,6 +227,46 @@ class PublisherTests(unittest.TestCase):
             self.assertEqual(delivered["generation"], 2)
             self.assertEqual(len(delivered["releases"]), 1)
             catalog.validate_successor(empty, delivered)
+
+    def test_repository_snapshot_is_canonical_schema_three(self):
+        data = (catalog.ROOT / "public/plugins/index.json").read_bytes()
+        seed = catalog.validate_snapshot(catalog.decode_json(data))
+        policy = catalog.validate_policy(catalog.decode_json(
+            (catalog.ROOT / "scripts/plugin-catalog-policy.json").read_bytes()))
+        catalog.validate_policy_snapshot(policy, seed)
+        self.assertEqual(seed["schema_version"], 3)
+        self.assertEqual(catalog.canonical(seed), data)
+
+    def test_tagged_manifest_requires_a_known_positive_integer_plugin_api(self):
+        for declaration, message in (
+                (b"", "Missing plugin_api"),
+                (b"plugin_api = 0\n", "plugin_api must be a positive integer"),
+                (b"plugin_api = -1\n", "plugin_api must be a positive integer"),
+                (b"plugin_api = 1.0\n", "plugin_api must be a positive integer"),
+                (b'plugin_api = "1"\n', "plugin_api must be a positive integer"),
+                (b"plugin_api = true\n", "plugin_api must be a positive integer"),
+                (b"plugin_api = []\n", "plugin_api must be a positive integer"),
+                (b"plugin_api = 2\n", "Unsupported plugin_api version: 2"),
+                (b"plugin_api = 2\nfuture = true\n", "Unsupported plugin_api version: 2")):
+            with self.subTest(declaration=declaration):
+                self.source = Source()
+                self.source.data = self.source.data.replace(b"plugin_api = 1\n", declaration)
+                self.source.reset_bytes()
+                with self.assertRaisesRegex(catalog.CatalogError,
+                                            f"^{REPOSITORY} release 20: {message}$"):
+                    self.snapshot()
+
+    def test_unsupported_catalog_schemas_fail_before_source_requests(self):
+        snapshot = self.snapshot()
+        for schema in (1, 2, 4, True, 3.0, "3", None):
+            with self.subTest(schema=schema):
+                previous = {**snapshot, "schema_version": schema}
+                calls = len(self.source.calls)
+                with self.assertRaisesRegex(catalog.CatalogError, "^Unsupported catalog schema$"):
+                    self.snapshot(previous)
+                self.assertEqual(len(self.source.calls), calls)
+                with self.assertRaisesRegex(catalog.CatalogError, "^Unsupported catalog schema$"):
+                    catalog.validate_successor(snapshot, previous)
 
     def test_repository_numeric_authority(self):
         for key, value in (("id", 11), ("fork", True), ("private", True), ("disabled", True), ("archived", True)):
@@ -499,13 +530,33 @@ class BoundaryTests(unittest.TestCase):
             with self.subTest(data=data[:20]), self.assertRaises(catalog.CatalogError):
                 catalog.decode_json(data)
 
-    def test_catalog_revision_unknown_schema_and_boolean_identity(self):
+    def test_catalog_revision_generation_and_timestamp(self):
         source = Source()
         original = catalog.reconcile(source, source.policy, now=NOW)
-        for key, value in (("schema_version", 3), ("schema_version", True), ("generation", True),
+        for key, value in (("generation", True),
                            ("revision", "f" * 64), ("generated_at", "2026-02-30T01:00:00Z")):
             with self.subTest(key=key), self.assertRaises(catalog.CatalogError):
                 catalog.validate_snapshot({**original, key: value})
+
+    def test_snapshot_requires_known_plugin_api_and_explicit_asset_targets(self):
+        source = Source()
+        original = catalog.reconcile(source, source.policy, now=NOW)
+        for value in (None, 0, -1, 1.0, "1", True, [], 2):
+            with self.subTest(plugin_api=value):
+                snapshot = copy.deepcopy(original)
+                snapshot["releases"][0]["compatibility"]["plugin_api"] = value
+                with self.assertRaisesRegex(catalog.CatalogError, "plugin_api"):
+                    catalog.validate_snapshot(snapshot)
+        for missing in ("plugin_api", "asset compatibility"):
+            with self.subTest(missing=missing):
+                snapshot = copy.deepcopy(original)
+                record = snapshot["releases"][0]
+                if missing == "plugin_api":
+                    record["compatibility"].pop("plugin_api")
+                else:
+                    record["assets"][0].pop("compatibility")
+                with self.assertRaisesRegex(catalog.CatalogError, "Invalid object fields"):
+                    catalog.validate_snapshot(snapshot)
 
     def test_semantic_versions_and_prerelease_bounds(self):
         self.assertTrue(catalog.precedes("1.0.0-rc.2", "1.0.0-rc.10"))

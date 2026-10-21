@@ -29,6 +29,7 @@ import urllib.request
 import zipfile
 
 PUBLISHER = {"login": "computer-mcp", "id": 315005910}
+PLUGIN_API_VERSIONS = (1,)
 MANIFEST = "computer-mcp-plugin.toml"
 MAX_INDEX = 4 * 1024 * 1024
 MAX_MANIFEST = 1024 * 1024
@@ -216,8 +217,15 @@ def target_subset(value, parent):
             <= set(parent["architectures"] or ("arm64", "x86_64")))
 
 
+def validate_plugin_api(value):
+    require(type(value) is int and value > 0, "plugin_api must be a positive integer")
+    require(value in PLUGIN_API_VERSIONS, f"Unsupported plugin_api version: {value}")
+    return value
+
+
 def validate_compatibility(value):
-    object_keys(value, ("platforms", "architectures", "minimum_host", "maximum_host"))
+    object_keys(value, ("plugin_api", "platforms", "architectures", "minimum_host", "maximum_host"))
+    validate_plugin_api(value["plugin_api"])
     validate_target({k: value[k] for k in ("platforms", "architectures")})
     for key in ("minimum_host", "maximum_host"):
         if value[key] is not None:
@@ -257,7 +265,9 @@ def project_manifest(data, repository, tag):
         manifest = tomllib.loads(data.decode("utf-8"))
     except (ValueError, UnicodeError, RecursionError) as error:
         raise CatalogError("Invalid released manifest") from error
-    object_keys(manifest, ("id", "name", "version"),
+    require("plugin_api" in manifest, "Missing plugin_api")
+    plugin_api = validate_plugin_api(manifest["plugin_api"])
+    object_keys(manifest, ("id", "name", "version", "plugin_api"),
                 ("description", "repository", "compatibility", "dependencies", "mcp", "cli", "skills"))
     matching(manifest["id"], IDENTIFIER)
     text(manifest["name"], 4096)
@@ -280,8 +290,9 @@ def project_manifest(data, repository, tag):
     unique(ids)
     source = manifest.get("compatibility", {})
     object_keys(source, (), ("minimum_host", "maximum_host", "platforms", "architectures", "artifacts"))
-    compatibility = {"platforms": source.get("platforms", ["macos"]), "minimum_host": source.get("minimum_host"),
-                     "maximum_host": source.get("maximum_host"), "architectures": source.get("architectures", [])}
+    compatibility = {"plugin_api": plugin_api, "platforms": source.get("platforms", ["macos"]),
+                     "minimum_host": source.get("minimum_host"), "maximum_host": source.get("maximum_host"),
+                     "architectures": source.get("architectures", [])}
     validate_compatibility(compatibility)
     compatibility["architectures"].sort()
     compatibility["platforms"].sort()
@@ -391,7 +402,7 @@ def asset_record(asset, repository, tag):
 
 def validate_snapshot(snapshot):
     object_keys(snapshot, ("schema_version", "publisher", "generation", "revision", "generated_at", "releases"))
-    require(type(snapshot["schema_version"]) is int and snapshot["schema_version"] in (1, 2), "Unsupported catalog schema")
+    require(type(snapshot["schema_version"]) is int and snapshot["schema_version"] == 3, "Unsupported catalog schema")
     require(snapshot["publisher"] == PUBLISHER, "Unexpected catalog publisher")
     identity(snapshot["generation"])
     matching(snapshot["revision"], DIGEST)
@@ -424,8 +435,6 @@ def validate_snapshot(snapshot):
         require(1 <= len(contribution_ids) <= 1024, "Invalid contribution count")
         unique(contribution_ids)
         validate_compatibility(record["compatibility"])
-        require(snapshot["schema_version"] != 1 or record["compatibility"]["platforms"] == ["macos"],
-                "Schema1 supports only macOS packages")
         validate_dependencies(record["dependencies"])
         require(type(record["prerelease"]) is bool and type(record["withdrawn"]) is bool, "Invalid release state")
         timestamp(record["published_at"])
@@ -436,11 +445,9 @@ def validate_snapshot(snapshot):
         assets = record["assets"]
         require(isinstance(assets, list) and 1 <= len(assets) <= 100, "Missing or excessive archives")
         for asset in assets:
-            keys = ("id", "name", "size", "sha256", "url")
-            object_keys(asset, keys + (("compatibility",) if snapshot["schema_version"] == 2 else ()))
-            if snapshot["schema_version"] == 2:
-                target = validate_target(asset["compatibility"])
-                require(target_subset(target, record["compatibility"]), "Asset target exceeds package compatibility")
+            object_keys(asset, ("id", "name", "size", "sha256", "url", "compatibility"))
+            target = validate_target(asset["compatibility"])
+            require(target_subset(target, record["compatibility"]), "Asset target exceeds package compatibility")
             # Validate the same asset identity shape used at the GitHub boundary.
             asset_record({"id": asset["id"], "name": asset["name"], "size": asset["size"],
                           "digest": "sha256:" + text(asset["sha256"], 64), "state": "uploaded",
@@ -481,16 +488,8 @@ def validate_policy_snapshot(policy, snapshot):
             "Catalog withdrawals differ from policy")
 
 
-def with_asset_targets(record):
-    result = copy.deepcopy(record)
-    inherited = {k: record["compatibility"][k] for k in ("platforms", "architectures")}
-    for asset in result["assets"]:
-        asset.setdefault("compatibility", copy.deepcopy(inherited))
-    return result
-
-
 def immutable_release(record):
-    return {k: v for k, v in with_asset_targets(record).items()
+    return {k: v for k, v in record.items()
             if k not in ("prerelease", "withdrawn", "withdrawal_reason")}
 
 
@@ -499,7 +498,6 @@ def validate_successor(previous, current):
     validate_snapshot(current)
     if current == previous:
         return
-    require(current["schema_version"] >= previous["schema_version"], "Catalog schema moved backwards")
     require(current["generation"] == previous["generation"] + 1
             and current["revision"] != previous["revision"]
             and current["generated_at"] >= previous["generated_at"], "Catalog generation does not advance")
@@ -742,8 +740,8 @@ def reconcile(github, policy, previous=None, now=None):
         require(key in current, "Withdrawal has no verified release record")
         current[key]["withdrawn"] = True
         current[key]["withdrawal_reason"] = reason
-    content = {"schema_version": 2, "publisher": PUBLISHER,
-               "releases": sorted((with_asset_targets(r) for r in current_releases(current.values())),
+    content = {"schema_version": 3, "publisher": PUBLISHER,
+               "releases": sorted(current_releases(current.values()),
                                   key=lambda r: (r["repository_id"], r["release_id"]))}
     revision = hashlib.sha256(canonical(content)).hexdigest()
     if previous and previous["revision"] == revision:
