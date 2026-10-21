@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-10-18T13:12:59Z",
+  "generated_at": "2026-10-21T07:35:22Z",
   "generation": 1,
   "publisher": {
     "id": 315005910,
     "login": "computer-mcp"
   },
   "releases": [],
-  "revision": "9a60c1fe076c1e33cef81d8db97732b5113325981abac9fc2abed3e350a4a6ae",
-  "schema_version": 2
+  "revision": "dcde5e2259f52e30756e09415d130474c0a7f026853c5b27700cd84568bbef15",
+  "schema_version": 3
 }

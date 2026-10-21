@@ -10,6 +10,7 @@ from unittest.mock import patch
 
 import plugin_catalog as catalog
 import plugin_catalog_publication as publication
+import test_plugin_catalog as catalog_tests
 from test_plugin_catalog import NOW, Source
 
 REST = publication.rest
@@ -160,6 +161,22 @@ class PublicationTests(unittest.TestCase):
         self.assertEqual(self.proposals(), [])
         self.assertEqual(self.api.calls, [])
 
+    def test_committed_seed_requires_schema_three(self):
+        for schema in (1, 2, 4):
+            with self.subTest(schema=schema):
+                unsupported = {**self.previous, "schema_version": schema}
+                content = {k: unsupported[k] for k in ("schema_version", "publisher", "releases")}
+                unsupported["revision"] = hashlib.sha256(catalog.canonical(content)).hexdigest()
+                (self.root / publication.INDEX).write_bytes(catalog.canonical(unsupported))
+                self.command(self.root, "add", publication.INDEX)
+                self.commit(self.root)
+                head = self.command(self.root, "rev-parse", "HEAD").strip()
+                with self.assertRaisesRegex(catalog.CatalogError, "^Unsupported catalog schema$"):
+                    publication.verify_seed(self.root, head)
+                with self.assertRaisesRegex(catalog.CatalogError, "^Unsupported catalog schema$"):
+                    publication.propose_commit(self.root, head)
+                self.assertEqual(self.api.calls, [])
+
     def test_new_proposal_replaces_unmerged_proposal(self):
         stale = self.advance_remote()
         self.command(self.remote, "update-ref", publication.PROPOSAL, stale)
@@ -238,11 +255,19 @@ class PublicationTests(unittest.TestCase):
         self.commit(self.root)
         self.command(self.root, "push", "origin", "master")
         head = self.command(self.root, "rev-parse", "HEAD").strip()
+        self.assertEqual(self.command(self.root, "diff", "--name-only", self.head, head).strip(), publication.POLICY)
+        catalog.validate_policy(catalog.decode_json((self.root / publication.POLICY).read_bytes()))
+        checks = unittest.TestResult()
+        with patch.object(catalog, "ROOT", self.root):
+            catalog_tests.PublisherTests("test_repository_snapshot_is_canonical_schema_three").run(checks)
+        self.assertTrue(checks.wasSuccessful(), checks.errors + checks.failures)
         self.assertEqual(publication.verify_seed(self.root, head), self.previous)
         current, changed = catalog.publish(self.source, self.source.policy,
                                            self.root / publication.INDEX, now=NOW, require_existing=True)
         self.assertTrue(changed)
         self.assertTrue(current["releases"][0]["withdrawn"])
+        self.assertEqual(current["releases"][0]["withdrawal_reason"], self.source.policy["withdrawals"][0]["reason"])
+        catalog.validate_policy_snapshot(self.source.policy, current)
         (self.root / "dist/plugins/index.json").write_bytes(catalog.canonical(current))
         commit = publication.propose_commit(self.root, head)
         self.assertEqual(json.loads(self.command(self.remote, "show", commit + ":" + publication.INDEX)), current)
