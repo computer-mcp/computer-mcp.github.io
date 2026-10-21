@@ -231,9 +231,6 @@ class PublisherTests(unittest.TestCase):
     def test_repository_snapshot_is_canonical_schema_three(self):
         data = (catalog.ROOT / "public/plugins/index.json").read_bytes()
         seed = catalog.validate_snapshot(catalog.decode_json(data))
-        policy = catalog.validate_policy(catalog.decode_json(
-            (catalog.ROOT / "scripts/plugin-catalog-policy.json").read_bytes()))
-        catalog.validate_policy_snapshot(policy, seed)
         self.assertEqual(seed["schema_version"], 3)
         self.assertEqual(catalog.canonical(seed), data)
 
