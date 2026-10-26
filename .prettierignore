@@ -8,3 +8,7 @@ test-results
 public/brand/
 # Canonical bytes are generated and validated by plugin_catalog.py.
 public/plugins/index.json
+# The agents CLI owns the instruction units' format, their declaration and lock,
+# and the generated AGENTS.md.
+.agent/
+AGENTS.md
