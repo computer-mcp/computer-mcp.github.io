@@ -6,3 +6,7 @@ test-results/
 *.log
 __pycache__/
 .cache/
+/.agent/*
+!/.agent/instructions/
+!/.agent/agents.json
+!/.agent/agents.resolved
