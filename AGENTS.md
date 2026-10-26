@@ -13,7 +13,6 @@
   [ProductIdentity](https://github.com/computer-mcp/computer-mcp/blob/master/Documentation/Architecture/ProductIdentity.md).
 - For capability, permission and connection facts, read the main repository's `Documentation/`
   before changing page copy.
-- For GitHub-facing collaboration files, use `.github/` and root governance files.
 
 ## Repository Guardrails
 
