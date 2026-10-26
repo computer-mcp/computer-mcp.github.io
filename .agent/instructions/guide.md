@@ -15,15 +15,13 @@ description: Route Computer MCP website changes to their product, design and cat
 - For capability, permission and connection facts, read the main repository's `Documentation/`
   before changing page copy.
 - For GitHub-facing collaboration files, use `.github/` and root governance files.
-- Stop and clarify before mixing route instructions into `README` files or index text into
-  `AGENTS.md`.
 
 ## Repository Guardrails
 
 - `src/styles.css` implements the organization DESIGN.md tokens. Change a color, typeface, radius or
   plane rule in DESIGN.md first.
-- `public/brand/` and `.github/brand/brand.lock.json` are organization imports; update them only
-  with the organization's `Brand/brand.py sync`. The lock also requires the tagline in both
+- `public/brand/` and `.github/brand/brand.lock.json` are organization imports; change them only
+  through a delivery from the organization repository, never by hand. The lock also requires the tagline in both
   languages, the social image and the favicon in `index.html`.
 - Text uses the system font stacks; do not bundle web fonts.
 - Chinese is the default page text. Every visible string, link target and metadata value that
