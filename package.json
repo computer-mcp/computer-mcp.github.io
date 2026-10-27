@@ -27,11 +27,11 @@
     "node": ">=22"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.13.0",
-    "@playwright/test": "^1.63.0",
-    "html-validate": "^11.16.1",
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.64.1",
+    "html-validate": "^11.17.0",
     "linkinator": "^8.1.0",
-    "prettier": "^3.9.9",
-    "vite": "^8.3.2"
+    "prettier": "^3.9.10",
+    "vite": "^8.3.5"
   }
 }
